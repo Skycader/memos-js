@@ -1,0 +1,81 @@
+.page2-root {
+    border: 0px solid blue; 
+    display: flex;
+    flex-direction: row;
+    align-items: flex-end;
+    justify-content: space-between;
+    border-radius: 15px 15px 0px 0px;
+    width: 100%;
+    height: 100vh;
+    overflow: hidden;
+    display: content;
+}
+
+.page2-subroot {
+    z-index: -1;
+    position: absolute;
+    width: 100%;  
+}
+
+.stick {
+    width: 50px;
+    height: 5px;
+    border-radius: 15px 15px;
+    background: white
+}
+
+.page2-node1 {
+    margin: 0 auto;
+    width: calc(100% - 40px);
+    height: calc(100vh - 110px)
+}
+
+.page2-node2 {
+    width: 100%;
+    height: 100%;  
+}
+
+.page2-node3 {
+    width: 100%; 
+    height: calc( 100% - 352px);  
+    min-height:  150px; 
+    border-radius: 10px; 
+    background: green;  
+}
+
+.page2-node4 {
+    border-radius: 15px 15px; 
+    border: 0px solid red; 
+    overflow: scroll; 
+    width: 100%;  
+    height: calc(100vh - 110px)
+}
+
+.page2-node5 {
+    width: 100%;
+     height: calc( 100% - 352px);
+     min-height:  150px; 
+     border-radius: 10px; 
+     background: transparent;  
+}
+
+.page2-node6 {
+    padding: 10px;
+    display: flex; 
+    flex-direction: column;
+    align-items: center; 
+    box-shadow: 0 0 10px rgb(0 0 0 / 50%); 
+    border-radius: 15px 15px; 
+    background: #232323; 
+    width: 100%; 
+    height: 200vh
+}
+
+.memobject {
+    margin-top: 10px;
+    background: #1d1d1d;
+    width: calc(100% - 10px);
+    height: 90px;
+    border-radius: 25px;
+}
+

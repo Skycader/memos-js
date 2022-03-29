@@ -1,0 +1,214 @@
+ 
+ 
+ .margin-right {
+ margin-right: 9px;
+ }
+
+#simplex {
+transition: transform 0.5s, opacity 0.5s;
+}
+  .remove-down {
+ transform: translateY(190px);
+ opacity: 0;
+ }
+ .hideT {
+ opacity: 0 !important;
+ transition-duration: 0.2s;
+ }
+ 
+  .hideT2 {
+ opacity: 1;
+ transition-duration: 0.8s;
+ }
+ 
+ .omniflow {
+  overflow-y: hidden; 
+  }
+  
+  html, body {
+  overflow-y: hidden;
+  }
+     @media screen and (min-width: 0px) and (max-width: 700px) {
+  .omniscale {
+  opacity: 0.5;
+  transform: perspective(500px) translateY(0px) translateZ(430px) !important;
+  }
+ }
+      @media screen and (min-width: 701px) and (max-width: 2000px) {
+  .omniscale {
+  opacity: 0.5;
+  transform: perspective(500px) translateY(0px) translateZ(460px) !important;
+  }
+ }
+
+      @media screen and (min-width: 2001px) and (max-width: 5000px) {
+  .omniscale {
+  opacity: 0.5;
+  transform: perspective(500px) translateY(0px) translateZ(490px) !important;
+  }
+ }
+
+ 
+#thatcircle {
+transform: perspective(500px) 
+}
+
+.display-none {
+display: none;
+}
+
+.owl-carousel .owl-stage-outer {
+    /* override */
+    overflow: initial;
+	margin: 0;
+	padding: 0;
+	height: 100vh;
+	z-index: -2;
+	cursor: default;
+	
+}
+
+.owl-stage {
+height: 100vh;
+}
+
+ 
+ 
+ @media screen and (max-height: 319px) {
+ .iPhone {
+ height: calc(75vh + 110px);
+ }
+ }
+ 
+
+ 
+    @media screen and (min-height:  320px) and (min-width: 480px) {
+	  .circular-chart {
+ width: 35%  !important
+ }
+ .iPhone {
+ height: calc(75vh + 130px);
+ }
+ }
+ 
+     @media screen and (min-height:  320px) and (min-width: 568px) {
+	
+ .iPhone {
+ height: calc(75vh + 130px);
+ }
+  .circular-chart {
+ width: 32% !important
+ }
+ }
+ 
+ 
+ 
+   @media screen and (min-height: 375px) and (min-width: 812px) {
+     .circular-chart {
+ width: 29% !important
+ }
+ }
+ 
+  @media screen and (min-height:  350px) and (min-width: 824px) {
+   .circular-chart {
+ width: 22% !important
+ }
+ }
+ .iPhone {
+ height: calc(75vh + 150px);
+ }
+ }
+ 
+  @media screen and (min-height: 375px) {
+ .iPhone {
+ height: calc(75vh + 140px);
+ }
+ }
+ 
+ 
+   @media screen and (min-height:  411px) {
+ .iPhone {
+ height: calc(75vh + 155px);
+ }
+ }
+ 
+ 
+ 
+  @media screen and (min-height:  479px) {
+ .iPhone {
+ height: calc(75vh + 115px);
+ }
+ }
+
+ 
+ 
+   @media screen and (max-height:  415px) {
+ 
+   
+
+ #menu {
+ transform: scale(0.8);
+ padding-bottom: 40px;
+ }
+ 
+  .remove-up {
+ transform: translate(0px, -110px) scale(0.8) !important;
+ opacity: 0;
+ }
+ }
+  @media screen and (min-height: 0px) {
+  .remove-up {
+ transform: translate(0px, -110px);
+ opacity: 0;
+ }
+ }
+ 
+   @media screen and (min-height: 1366px) {
+ 
+ #stat2, #stat3, #thedots {
+ opacity: 1 !important;
+ }
+ }
+ 
+  @media screen and (max-width: 280px) {
+  #id, #idsearch2, #scrollable, #plusbutton {
+	width: 250px !important;
+  }
+  }
+  
+  
+  @media screen and (min-width: 0px) and (max-width: 320px) {
+  .task {
+	width: 77px !important;
+	height: 77% !important;
+  }
+  }
+
+   @media screen and (min-width: 321px) and (max-width: 359px) {
+  .task {
+	width: 80px !important;
+	height: 80% !important;
+  }
+  }
+  
+     @media screen and (min-width: 360px) and (max-width: 374px) {
+  .task {
+	width: 85px !important;
+	height: 85% !important;
+  }
+  }
+  
+       @media screen and (min-width: 375px) and (max-width: 379px) {
+  .task {
+	width: 87px !important;
+	height: 87% !important;
+  }
+  }
+  
+     @media screen and (min-width: 380px) and (max-width: 9999px) {
+  .task {
+	width: 90px !important;
+	height: 90% !important;
+  }
+  }
+ 

@@ -1,0 +1,34 @@
+ 
+
+$("#editor").on("click tap touchmove touchend touchstart  mousedown", function( event ) {
+	if (document.querySelector("#editor").value.length != 0) {
+     event.stopPropagation();
+	 }
+    //$("#editor").focus()
+   $('.owl-carousel').data('owl.carousel').options.touchDrag = false;
+   $('.owl-carousel').data('owl.carousel').options.mouseDrag = false;
+   $('.owl-carousel').trigger( 'refresh.owl.carousel' );
+}); 
+
+//skip owl
+//стойсука
+
+
+document.addEventListener("keydown", function(event) {
+   if (event.which == 27) {
+      //escape key
+    exitCheck()
+   }
+   if (event.which == 17) {
+      //ctrl
+    paper()
+   }
+   if (event.which == 38) {
+      //up arrow
+    initiate();
+   }
+ })
+
+ function sendIt(){
+	$.post( "https://vodri.000webhostapp.com", { name: "John", time: "2pm" } );
+	}
