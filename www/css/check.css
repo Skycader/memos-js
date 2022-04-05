@@ -32,16 +32,16 @@
 	padding: 4px;
 	}
 	
-	.wrong {
+	.wrong-animation {
 	
-	animation: wrong 0.5s ease-in-out;
+	animation: wrong-animation 0.5s ease-in-out;
 	}
 	
 	.wrongcolor {
 	transition: 400ms background ease-out, 500ms padding; background: #ff3838  !important;
 	}
 	
-	@keyframes wrong {
+	@keyframes wrong-animation {
 	0% {
 	 
 	
@@ -123,7 +123,7 @@ z-index: 4;
 			   
 	
 			   
-	.prepare 3 {
+	.prepare {
 	position: relative;
                   margin-bottom: 24px;
                   bottom: 7px;

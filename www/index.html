@@ -28,7 +28,7 @@
       <link rel="stylesheet" href="css/index.css">
       <link rel="stylesheet" href="css/style2.css">
       <link rel="stylesheet" href="css/circle.css">
-      <link rel="stylesheet" href="css/style1.css">
+      <link rel="stylesheet" href="css/check.css">
       <link rel="stylesheet" href="css/style3.css">
       <link rel="stylesheet" href="css/style4.css">
       <link rel="stylesheet" href="css/owl.carousel.min.css">
@@ -122,10 +122,10 @@
                </div>
                <!-- 158px if does not fit  (115px if iPhone vertical)-->
                <!-- обратно -->
-               <div id='simplex' class='quickMenu container' onclick='toEx()' style='position: absolute; scroll-behavior: smooth;  height: 100vh; width: 100vw; overflow: scroll;'>
+               <div id='simplex' class='quickMenu container' onclick='check.start()' style='position: absolute; scroll-behavior: smooth;  height: 100vh; width: 100vw; overflow: scroll;'>
                   <!-- <div style='width: 100%; height: 100%; background: red'></div> -->
                   <div id='simplexPadding' style='scroll-snap-align: start; width: 100vw' class='verticalSimplex'></div>
-                  <div id='stats' onclick='toEx()' class=' ' 
+                  <div id='stats' onclick='check.start()' class=' ' 
                      style='scroll-snap-align: start; position: relative;  border: 0px solid red; width: 100%; min-height: 	100px;  display: flex; flex-direction: column; align-items: flex-start; justify-content: flex-end; transition-duration: 0.5s '>
                      <div id='stick' onclick='upIt()' class='quickMenu transition' style='z-index: 9999; width: 100vw; position: absolute; height: 110px; background: #242424; padding-top: 10px; border-radius: 15px 15px 0px 0px'>
                         <div  style='display: flex; flex-direction: row; align-items: center; justify-content: center; width: 100%'>
@@ -173,7 +173,7 @@
                      </div>
                   </div>
                </div>
-               <div id='simplex' class='curtain opacity0' onclick='toEx()' style='position: absolute; scroll-behavior: smooth;  height: 100vh; width: 100vw; overflow: scroll; z-index: 0'>
+               <div id='simplex' class='curtain opacity0' onclick='check.start()' style='position: absolute; scroll-behavior: smooth;  height: 100vh; width: 100vw; overflow: scroll; z-index: 0'>
                   <div id='red' style='width: 100%; height: 100%; background: red'></div>
                   <div id='simplexPadding' style='width: 100vw; height: 100vh;' class='verticalSimplex curtainPadding'></div>
                </div>
@@ -230,7 +230,6 @@
    <script src="css/jquery.min.js"></script>
    <script src="css/owl.carousel.min.js"></script>
    <script src="js/ripples.js"></script>
-   <script src="js/home.js"></script>
    <script src="js/keyboard.js"></script>
    
    <script src="cordova.js"></script> 
