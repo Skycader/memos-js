@@ -185,12 +185,12 @@ function initApp() {
 function adopt(a){
 
 if (a){
- 
+
  document.querySelector("#thatcircle").style.height =$("#thatcircle").height() + 'px' //Клава ебаная 
- document.querySelector("#simplexPadding").style.height =$("#simplexPadding").height() + 'px'
+ //document.querySelector("#simplexPadding").style.height =$("#simplexPadding").height() + 'px'
  document.querySelector(".curtain").style.height = $(".curtain").height() + 'px'
- document.querySelector(".curtainPadding").style.height = $(".curtainPadding").height() + 'px'
- 
+ document.querySelector(".curtainPadding").style.height = $(".curtainPadding").height()+1 + 'px'
+ document.querySelector(".curtain").scrollBy(0,$("#red").height()+100) 
     //document.querySelector("#stats").style.height =$("#stats").height() + 'px'
    } else {
    //document.querySelector("#thatcircle").style.height = "100vh"

@@ -23,6 +23,8 @@ document.addEventListener('deviceready', onDeviceReady, false);
  
 $( document ).ready(function() {
     
+   
+
     onDeviceReady() 
 });
  
@@ -30,7 +32,7 @@ function openMemos(){
     document.querySelector("html").classList.remove('simpleblack');
     document.querySelector("html").classList.add('memoscolor');
     document.querySelector(".menu").classList.remove('donotdisplay');
-    document.querySelector(".curtain").scrollBy(0,$("#red").height()) 
+    document.querySelector(".curtain").scrollBy(0,$("#red").height()+100) 
     
 }
 function curtain(){
@@ -39,8 +41,8 @@ function curtain(){
 function onDeviceReady() {
     // Cordova is now initialized. Have fun!
    
-    document.querySelector(".curtain").scrollBy(0,$("#red").height()) 
-    setTimeout(curtain,500)
+    document.querySelector(".curtain").scrollBy(0,$("#red").height()+100) 
+    setTimeout(curtain,1000)
    // openMemos()
 	NavigationBar.backgroundColorByHexString("#242424", false);
     

@@ -29,15 +29,13 @@ html, body {
 	 position:relative;
   overflow-x: hidden;
   padding: 0px;
+  background-color:  #242424; /*memos theme color */
    
   
  
  
 }
-
-.memoscolor {
-  background-color:  #242424
-}
+ 
 .simpleblack {
   background-color:black;
 }

@@ -20,10 +20,7 @@ transition: transform 0.5s, opacity 0.5s;
  opacity: 1;
  transition-duration: 0.8s;
  }
- 
- .omniflow {
-  overflow-y: hidden; 
-  }
+
   
   html, body {
   overflow-y: hidden;
