@@ -133,9 +133,7 @@ z-index: 4;
 	line-height: 6px;
 	}
 	
-	.forpicture2 {
-	min-width: 60px;margin-left: -100px; min-height: 60px;
-	}
+ 
 	
 	.donotdisplay {
 	display: none !important;
@@ -149,9 +147,7 @@ z-index: 4;
 	font-size: 28px; padding-left: 45px
 	}
 	
-	.forpicture-was  {
-	min-width: 60px; margin-left: 20px; min-height: 60px;
-	}
+ 
 
 	.forpicture {
 		min-width: 70px;

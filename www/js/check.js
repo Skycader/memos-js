@@ -101,9 +101,10 @@ setTimeout(inner,800)
 }
 
 check = {}
-check.started = false;
+check.toggleed = false;
 check.exit = () => {
- 
+
+
 document.getElementById("textarea").classList.remove("td5")
 document.getElementById("textarea").classList.add("opacity0")
  
@@ -114,11 +115,13 @@ cards.close()
 inititated=false;
 document.querySelector("#textarea").value = "";
 document.querySelector("#textarea").classList.remove("padding")
-setTimeout(check.start,550)
+setTimeout(check.toggle,550)
 }
 
 cards = {}
 cards.init = () => {
+
+
 
 function p1(){
 try {
@@ -177,7 +180,7 @@ check.wrong = () => {
   }
 }
 
-check.next = (success) => {
+check.next = (success) => { //Just moves the cards
 
 if (success) {
 	m = "win" //mode
@@ -212,6 +215,7 @@ document.querySelector(".work").classList.remove("pos4")
 document.querySelector(".work").classList.add("pos3")
 document.querySelector(".pos3").classList.remove("work")
 } catch(e) {}
+
 document.querySelector("#papers").insertAdjacentHTML("afterbegin", " <div class='pos4 card'></div>");
 
 setTimeout(rem,500);
@@ -233,21 +237,25 @@ function next(type){
 				qst = 1
 				if (qst) {
 				//document.querySelector(".pos4").innerHTML = cardid.replace("$id",qst)
-				document.querySelector(".pos4").innerHTML = cardwin;
+				document.querySelector(".pos1").innerHTML = cardwin;
 				} else {
 					document.querySelector(".pos4").innerHTML = cardwin;
 				}
 		} else {
 						qst = 1
 				if (qst) {
-				document.querySelector(".pos2").innerHTML = cardid.replace("$id",qst)
+				let renderedCard = cardSample.replace("$icon","🇫🇷");
+				renderedCard = renderedCard.replace("$title","Un renard");
+				renderedCard = renderedCard.replace("$subTitle","Subtitle")
+				document.querySelector(".pos1").innerHTML = renderedCard;
 				} else {
-					document.querySelector(".pos2").innerHTML = cardwin;
+					document.querySelector(".pos1").innerHTML = cardwin;
 				}
-		paper();
+		
 		}
 		}
- 
+
+cardSample = "<div class='forpicture'>$icon</div> <div class='table'> <div class='table2'> <div class='cell prepare0'> <div class='prepare'>$title</div> <div class='prepare2'> <div class='prepare3'> <p class='tip'>$subTitle</p> </div> </div> </div> </div> </div>"
 cardwin = " <div class='forpicture'><img src='assets/medal.svg'></div> <div class='table'> <div class='table2'> <div class='cell prepare0'> <div class='prepare'>All complete!</div> <div class='prepare2'> <div class='prepare3'> <p class='tip'>Pay us a visit in 3 hours.</p> </div> </div> </div> </div> </div> "	
 
 cardid= "<div class='table'> <div class='table2'> <div class='cell pad'> <div> $id </div> </div></div></div> "
@@ -286,7 +294,10 @@ document.querySelector(".pos00").classList.remove("work")
 }
 
 function rem(){
-	$(".pos00").remove();
+	 for (var i = 0; i < 58; i++) {
+		 document.querySelector(".card").remove()
+		 console.log( document.querySelector(".card"))
+	 }
 }
 
 p1()
@@ -297,26 +308,27 @@ setTimeout(rem,500)
  
 }
  
-check.started = 0;
-check.start = () => {
+check.toggleed = 0;
+check.toggle = () => {
 
-document.querySelector("#papers").insertAdjacentHTML("afterbegin", " <div class='pos4 card'><div class='table'> <div class='table2'> <div class='cell pad'> <div> </div> </div></div></div></div>");
-document.querySelector("#papers").insertAdjacentHTML("afterbegin", " <div class='pos4 card'><div class='table'> <div class='table2'> <div class='cell pad'> <div></div> </div></div></div></div>");
-document.querySelector("#papers").insertAdjacentHTML("afterbegin", " <div class='pos4 card'><div class='table'> <div class='table2'> <div class='cell pad'> <div></div> </div></div></div></div>");
-document.querySelector("#papers").insertAdjacentHTML("afterbegin", " <div class='pos4 card'><div class='table'> <div class='table2'> <div class='cell pad'> <div> </div> </div></div></div></div>");
+
 
  
 
 if ((p()==0)) {
 closeStats()
 
-if (check.started) {
-check.started = 0;
+if (check.toggleed) {
+check.toggleed = 0;
 document.querySelector("#keyboard2").classList.add("donotdisplay")
 
 } else {
+	document.querySelector("#papers").insertAdjacentHTML("afterbegin", " <div class='pos4 card'><div class='table'> <div class='table2'> <div class='cell pad'> <div> </div> </div></div></div></div>");
+	document.querySelector("#papers").insertAdjacentHTML("afterbegin", " <div class='pos4 card'><div class='table'> <div class='table2'> <div class='cell pad'> <div></div> </div></div></div></div>");
+	document.querySelector("#papers").insertAdjacentHTML("afterbegin", " <div class='pos4 card'><div class='table'> <div class='table2'> <div class='cell pad'> <div></div> </div></div></div></div>");
+	document.querySelector("#papers").insertAdjacentHTML("afterbegin", " <div class='pos4 card'><div class='table'> <div class='table2'> <div class='cell pad'> <div> </div> </div></div></div></div>");
 setTimeout(cards.init,450)
-check.started = 1;
+check.toggleed = 1;
 document.querySelector("#keyboard2").classList.remove("donotdisplay")
 setTimeout(keyboard.open,250);
 document.querySelector("svg").onclick = ''
@@ -326,7 +338,7 @@ document.querySelector("#keyboard").classList.toggle("hidekeyboard")
 document.querySelector("#menu").classList.toggle("remove-up")
 document.querySelector("#simplex").classList.toggle("remove-down")
 
-if (check.started) {
+if (check.toggleed) {
 document.querySelector("#info1").classList.add("hideT")
 document.querySelector("#info2").classList.add("hideT")
 document.querySelector("#info3").classList.add("hideT")
@@ -353,7 +365,7 @@ document.querySelector("#info5").classList.remove("hideT")
 }
 
 
-if (check.started) {
+if (check.toggleed) {
 document.querySelector("html").classList.toggle("omniflow");
 document.querySelector("body").classList.toggle("omniflow");
 } else {
