@@ -87,7 +87,8 @@ if (globalScreen<screen) {
  
 keyboard.opened = false;
 keyboard.open = () => {
-keyboard= Date.now();
+ 
+ 
 function inner0(){
 document.getElementById("textarea").focus();
 }
@@ -233,7 +234,7 @@ document.querySelector(".pos0").remove()
 
 //document.querySelector(".table").offsetHeight > 100 то пизда (нужно раздеить на 2 карточки)
 
-function next(type){
+function next(type,title){
 		
 		if (type) {
 				qst = 1
@@ -247,7 +248,7 @@ function next(type){
 						qst = 1
 				if (qst) {
 				let renderedCard = cardSample.replace("$icon","🇫🇷");
-				renderedCard = renderedCard.replace("$title","Un renard");
+				renderedCard = renderedCard.replace("$title",title);
 				renderedCard = renderedCard.replace("$subTitle","Translation")
 				document.querySelector(".pos1").innerHTML = renderedCard;
 				} else {
@@ -312,6 +313,17 @@ setTimeout(rem,500)
 }
  
 check.toggleed = 0;
+
+check.check = (ans) => {
+ 
+		ans = ans.toLowerCase()
+		
+		if (document.querySelector("#textarea").value.length >= 24) {
+			document.querySelector("#textarea").classList.add("padding")
+		} else {
+			document.querySelector("#textarea").classList.remove("padding")
+		}
+}
 check.toggle = () => {
 
 
