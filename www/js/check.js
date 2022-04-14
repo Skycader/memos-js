@@ -151,8 +151,10 @@ document.querySelector(".pos1").classList.remove("work")
  
 
 p3();
+next();
 setTimeout(p2,100)
 setTimeout(p1,200)
+ 
 }
 
 check.wrong = () => {
@@ -237,7 +239,7 @@ function next(type){
 				qst = 1
 				if (qst) {
 				//document.querySelector(".pos4").innerHTML = cardid.replace("$id",qst)
-				document.querySelector(".pos1").innerHTML = cardwin;
+				document.querySelector(".pos4").innerHTML = cardwin;
 				} else {
 					document.querySelector(".pos4").innerHTML = cardwin;
 				}
@@ -246,7 +248,7 @@ function next(type){
 				if (qst) {
 				let renderedCard = cardSample.replace("$icon","🇫🇷");
 				renderedCard = renderedCard.replace("$title","Un renard");
-				renderedCard = renderedCard.replace("$subTitle","Subtitle")
+				renderedCard = renderedCard.replace("$subTitle","Translation")
 				document.querySelector(".pos1").innerHTML = renderedCard;
 				} else {
 					document.querySelector(".pos1").innerHTML = cardwin;
@@ -255,7 +257,8 @@ function next(type){
 		}
 		}
 
-cardSample = "<div class='forpicture'>$icon</div> <div class='table'> <div class='table2'> <div class='cell prepare0'> <div class='prepare'>$title</div> <div class='prepare2'> <div class='prepare3'> <p class='tip'>$subTitle</p> </div> </div> </div> </div> </div>"
+cardSample = '<div><div class="forpicture">$icon</div> <div class="prepare2"> <div class="prepare3"> <p class="tip">$subTitle</p> </div> </div> </div> <div class="table"> <div class="table2"> <div class="cell prepare0"> <div class="prepare">$title</div>  </div> </div> </div>'
+cardSample2 = "<div class='forpicture'>$icon</div> <div class='table'> <div class='table2'> <div class='cell prepare0'> <div class='prepare'>$title</div> <div class='prepare2'> <div class='prepare3'> <p class='tip'>$subTitle</p> </div> </div> </div> </div> </div>"
 cardwin = " <div class='forpicture'><img src='assets/medal.svg'></div> <div class='table'> <div class='table2'> <div class='cell prepare0'> <div class='prepare'>All complete!</div> <div class='prepare2'> <div class='prepare3'> <p class='tip'>Pay us a visit in 3 hours.</p> </div> </div> </div> </div> </div> "	
 
 cardid= "<div class='table'> <div class='table2'> <div class='cell pad'> <div> $id </div> </div></div></div> "
