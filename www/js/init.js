@@ -22,7 +22,7 @@
 document.addEventListener('deviceready', onDeviceReady, false);
  
 $( document ).ready(function() {
-    
+   
    
 
     onDeviceReady() 

@@ -84,25 +84,50 @@ if (globalScreen<screen) {
 
 }
 }
+
  
+
 keyboard.opened = false;
-keyboard.open = () => {
+defaultWindowHeight = 0
+
  
- 
-function inner0(){
-document.getElementById("textarea").focus();
-}
-setTimeout(inner0,600)
-function inner(){
-document.getElementById("textarea").classList.remove("opacity0")
-document.getElementById("textarea").classList.add("td5")
+keyboard.exit = () => {
+	if ((keyboard.opened)&&(window.innerHeight == defaultWindowHeight)) {
+		keyboard.opened=0
+		document.querySelector("#simplex").scrollTo(0,0) //panel opens sometimes due to resizing, so let's just close it every time
+		check.exit()
+	}
 }
 
-setTimeout(inner,800)
+window.addEventListener('resize', function(event) {
+
+   // alert(window.innerHeight + " " + defaultWindowHeight)
+   if ((!check.toggled)&&(!fullscreenToggling)) {
+	   window.location.reload(true)
+   }
+   keyboard.exit();
+
+  
+}, true);
+
+
+keyboard.open = () => {
+		defaultWindowHeight = window.innerHeight
+		document.getElementById("textarea").classList.remove("opacity0")
+		document.getElementById("textarea").classList.add("td5")
+		document.getElementById("textarea").focus();
+
+		inner = () => {
+		keyboard.opened = true;
+		}
+
+		setTimeout(inner,500)
+ 
+ 
 }
 
 check = {}
-check.toggleed = false;
+check.toggled = false;
 check.exit = () => {
 
 
@@ -170,8 +195,9 @@ check.wrong = () => {
 	setTimeout(inner2,350)
 	setTimeout(inner,500)
 	}
-
+fullscreenToggling = 1;
 	function toggleFullscreen() {
+	 //alert(fullscreenToggling)
   let elem = document.querySelector("html");
 
   if (!document.fullscreenElement) {
@@ -181,7 +207,17 @@ check.wrong = () => {
   } else {
     document.exitFullscreen();
   }
+
+  function inner() {
+	fullscreenToggling=0
+	 
+  }
+
+  setTimeout(inner,1000)
+ 
 }
+
+
 
 check.next = (success) => { //Just moves the cards
 
@@ -312,7 +348,7 @@ setTimeout(rem,500)
  
 }
  
-check.toggleed = 0;
+check.toggled = 0;
 
 check.check = (ans) => {
  
@@ -324,6 +360,8 @@ check.check = (ans) => {
 			document.querySelector("#textarea").classList.remove("padding")
 		}
 }
+
+
 check.toggle = () => {
 
 
@@ -333,19 +371,21 @@ check.toggle = () => {
 if ((p()==0)) {
 closeStats()
 
-if (check.toggleed) {
-check.toggleed = 0;
+if (check.toggled) {
+check.toggled = 0;
 document.querySelector("#keyboard2").classList.add("donotdisplay")
-
+ 
 } else {
 	document.querySelector("#papers").insertAdjacentHTML("afterbegin", " <div class='pos4 card'><div class='table'> <div class='table2'> <div class='cell pad'> <div> </div> </div></div></div></div>");
 	document.querySelector("#papers").insertAdjacentHTML("afterbegin", " <div class='pos4 card'><div class='table'> <div class='table2'> <div class='cell pad'> <div></div> </div></div></div></div>");
 	document.querySelector("#papers").insertAdjacentHTML("afterbegin", " <div class='pos4 card'><div class='table'> <div class='table2'> <div class='cell pad'> <div></div> </div></div></div></div>");
 	document.querySelector("#papers").insertAdjacentHTML("afterbegin", " <div class='pos4 card'><div class='table'> <div class='table2'> <div class='cell pad'> <div> </div> </div></div></div></div>");
 setTimeout(cards.init,450)
-check.toggleed = 1;
+check.toggled = 1;
+
 document.querySelector("#keyboard2").classList.remove("donotdisplay")
-setTimeout(keyboard.open,250);
+ 
+setTimeout(keyboard.open,800);
 document.querySelector("svg").onclick = ''
 }
  
@@ -353,7 +393,7 @@ document.querySelector("#keyboard").classList.toggle("hidekeyboard")
 document.querySelector("#menu").classList.toggle("remove-up")
 document.querySelector("#simplex").classList.toggle("remove-down")
 
-if (check.toggleed) {
+if (check.toggled) {
 document.querySelector("#info1").classList.add("hideT")
 document.querySelector("#info2").classList.add("hideT")
 document.querySelector("#info3").classList.add("hideT")
@@ -380,7 +420,7 @@ document.querySelector("#info5").classList.remove("hideT")
 }
 
 
-if (check.toggleed) {
+if (check.toggled) {
 document.querySelector("html").classList.toggle("omniflow");
 document.querySelector("body").classList.toggle("omniflow");
 } else {

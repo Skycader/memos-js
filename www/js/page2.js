@@ -10,3 +10,31 @@ checkP2N4 = () => {
     }
 }
 */
+
+$(document).ready(function(){
+    document.querySelector(".page2-node4").scrollBy(0,100)
+
+    const scrollHeight = 860+window.innerHeight;
+    a = 0;
+function r() {
+    if (document.querySelector(".page2-node4").scrollTop > scrollHeight) {
+    document.querySelector(".page2-node4").classList.add("nonScroll")
+    document.querySelector(".page2-node4").scrollTop = scrollHeight
+    a = setInterval(sc,10)
+    }
+
+    
+  
+}
+
+function sc(){
+    if (document.querySelector(".page2-node4").scrollTop == scrollHeight) {
+
+          document.querySelector(".page2-node4").classList.remove("nonScroll")
+        clearInterval(a)
+    }
+    
+}
+window.addEventListener('touchend', r);
+ 
+})

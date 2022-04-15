@@ -11,7 +11,7 @@ document.addEventListener('mouseup', e => {
 });
 
 document.addEventListener('touchstart', e => {
- interval = setInterval(setBar,16)
+ interval = setInterval(setBar,10)
  document.querySelector(".bar").classList.remove("bar-anim")
   
     

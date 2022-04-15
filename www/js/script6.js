@@ -407,11 +407,15 @@ if ((window.innerWidth == height)||(window.innerHeight == width)) {
 }
 }
 
+/*
 window.addEventListener("orientationchange", function(event) {
 window.location.reload(true);
 })
+*/
 	 //window.onresize = function() {normalize()}
-	  window.onresize = function() {switchMode3()}
+
+
+	 // window.onresize = function() {switchMode3()}
 function closeStats(){
  
  
