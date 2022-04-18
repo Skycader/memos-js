@@ -22,7 +22,7 @@ db.transaction(function(tx) {
 */
 
 
-let sql = (query) => {
+let sql = (query,callback) => {
    console.log('sql called: ', query)
    db.transaction(function(tx) {
       console.log(tx)  
@@ -34,7 +34,8 @@ let sql = (query) => {
          console.log(results)
         
          try {
-            response = notify(results.rows[0])
+            notify(results.rows[0],callback)
+            
          } catch(e) { 
             console.log(e)
          }
@@ -63,8 +64,10 @@ OBJexp = {1:"Un renard",
 mem.res = {};
 mem.res.obj = 0;
 mem.res.sample = 0;
-
-let notify = (res) => { //notify is called any time sql is called
+mem.res.question = null;
+mem.res.rightAnswer = null;
+mem.res.requestedFieldName = null;
+let notify = (res,callback) => { //notify is called any time sql is called
    
    
    if (method=="ask2") {
@@ -87,35 +90,62 @@ let notify = (res) => { //notify is called any time sql is called
        //console.log("INDEX: " + index)
        console.log(index)
        let question = DATA[index[0]]
+       mem.res.question = question;
        console.log("Question: " + question)
-       let rightAnswer = DATA[index[1]]
-      
+       let rightAnswer;
+       let answerIsCorrect;
+       try {
+        rightAnswer = JSON.parse(DATA[index[1]])
+        answerIsCorrect = (answer.toLowerCase() == rightAnswer.toLowerCase())
+       } catch(e) {
+         rightAnswer =  DATA[index[1]]
+         answerIsCorrect = ((rightAnswer.indexOf(answer) > -1) ? true : false)
+       }
+       mem.res.rightAnswer = rightAnswer;
+       callback(mem);
        
       let dirData = JSON.parse(mem.res.dir.DATA)
       //console.log(requestedFieldName)
-      console.log(dirData[1][index[1]-1])
+      let requestedFieldName = dirData[1][index[1]-1];
+      mem.res.requestedFieldName = requestedFieldName;
+      console.log(requestedFieldName)
       //console.log("Right answer: " + rightAnswer)
       if (answer) { //if there's any answer provided, then check, else just show question
          
          
-         if (answer.toLowerCase() == rightAnswer.toLowerCase()) {
+         if (answerIsCorrect) {
+
+             
             console.log("OK")
+            console.log(((rightAnswer.indexOf(answer) > -1) ? true : false))
+            console.log(rightAnswer)
+            console.log(answer)
+            
             console.log(mem.res.obj.LREPEAT)
             let diff = Date.now()-mem.res.obj.LREPEAT*1;
             console.log("Different in hours: " + diff/1000/60/60)
             diff=2*diff+Date.now();
             console.log("New RDATE: " + new Date(diff))
             mem.update('RDATE',diff,'ID',mem.res.obj.ID)
+
+            SPEC = JSON.stringify(SPEC);
+             mem.update("SPEC",SPEC,"ID",mem.res.obj.ID)
+
+             
             //mem.get(res.ID)
              
          } else {
+            console.log(((rightAnswer.indexOf(answer) > -1) ? true : false))
+            console.log(rightAnswer)
+            console.log(answer)
             console.log("BAD")
          }
          ask=null;
           
          answer= null;
-         SPEC = JSON.stringify(SPEC);
-         mem.update("SPEC",SPEC,"ID",mem.res.obj.ID)
+       
+
+         
       }
    }
    if (method=="ask") {
@@ -125,7 +155,7 @@ let notify = (res) => { //notify is called any time sql is called
       mem.res.obj = res;
       console.log(mem.res.obj)
       if (res) { //res is argument given for notify by sql as a result
-      mem.check2(res);
+      mem.check2(res,callback);
       }  else {
          console.log("No objects to repeat")
       }
@@ -136,13 +166,13 @@ let notify = (res) => { //notify is called any time sql is called
 
 let answer = null;
 
-mem.check = (ans,debug) => {
+mem.check = (ans,callback,debug) => {
    //First part of check to find an object in need of repeat
    if (debug) {
-   sql(`SELECT ID, DATA, RDATE, LREPEAT, SPEC FROM OBJECTS WHERE ID = "${debug}"`)
+   sql(`SELECT ID, DATA, RDATE, LREPEAT, SPEC FROM OBJECTS WHERE ID = "${debug}"`,callback)
    
    } else {
-      sql(`SELECT ID, DATA, RDATE, LREPEAT, SPEC FROM OBJECTS WHERE RDATE < '${Date.now()}' LIMIT 1`)
+      sql(`SELECT ID, DATA, RDATE, LREPEAT, SPEC FROM OBJECTS WHERE RDATE < '${Date.now()}' LIMIT 1`,callback)
    }
    method='ask'
    answer = ans;
@@ -152,9 +182,9 @@ mem.getDir = (string) => {
    return string.split(".").slice(0,2).join(".");
 }
 
-mem.check2 = (res) => {
+mem.check2 = (res,callback) => {
    let DIRID = mem.getDir(res.ID);
-   sql(`SELECT DATA FROM DIRS WHERE ID = '${DIRID}'`);
+   sql(`SELECT DATA FROM DIRS WHERE ID = '${DIRID}'`,callback);
    method = "ask2"
 }
  
@@ -167,7 +197,7 @@ mem.drop = () => {
 }
 
 mem.addExample = () => {
-   mem.add("1.1.1",["Un renard","А рынар","A fox"])
+   mem.add("1.1.1",["Un renard",["А рынар","123"],"A fox"])
    mem.addDir('1.1',[["FRE","FRENCH"],["Original","Transcription","Translation"]])
 }
 mem.set = function(ID,DATA,SPEC) {

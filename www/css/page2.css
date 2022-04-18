@@ -41,6 +41,7 @@
     min-height:  150px; 
     border-radius: 10px; 
     background: green;  
+    margin-top: 1px;
 }
 
 
@@ -58,6 +59,7 @@
 
 .nonScroll {
     overflow: hidden;
+
 }
 
 .page2-node5 {
@@ -77,6 +79,7 @@
     border-radius: 15px 15px; 
     /*background: #232323; */
     width: 100%; 
+    -webkit-overflow-scrolling: touch; 
      
 }
 

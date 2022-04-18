@@ -147,7 +147,7 @@ setTimeout(check.toggle,550)
 cards = {}
 cards.init = () => {
 
-
+cards.set("Title")
 
 function p1(){
 try {
@@ -177,7 +177,7 @@ document.querySelector(".pos1").classList.remove("work")
  
 
 p3();
-next();
+//cards.set("Title")
 setTimeout(p2,100)
 setTimeout(p1,200)
  
@@ -270,29 +270,16 @@ document.querySelector(".pos0").remove()
 
 //document.querySelector(".table").offsetHeight > 100 то пизда (нужно раздеить на 2 карточки)
 
-function next(type,title){
+cards.set = (title) => {
 		
-		if (type) {
-				qst = 1
-				if (qst) {
-				//document.querySelector(".pos4").innerHTML = cardid.replace("$id",qst)
-				document.querySelector(".pos4").innerHTML = cardwin;
-				} else {
-					document.querySelector(".pos4").innerHTML = cardwin;
-				}
-		} else {
-						qst = 1
-				if (qst) {
+		 
 				let renderedCard = cardSample.replace("$icon","🇫🇷");
 				renderedCard = renderedCard.replace("$title",title);
 				renderedCard = renderedCard.replace("$subTitle","Translation")
-				document.querySelector(".pos1").innerHTML = renderedCard;
-				} else {
-					document.querySelector(".pos1").innerHTML = cardwin;
-				}
-		
+				document.querySelector(".pos4").innerHTML = renderedCard;
+
 		}
-		}
+		 
 
 cardSample = '<div><div class="forpicture">$icon</div> <div class="prepare2"> <div class="prepare3"> <p class="tip">$subTitle</p> </div> </div> </div> <div class="table"> <div class="table2"> <div class="cell prepare0"> <div class="prepare">$title</div>  </div> </div> </div>'
 cardSample2 = "<div class='forpicture'>$icon</div> <div class='table'> <div class='table2'> <div class='cell prepare0'> <div class='prepare'>$title</div> <div class='prepare2'> <div class='prepare3'> <p class='tip'>$subTitle</p> </div> </div> </div> </div> </div>"
