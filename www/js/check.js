@@ -113,9 +113,9 @@ window.addEventListener('resize', function(event) {
 
 keyboard.open = () => {
 		defaultWindowHeight = window.innerHeight
-		document.getElementById("textarea").classList.remove("opacity0")
-		document.getElementById("textarea").classList.add("td5")
-		document.getElementById("textarea").focus();
+		document.getElementById("memosInput").classList.remove("opacity0")
+		document.getElementById("memosInput").classList.add("td5")
+		document.getElementById("memosInput").focus();
 
 		inner = () => {
 		keyboard.opened = true;
@@ -128,59 +128,108 @@ keyboard.open = () => {
 
 check = {}
 check.toggled = false;
+
+document.querySelector('#memosInput').addEventListener('keypress', function (e) {
+	if (e.key === 'Enter') {
+	   check.onEnter();
+	}
+});
+
+check.onEnter = () => {
+	 
+	mem.check(check.get())
+	
+	
+}
+	
+check.get = () => {
+	return document.querySelector("#memosInput").value
+
+}
+
+check.clear = () => {
+	document.querySelector("#memosInput").value = ''
+
+}
 check.exit = () => {
 
 
-document.getElementById("textarea").classList.remove("td5")
-document.getElementById("textarea").classList.add("opacity0")
+document.getElementById("memosInput").classList.remove("td5")
+document.getElementById("memosInput").classList.add("opacity0")
  
-document.getElementById("textarea").value = ""
-document.getElementById("textarea").blur();
+document.getElementById("memosInput").value = ""
+document.getElementById("memosInput").blur();
 cards.close()
 
 inititated=false;
-document.querySelector("#textarea").value = "";
-document.querySelector("#textarea").classList.remove("padding")
+document.querySelector("#memosInput").value = "";
+document.querySelector("#memosInput").classList.remove("padding")
 setTimeout(check.toggle,550)
 }
 
 cards = {}
 cards.init = () => {
 
-cards.set("Title")
-
-function p1(){
-try {
-document.querySelector(".pos4").classList.add("work")
-document.querySelector(".work").classList.remove("pos4")
-document.querySelector(".work").classList.add("pos3")
-document.querySelector(".pos3").classList.remove("work")
-} catch(e) {}
-}
-function p2(){
-try {
-document.querySelector(".pos4").classList.add("work")
-document.querySelector(".work").classList.remove("pos4")
-document.querySelector(".work").classList.add("pos2")
-document.querySelector(".pos2").classList.remove("work")
-} catch(e) {}
-}
-
-function p3(){
-try {
-document.querySelector(".pos4").classList.add("work")
-document.querySelector(".work").classList.remove("pos4")
-document.querySelector(".work").classList.add("pos1")
-document.querySelector(".pos1").classList.remove("work")
-} catch(e) {}
-}
- 
-
-p3();
+//mem.check time!
 //cards.set("Title")
-setTimeout(p2,100)
-setTimeout(p1,200)
+check.justStarted=1;
+console.log("!")
+mem.check(undefined,cards.set)
  
+}
+
+cards.p1 = () => {
+	try {
+	document.querySelector(".pos4").classList.add("work")
+	document.querySelector(".work").classList.remove("pos4")
+	document.querySelector(".work").classList.add("pos3")
+	document.querySelector(".pos3").classList.remove("work")
+	} catch(e) {}
+	}
+	cards.p2 = () => {
+	try {
+	document.querySelector(".pos4").classList.add("work")
+	document.querySelector(".work").classList.remove("pos4")
+	document.querySelector(".work").classList.add("pos2")
+	document.querySelector(".pos2").classList.remove("work")
+	} catch(e) {}
+	}
+	
+	cards.p3 = () => {
+	try {
+	document.querySelector(".pos4").classList.add("work")
+	document.querySelector(".work").classList.remove("pos4")
+	document.querySelector(".work").classList.add("pos1")
+	document.querySelector(".pos1").classList.remove("work")
+	} catch(e) {}
+	}
+
+	cards.call = () => {
+	cards.p3();
+//cards.set("Title")
+setTimeout(cards.p2,100)
+setTimeout(cards.p1,200)
+	}
+
+cards.insert = (amount) => {
+	if (!amount) {
+		amount = 1;
+	}
+
+	for (var i = 0; i<amount; i++) {
+	document.querySelector("#papers").insertAdjacentHTML("afterbegin", " <div class='pos4 card'><div class='table'> <div class='table2'> <div class='cell pad'> <div> </div> </div></div></div></div>");
+	}
+}
+cards.autoSet = () => {
+	
+	let renderedCard = cardSample.replace("$icon","🇫🇷");
+	renderedCard = renderedCard.replace("$title",mem.res.question);
+	renderedCard = renderedCard.replace("$subTitle",mem.res.reqFieldName)
+	console.log(JSON.stringify(mem.res))
+	document.querySelector(".pos4").innerHTML = renderedCard;
+
+	cards.call();
+
 }
 
 check.wrong = () => {
@@ -218,66 +267,128 @@ fullscreenToggling = 1;
 }
 
 
-
+cards.color = null;
 check.next = (success) => { //Just moves the cards
-
+if (success == undefined) {
+	success = 1;
+}
 if (success) {
-	m = "win" //mode
+	cards.color = "win" //mode
 } else {
-	m = "wrongcolor"
+	cards.color = "wrongcolor"
 }
+ 
+	if ((success>0)&&(!mem.nothing)) {
+	mem.check(undefined,check.subNext)
+	} else {
+		check.subNext();
+	}
+ 
+}
+check.right = () => {
 	try {
-document.querySelector(".pos1").classList.add("work")
-document.querySelector(".work").classList.remove("pos1")
-document.querySelector(".work").classList.add("pos0")
-document.querySelector(".work").classList.add(m)
-document.querySelector(".pos0").classList.remove("work")
-} catch(e) {}
-
-try {
-document.querySelector(".pos2").classList.add("work")
-document.querySelector(".work").classList.remove("pos2")
-document.querySelector(".work").classList.add("pos1")
-document.querySelector(".pos1").classList.remove("work")
-} catch(e) {}
-
-try {
-document.querySelector(".pos3").classList.add("work")
-document.querySelector(".work").classList.remove("pos3")
-document.querySelector(".work").classList.add("pos2")
-document.querySelector(".pos2").classList.remove("work")
-} catch(e) {}
-
-try {
-document.querySelector(".pos4").classList.add("work")
-document.querySelector(".work").classList.remove("pos4")
-document.querySelector(".work").classList.add("pos3")
-document.querySelector(".pos3").classList.remove("work")
-} catch(e) {}
-
-document.querySelector("#papers").insertAdjacentHTML("afterbegin", " <div class='pos4 card'></div>");
-
-setTimeout(rem,500);
+		document.querySelector(".pos1").classList.add("win")
+		} catch(e) {}	
+}
+check.p1 = () => {
+	try {
+		document.querySelector(".pos1").classList.add("work")
+		document.querySelector(".work").classList.remove("pos1")
+		document.querySelector(".work").classList.add("pos0")
+		document.querySelector(".work").classList.add(cards.color)
+		document.querySelector(".pos0").classList.remove("work")
+		} catch(e) {}
 }
 
-function rem(){
-
-try {
-document.querySelector(".pos0").remove()
-} catch(e){}
+check.p2 = () => {
+	try {
+		document.querySelector(".pos2").classList.add("work")
+		document.querySelector(".work").classList.remove("pos2")
+		document.querySelector(".work").classList.add("pos1")
+		document.querySelector(".pos1").classList.remove("work")
+		} catch(e) {}
 }
 
+check.p3 = () => {
+	try {
+		document.querySelector(".pos3").classList.add("work")
+		document.querySelector(".work").classList.remove("pos3")
+		document.querySelector(".work").classList.add("pos2")
+		document.querySelector(".pos2").classList.remove("work")
+		} catch(e) {}
+}
 
-//document.querySelector(".table").offsetHeight > 100 то пизда (нужно раздеить на 2 карточки)
+check.p4 = () => {
+	try {
+		document.querySelector(".pos4").classList.add("work")
+		document.querySelector(".work").classList.remove("pos4")
+		document.querySelector(".work").classList.add("pos3")
+		document.querySelector(".pos3").classList.remove("work")
+		} catch(e) {}
+}
+ 
+check.p5 = () => {
+	document.querySelector("#papers").insertAdjacentHTML("afterbegin", " <div class='pos4 card'></div>");
+}
+check.subNext = () => {
+	 
+	 console.log("SUBNEXT INFO")
+	 console.log(mem.res)
+	cards.set(mem,2)
 
-cards.set = (title) => {
+	
 		
-		 
-				let renderedCard = cardSample.replace("$icon","🇫🇷");
-				renderedCard = renderedCard.replace("$title",title);
-				renderedCard = renderedCard.replace("$subTitle","Translation")
-				document.querySelector(".pos4").innerHTML = renderedCard;
+		setTimeout(check.p1,50)
+		setTimeout(check.p2,100)
+		setTimeout(check.p3,150)
+		setTimeout(check.p4,200)
+		setTimeout(check.p5,250)
+		
+		setTimeout(cards.rem0,300);
+	 
+	}
+ 
+cards.rem0 = () => {
+	try {
+		document.querySelector(".pos0").remove()
+		} catch(e){}
 
+}
+//document.querySelector(".table").offsetHeight > 100 то пизда (нужно раздеить на 2 карточки)
+check.justStarted = 0;
+cards.set = (data,pos) => {
+	try {
+	 
+	 
+	 
+				if (!pos) {
+					pos = 4;
+					
+					
+				}
+				let renderedCard = null;
+				console.log(mem)
+				if (!mem.nothing) {
+					 
+				renderedCard = cardSample.replace("$icon","🇫🇷");
+				renderedCard = renderedCard.replace("$title",mem.res.question);
+				renderedCard = renderedCard.replace("$subTitle",mem.res.reqFieldName)
+			} else {
+			    
+				renderedCard = cardwin;
+				 
+				check.win = 1;
+			}
+				console.log("!" + renderedCard)
+				document.querySelector(".pos"+pos).innerHTML = renderedCard;
+				
+				if (pos==4) {
+					cards.call();
+				}
+			  
+			} catch(e) {
+				console.log(e)
+			}
 		}
 		 
 
@@ -363,10 +474,7 @@ check.toggled = 0;
 document.querySelector("#keyboard2").classList.add("donotdisplay")
  
 } else {
-	document.querySelector("#papers").insertAdjacentHTML("afterbegin", " <div class='pos4 card'><div class='table'> <div class='table2'> <div class='cell pad'> <div> </div> </div></div></div></div>");
-	document.querySelector("#papers").insertAdjacentHTML("afterbegin", " <div class='pos4 card'><div class='table'> <div class='table2'> <div class='cell pad'> <div></div> </div></div></div></div>");
-	document.querySelector("#papers").insertAdjacentHTML("afterbegin", " <div class='pos4 card'><div class='table'> <div class='table2'> <div class='cell pad'> <div></div> </div></div></div></div>");
-	document.querySelector("#papers").insertAdjacentHTML("afterbegin", " <div class='pos4 card'><div class='table'> <div class='table2'> <div class='cell pad'> <div> </div> </div></div></div></div>");
+cards.insert(4)
 setTimeout(cards.init,450)
 check.toggled = 1;
 
@@ -424,7 +532,9 @@ document.querySelector("#thatcircle").classList.toggle("omniscale");
 document.addEventListener("keydown", function(event) {
 	if (event.which == 27) {
 		//escape key
+	  check.win = 0;
 	  check.exit();
 	}
   })
   
+ 

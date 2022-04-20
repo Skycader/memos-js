@@ -63,12 +63,12 @@
 	
 	}
     25% {
-    margin-right: 15%;
+    margin-right: 10%;
 	 
   }
 
     50% {
-    margin-left: 15%;
+    margin-left: 10%;
 	 
   }
   
@@ -90,7 +90,7 @@ z-index: 4;
 	}
 	
 	.win {
-	transition: 400ms background ease-out, 500ms margin-top; background: #00ff00;
+	transition: 400ms background ease-out, 500ms margin-top; background: #00ff00 !important; 
 	}
 		.loose {
 	transition: 400ms background ease-out, 500ms margin-top; background: red;

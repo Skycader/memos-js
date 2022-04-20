@@ -1,4 +1,4 @@
-let method = null; //methods like need, set, get ... etc.
+method = null; //methods like need, set, get ... etc.
 var db = openDatabase('MEMODB', '1.0', 'OBJECTS DATABASE', null);
 db.transaction(function (tx) { 
    //rDATA - repeatition DATA; lrepeat - last repeat unix time; dur - duration;
@@ -22,8 +22,9 @@ db.transaction(function(tx) {
 */
 
 
-let sql = (query,callback) => {
+sql = (query,callback) => {
    console.log('sql called: ', query)
+   mem.query = query;
    db.transaction(function(tx) {
       console.log(tx)  
       tx.executeSql(query, [], 
@@ -32,8 +33,16 @@ let sql = (query,callback) => {
          console.log(tx)
          //console.log(query)
          console.log(results)
-        
+         /*
          try {
+            callback(results.rows[0])
+         } catch(e) {}
+          */
+         try {
+            console.error("sql data")
+            console.error(query)
+            console.error(results)
+            console.error(mem.res)
             notify(results.rows[0],callback)
             
          } catch(e) { 
@@ -47,6 +56,7 @@ let sql = (query,callback) => {
     }
 
 let mem = {};
+mem.query = null;
 mem.test = () => {
    console.log("test")
 }
@@ -66,12 +76,35 @@ mem.res.obj = 0;
 mem.res.sample = 0;
 mem.res.question = null;
 mem.res.rightAnswer = null;
-mem.res.requestedFieldName = null;
-let notify = (res,callback) => { //notify is called any time sql is called
-   
+mem.res.reqFieldName = null;
+mem.code = null;
+mem.nothing = null;
+notify = (res,callback) => { //notify is called any time sql is called
+   if (method=="update") {
+      try {
+         callback(res)
+         } catch(e) {}
+   }
+   if (method=="when") {
+      console.log(res)
+      mem.res = res;
+      try {
+          
+      callback(res)
+      } catch(e) {} 
+      
+   }
+   if (method=="get") {
+      try {
+         callback(res)
+         } catch(e) {} 
+      mem.res = res;
+   }
    
    if (method=="ask2") {
-      mem.res.dir = res;
+       
+     
+       mem.res.dir = res;
        method=null; //nullificate method, so it's not checked next sql request
 
        console.log(mem.res)
@@ -92,53 +125,84 @@ let notify = (res,callback) => { //notify is called any time sql is called
        let question = DATA[index[0]]
        mem.res.question = question;
        console.log("Question: " + question)
+       let dirData = JSON.parse(mem.res.dir.DATA)
+      //console.log(requestedFieldName)
+      let reqFieldName = dirData[1][index[1]-1];
+      mem.res.reqFieldName = reqFieldName;
+      console.log(reqFieldName)
        let rightAnswer;
        let answerIsCorrect;
+       if (answer) {
+          console.log("DATA")
+          console.log(DATA[index[1]])
        try {
-        rightAnswer = JSON.parse(DATA[index[1]])
+          
+        rightAnswer = DATA[index[1]]
         answerIsCorrect = (answer.toLowerCase() == rightAnswer.toLowerCase())
        } catch(e) {
+          console.log(e)
          rightAnswer =  DATA[index[1]]
+         console.log("ARRAY DETECTED")
+         rightAnswer = rightAnswer.map(function(e) {
+            return e.toLowerCase();
+         })
+
+         /*
+         const lower = arr.map(element => {
+         return element.toLowerCase();
+         });
+         */
+            
+         answer = answer.toLowerCase();
          answerIsCorrect = ((rightAnswer.indexOf(answer) > -1) ? true : false)
        }
+       }
        mem.res.rightAnswer = rightAnswer;
+       try {
        callback(mem);
+       } catch(e) {}
        
-      let dirData = JSON.parse(mem.res.dir.DATA)
-      //console.log(requestedFieldName)
-      let requestedFieldName = dirData[1][index[1]-1];
-      mem.res.requestedFieldName = requestedFieldName;
-      console.log(requestedFieldName)
+      
       //console.log("Right answer: " + rightAnswer)
       if (answer) { //if there's any answer provided, then check, else just show question
          
          
          if (answerIsCorrect) {
 
-             
+            
             console.log("OK")
+            mem.code = 1; //code OK
             console.log(((rightAnswer.indexOf(answer) > -1) ? true : false))
             console.log(rightAnswer)
             console.log(answer)
-            
+            console.log(mem.res)
             console.log(mem.res.obj.LREPEAT)
+             
             let diff = Date.now()-mem.res.obj.LREPEAT*1;
             console.log("Different in hours: " + diff/1000/60/60)
+            
             diff=2*diff+Date.now();
             console.log("New RDATE: " + new Date(diff))
             mem.update('RDATE',diff,'ID',mem.res.obj.ID)
 
             SPEC = JSON.stringify(SPEC);
-             mem.update("SPEC",SPEC,"ID",mem.res.obj.ID)
-
+            mem.update("SPEC",SPEC,"ID",mem.res.obj.ID);
              
+            
             //mem.get(res.ID)
+            check.clear();
+           
              
+            
+
          } else {
+            
+            check.wrong();
             console.log(((rightAnswer.indexOf(answer) > -1) ? true : false))
             console.log(rightAnswer)
             console.log(answer)
             console.log("BAD")
+            
          }
          ask=null;
           
@@ -147,17 +211,64 @@ let notify = (res,callback) => { //notify is called any time sql is called
 
          
       }
+    
+   console.log("Unblocked: " + Date.now())
+   mem.blocked=0;
+   
+   if (mem.code != 0) {
+      check.right();
+      setTimeout(check.next,1000,mem.code)
+      //check.next(mem.code);
+      mem.code = 0;
+    
+   }  
    }
    if (method=="ask") {
+      mem.code = 0;
       console.log("ASK");
+      
+      if (res) { 
+      mem.nothing = 0;
+      //res is argument given for notify by sql as a result
+      console.log("RES:")
       console.log(res)
-      console.log(mem.res.obj)
+      
+      if (!mem.res) {
+         mem.res = {}
+      }
+       
+       
       mem.res.obj = res;
+       
+
+      if (mem.res) {
+         check.justStarted = 0;
+      }
       console.log(mem.res.obj)
-      if (res) { //res is argument given for notify by sql as a result
+      
       mem.check2(res,callback);
+     
       }  else {
+        
+        
+         mem.nothing = 1;
+         console.error("No objects to repeat")
+         console.log(mem.res)
          console.log("No objects to repeat")
+         method=null;
+
+         console.log("Unblocked: " + Date.now())
+          mem.blocked=0;
+         
+         if (check.justStarted == 0) {
+         check.next(-1);
+         } else {
+            check.justStarted = 0;
+         }
+         
+         try {
+         callback();
+         } catch(e) {}
       }
 }
     
@@ -166,7 +277,38 @@ let notify = (res,callback) => { //notify is called any time sql is called
 
 let answer = null;
 
+mem.when = (id) => {
+   method="when"
+   if (!id) {
+   sql(`SELECT ID, DATA, MIN(RDATE) AS RDATE, LREPEAT, SPEC FROM OBJECTS LIMIT 1`,mem.when2)
+   }
+   
+}
+
+mem.when2 = () => {
+   if (mem) {
+    
+   date = new Date(mem.res.RDATE*1)
+   console.log(date)
+   let diff = mem.res.RDATE*1-Date.now();
+   if (diff <= 0) {
+      diff = 0;
+   }
+   diff = diff/1000/60/60;
+   mem.res.in = diff;
+     
+   } else {
+      mem.res = undefined;
+       
+  
+}
+}
+mem.blocked = 0;
 mem.check = (ans,callback,debug) => {
+   if (!mem.blocked) {
+   console.log("BLOCKED: " + Date.now())
+   mem.blocked = 1;
+   
    //First part of check to find an object in need of repeat
    if (debug) {
    sql(`SELECT ID, DATA, RDATE, LREPEAT, SPEC FROM OBJECTS WHERE ID = "${debug}"`,callback)
@@ -176,14 +318,30 @@ mem.check = (ans,callback,debug) => {
    }
    method='ask'
    answer = ans;
+} else {
+   console.log("Please wait")
 }
+}
+
+mem.count = () => {
+    
+   sql(`SELECT COUNT(ID) FROM OBJECTS WHERE RDATE < '${Date.now()}'`,mem.count2)
+}
+
+mem.count2 = (data) => {
+   console.log(data)
+}
+
 
 mem.getDir = (string) => {
    return string.split(".").slice(0,2).join(".");
 }
 
 mem.check2 = (res,callback) => {
+   console.log("DIR RES")
+   console.log(res)
    let DIRID = mem.getDir(res.ID);
+   console.log("DIRID" + DIRID)
    sql(`SELECT DATA FROM DIRS WHERE ID = '${DIRID}'`,callback);
    method = "ask2"
 }
@@ -228,6 +386,7 @@ mem.addSample = (ID,ARRAY) => {
 
 mem.get = (ID) => 
 {
+   method="get"
    sql(`SELECT * FROM OBJECTS WHERE ID = '${ID}'`);
 }
 
@@ -245,8 +404,9 @@ mem.need = (LIMIT) =>
       sql(`SELECT ID, DATA FROM OBJECTS WHERE DATE < '${DATA.now()}' LIMIT ${LIMIT}`)
    }
 
-mem.update = (FIELD,DATA,CON1,CON2) => {
-   sql(`UPDATE OBJECTS SET ${FIELD} = '${DATA}' WHERE ${CON1} = '${CON2}'`);
+mem.update = (FIELD,DATA,CON1,CON2,callback) => {
+   method="update"
+   sql(`UPDATE OBJECTS SET ${FIELD} = '${DATA}' WHERE ${CON1} = '${CON2}'`,callback);
 }
 
 
