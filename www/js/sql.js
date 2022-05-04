@@ -80,9 +80,17 @@ mem.res.reqFieldName = null;
 mem.code = null;
 mem.nothing = null;
 notify = (res,callback) => { //notify is called any time sql is called
-   if (method=="update") {
+	if (!method) {
+	try {
+		callback(res)
+	} catch(e) {}
+	}
+	if (method=="update") {
       try {
+		  //alert()
+		  console.log("update called")
          callback(res)
+		 // mem.res=res;
          } catch(e) {}
    }
    if (method=="when") {
@@ -185,14 +193,18 @@ notify = (res,callback) => { //notify is called any time sql is called
             console.log("New RDATE: " + new Date(diff))
             mem.update('RDATE',diff,'ID',mem.res.obj.ID)
 
+
             SPEC = JSON.stringify(SPEC);
             mem.update("SPEC",SPEC,"ID",mem.res.obj.ID);
              
             
             //mem.get(res.ID)
             check.clear();
-           
              
+			function inner() {
+				//alert()
+				//check.next(mem.code)
+			}
             
 
          } else {
@@ -211,13 +223,13 @@ notify = (res,callback) => { //notify is called any time sql is called
 
          
       }
-    
-   console.log("Unblocked: " + Date.now())
-   mem.blocked=0;
+
    
    if (mem.code != 0) {
-      check.right();
-      setTimeout(check.next,1000,mem.code)
+       check.right();
+       setTimeout(check.next,200,mem.code)
+
+
       //check.next(mem.code);
       mem.code = 0;
     
@@ -257,8 +269,6 @@ notify = (res,callback) => { //notify is called any time sql is called
          console.log("No objects to repeat")
          method=null;
 
-         console.log("Unblocked: " + Date.now())
-          mem.blocked=0;
          
          if (check.justStarted == 0) {
          check.next(-1);
@@ -303,24 +313,20 @@ mem.when2 = () => {
   
 }
 }
-mem.blocked = 0;
+
 mem.check = (ans,callback,debug) => {
-   if (!mem.blocked) {
-   console.log("BLOCKED: " + Date.now())
-   mem.blocked = 1;
+ 
    
    //First part of check to find an object in need of repeat
    if (debug) {
    sql(`SELECT ID, DATA, RDATE, LREPEAT, SPEC FROM OBJECTS WHERE ID = "${debug}"`,callback)
    
    } else {
-      sql(`SELECT ID, DATA, RDATE, LREPEAT, SPEC FROM OBJECTS WHERE RDATE < '${Date.now()}' LIMIT 1`,callback)
+      sql(`SELECT ID, DATA, RDATE, LREPEAT, SPEC FROM OBJECTS WHERE RDATE < '${Date.now()}' LIMIT 10`,callback)
    }
    method='ask'
    answer = ans;
-} else {
-   console.log("Please wait")
-}
+ 
 }
 
 mem.count = () => {
