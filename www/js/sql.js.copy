@@ -33,14 +33,17 @@ sql = (query,callback) => {
          console.log(tx)
          //console.log(query)
          console.log(results)
-         
+         /*
          try {
-            callback(results.rows)
+            callback(results.rows[0])
          } catch(e) {}
-          
+          */
          try {
-            
-           // notify(results.rows[0],callback)
+            console.error("sql data")
+            console.error(query)
+            console.error(results)
+            console.error(mem.res)
+            notify(results.rows[0],callback)
             
          } catch(e) { 
             console.log(e)
@@ -55,178 +58,12 @@ sql = (query,callback) => {
 let mem = {};
 
 mem.list = [];
-mem.dirList = [];
 mem.collect = () => {
    sql(`SELECT ID, DATA, RDATE, LREPEAT, SPEC FROM OBJECTS WHERE RDATE < '${Date.now()}' LIMIT 10`, mem.collectCallback)
 }
-let ga = 0;
+
 mem.collectCallback = (res) => {
-    
-  for (var i = 0; i<res.length; i++) {
-      
-      if (mem.list.indexOf(res[i]) == -1) {
-         console.log(mem.list.indexOf(res[i]))
-         console.log("pushing")
-         console.log(res[i])
-         mem.list.push(res[i])
-         
-      } else {
-         console.log("Already in")
-      }
-     
-   }
-
-   for (var i = 0; i<mem.list.length; i++) {
-      mem.list[i].DIRID = mem.getDir(mem.list[i].ID);
-      mem.getDirInfo(i,mem.list[i].DIRID)
-       
-   }
-   
-}
-
-mem.reservedI = null;
-mem.getDirInfo = (reservedI,dirid) => {
-   try {
-    
-   mem.reservedI = reservedI;
-    
-   sql(`SELECT DATA FROM DIRS WHERE ID = '${dirid}'`,mem.getDirInfoCallback);
-   } catch(e) {console.log(e)}
-}
-mem.getDirInfoCallback = (res) => {
-   try {
-    
-   mem.dirList.push(res[0].DATA)
-   } catch(e) { console.log(e)}
-}
-
-mem.checkNew = (answer) => {
-   mem.res.obj = mem.list[0];
-   mem.res.dir = mem.dirList[0]
-        
-   method=null; //nullificate method, so it's not checked next sql request
-
-   console.log(mem.res)
-   let DATA = JSON.parse(mem.res.obj.DATA)
-   let SPEC = JSON.parse(mem.res.obj.SPEC);
-  
-   
-   let index = mem.linker(SPEC) //calculate links, meaning what field is asked and which field is considered as answer
-   //index looks like this [n,m], where n and m are numbers from 0 to N,M (integers)
-    //n -> answer field
-    //m -> question field, this needs to be taken from structure table by sql query
-    // [DIR] n [data] ---> m [type]
-    //example: [FRENCH] un renard -> [translation] would be [1,3] as linker
-
-   
-   //console.log("INDEX: " + index)
-   console.log(index)
-   let question = DATA[index[0]]
-   mem.res.question = question;
-   console.log("Question: " + question)
-   let dirData = JSON.parse(mem.res.dir)
-  //console.log(requestedFieldName)
-  let reqFieldName = dirData[1][index[1]-1];
-  mem.res.reqFieldName = reqFieldName;
-  console.log(reqFieldName)
-   let rightAnswer;
-   let answerIsCorrect;
-   if (answer) {
-      console.log("DATA")
-      console.log(DATA[index[1]])
-   try {
-       
-    rightAnswer = DATA[index[1]]
-    answerIsCorrect = (answer.toLowerCase() == rightAnswer.toLowerCase())
-   } catch(e) {
-      console.log(e)
-     rightAnswer =  DATA[index[1]]
-     console.log("ARRAY DETECTED")
-     rightAnswer = rightAnswer.map(function(e) {
-        return e.toLowerCase();
-     })
-
-     /*
-     const lower = arr.map(element => {
-     return element.toLowerCase();
-     });
-     */
-        
-     answer = answer.toLowerCase();
-     answerIsCorrect = ((rightAnswer.indexOf(answer) > -1) ? true : false)
-   }
-   }
-   mem.res.rightAnswer = rightAnswer;
-   try {
-   callback(mem);
-   } catch(e) {}
-   
-  
-  //console.log("Right answer: " + rightAnswer)
-  if (answer) { //if there's any answer provided, then check, else just show question
-     
-     
-     if (answerIsCorrect) {
-
-        
-        console.log("OK")
-        mem.code = 1; //code OK
-
-
-        console.log(((rightAnswer.indexOf(answer) > -1) ? true : false))
-        console.log(rightAnswer)
-        console.log(answer)
-        console.log(mem.res)
-        console.log(mem.res.obj.LREPEAT)
-         
-        let diff = Date.now()-mem.res.obj.LREPEAT*1;
-        console.log("Different in hours: " + diff/1000/60/60)
-        
-        diff=2*diff+Date.now();
-        console.log("New RDATE: " + new Date(diff))
-        mem.update('RDATE',diff,'ID',mem.res.obj.ID)
-        mem.collect();
-
-        SPEC = JSON.stringify(SPEC);
-        mem.update("SPEC",SPEC,"ID",mem.res.obj.ID);
-         
-        
-        //mem.get(res.ID)
-        check.clear();
-         
-     function inner() {
-        //alert()
-        //check.next(mem.code)
-     }
-        
-
-     } else {
-        
-        check.wrong();
-        console.log(((rightAnswer.indexOf(answer) > -1) ? true : false))
-        console.log(rightAnswer)
-        console.log(answer)
-        console.log("BAD")
-        
-     }
-     ask=null;
-      
-     answer= null;
-   
-
-     
-  }
-
-
-if (mem.code != 0) {
-   check.right();
-   setTimeout(check.next,200,mem.code)
-
-
-  //check.next(mem.code);
-  mem.code = 0;
-
-} 
+   mem.list.push(res)
 }
 
 mem.query = null;
@@ -286,7 +123,7 @@ notify = (res,callback) => { //notify is called any time sql is called
        
      
        mem.res.dir = res;
-        
+       mem.list.push(mem.res)
        method=null; //nullificate method, so it's not checked next sql request
 
        console.log(mem.res)
@@ -318,7 +155,7 @@ notify = (res,callback) => { //notify is called any time sql is called
           console.log("DATA")
           console.log(DATA[index[1]])
        try {
-           
+          
         rightAnswer = DATA[index[1]]
         answerIsCorrect = (answer.toLowerCase() == rightAnswer.toLowerCase())
        } catch(e) {
@@ -496,7 +333,7 @@ mem.check = (ans,callback,debug) => {
    sql(`SELECT ID, DATA, RDATE, LREPEAT, SPEC FROM OBJECTS WHERE ID = "${debug}"`,callback)
    
    } else {
-      //sql(`SELECT ID, DATA, RDATE, LREPEAT, SPEC FROM OBJECTS WHERE RDATE < '${Date.now()}' LIMIT 1`,callback)
+      sql(`SELECT ID, DATA, RDATE, LREPEAT, SPEC FROM OBJECTS WHERE RDATE < '${Date.now()}' LIMIT 10`,callback)
    }
    method='ask'
    answer = ans;
