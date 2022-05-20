@@ -137,7 +137,7 @@ document.querySelector('#memosInput').addEventListener('keypress', function (e) 
 
 check.onEnter = () => {
 	 
-	mem.check(check.get())
+	mem.checkNew(check.get())
 	
 	
 }
@@ -152,7 +152,9 @@ check.clear = () => {
 
 }
 check.exit = () => {
-
+	mem.list = [];
+	mem.dirList = [];
+	mem.idList = [];
 
 document.getElementById("memosInput").classList.remove("td5")
 document.getElementById("memosInput").classList.add("opacity0")
@@ -169,13 +171,18 @@ setTimeout(check.toggle,550)
 
 cards = {}
 cards.init = () => {
+mem.answered = 0;
 
 //mem.check time!
 //cards.set("Title")
 check.justStarted=1;
-console.log("!")
-mem.check(undefined,cards.set)
- 
+console.log("Cards init")
+//mem.check(undefined,cards.set)
+mem.nothing = 0;
+try {
+mem.checkNew();
+} catch(e) { console.log(e)};
+cards.set()
 }
 
 cards.p1 = () => {
@@ -279,7 +286,7 @@ if (success) {
 }
  
 	if ((success>0)&&(!mem.nothing)) {
-	mem.check(undefined,check.subNext)
+		check.subNext();
 	} else {
 		check.subNext();
 	}
@@ -331,7 +338,10 @@ check.p5 = () => {
 	document.querySelector("#papers").insertAdjacentHTML("afterbegin", " <div class='pos4 card'></div>");
 }
 check.subNext = () => {
-	 
+	try {
+	mem.code = 0;
+     mem.checkNew();
+	} catch(e) {}
 	 console.log("SUBNEXT INFO")
 	 console.log(mem.res)
 	cards.set(mem,2)
@@ -357,35 +367,26 @@ cards.rem0 = () => {
 //document.querySelector(".table").offsetHeight > 100 то пизда (нужно раздеить на 2 карточки)
 check.justStarted = 0;
 cards.set = (data,pos) => {
+	 
 	try {
-	 
-	 
-	 
 				if (!pos) {
-					pos = 4;
-					
-					
+					pos = 4;		
 				}
 				let renderedCard = null;
 				console.log(mem)
-				if (!mem.nothing) {
-					 
+				if (!mem.nothing) {	 
 				renderedCard = cardSample.replace("$icon","🇫🇷");
 				renderedCard = renderedCard.replace("$title",mem.res.question);
 				renderedCard = renderedCard.replace("$subTitle",mem.res.reqFieldName)
 			} else {
-			    
 				renderedCard = cardwin;
-				 
 				check.win = 1;
 			}
 				console.log("!" + renderedCard)
-				document.querySelector(".pos"+pos).innerHTML = renderedCard;
-				
+				document.querySelector(".pos"+pos).innerHTML = renderedCard;	
 				if (pos==4) {
 					cards.call();
 				}
-			  
 			} catch(e) {
 				console.log(e)
 			}

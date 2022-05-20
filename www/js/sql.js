@@ -26,13 +26,13 @@ sql = (query,callback) => {
    console.log('sql called: ', query)
    mem.query = query;
    db.transaction(function(tx) {
-      console.log(tx)  
+     // console.log(tx)  
       tx.executeSql(query, [], 
          
          function(tx, results) {
-         console.log(tx)
+         //console.log(tx)
          //console.log(query)
-         console.log(results)
+         //console.log(results)
          
          try {
             callback(results.rows)
@@ -56,6 +56,7 @@ let mem = {};
 
 mem.list = [];
 mem.dirList = [];
+mem.idList = [];
 mem.collect = () => {
    sql(`SELECT ID, DATA, RDATE, LREPEAT, SPEC FROM OBJECTS WHERE RDATE < '${Date.now()}' LIMIT 10`, mem.collectCallback)
 }
@@ -64,11 +65,12 @@ mem.collectCallback = (res) => {
     
   for (var i = 0; i<res.length; i++) {
       
-      if (mem.list.indexOf(res[i]) == -1) {
-         console.log(mem.list.indexOf(res[i]))
-         console.log("pushing")
-         console.log(res[i])
+      if (mem.idList.indexOf(res[i].ID) == -1) {
+         //console.log(mem.list.indexOf(res[i]))
+         //console.log("pushing")
+         //console.log(res[i])
          mem.list.push(res[i])
+         mem.idList.push(res[i].ID)
          
       } else {
          console.log("Already in")
@@ -100,9 +102,22 @@ mem.getDirInfoCallback = (res) => {
    } catch(e) { console.log(e)}
 }
 
+mem.answered = 0;
+mem.lastAnswered = null;
 mem.checkNew = (answer) => {
-   mem.res.obj = mem.list[0];
-   mem.res.dir = mem.dirList[0]
+   mem.res.obj = mem.list[mem.answered];
+   if (mem.res.obj) {
+      
+      
+      
+      mem.res.dir = mem.dirList[mem.answered]
+       
+      mem.lastAnswered = mem.answered;
+       
+   } else {
+      console.log("No more objects to repeat")
+      mem.nothing=1;
+   }
         
    method=null; //nullificate method, so it's not checked next sql request
 
@@ -131,21 +146,25 @@ mem.checkNew = (answer) => {
   console.log(reqFieldName)
    let rightAnswer;
    let answerIsCorrect;
+   rightAnswer = DATA[index[1]]
+   mem.rightAnswer = rightAnswer;
    if (answer) {
       console.log("DATA")
       console.log(DATA[index[1]])
    try {
        
     rightAnswer = DATA[index[1]]
+    mem.rightAnswer = rightAnswer;
     answerIsCorrect = (answer.toLowerCase() == rightAnswer.toLowerCase())
    } catch(e) {
       console.log(e)
      rightAnswer =  DATA[index[1]]
+     
      console.log("ARRAY DETECTED")
      rightAnswer = rightAnswer.map(function(e) {
         return e.toLowerCase();
      })
-
+     mem.rightAnswer = rightAnswer;
      /*
      const lower = arr.map(element => {
      return element.toLowerCase();
@@ -154,6 +173,7 @@ mem.checkNew = (answer) => {
         
      answer = answer.toLowerCase();
      answerIsCorrect = ((rightAnswer.indexOf(answer) > -1) ? true : false)
+     //alert(answerIsCorrect)
    }
    }
    mem.res.rightAnswer = rightAnswer;
@@ -185,7 +205,8 @@ mem.checkNew = (answer) => {
         diff=2*diff+Date.now();
         console.log("New RDATE: " + new Date(diff))
         mem.update('RDATE',diff,'ID',mem.res.obj.ID)
-        mem.collect();
+
+        
 
         SPEC = JSON.stringify(SPEC);
         mem.update("SPEC",SPEC,"ID",mem.res.obj.ID);
@@ -207,6 +228,8 @@ mem.checkNew = (answer) => {
         console.log(rightAnswer)
         console.log(answer)
         console.log("BAD")
+        mem.code = 0;
+
         
      }
      ask=null;
@@ -218,10 +241,23 @@ mem.checkNew = (answer) => {
   }
 
 
-if (mem.code != 0) {
-   check.right();
-   setTimeout(check.next,200,mem.code)
-
+if (mem.code != null) {
+    
+   //check.right();
+  // setTimeout(check.next,200,mem.code)
+  if (mem.code == 1) {
+     //alert("Clearing: " + mem.answered)
+     mem.list[mem.answered]=null;
+     mem.idList[mem.answered]=null;
+     mem.dirList[mem.answered]=null;
+    // alert("++", mem.answered)
+     mem.answered++;
+     //!!! Here should be updating the memos buffer
+     mem.collect();
+    
+   check.next(mem.code)
+  }
+    
 
   //check.next(mem.code);
   mem.code = 0;
@@ -322,7 +358,7 @@ notify = (res,callback) => { //notify is called any time sql is called
         rightAnswer = DATA[index[1]]
         answerIsCorrect = (answer.toLowerCase() == rightAnswer.toLowerCase())
        } catch(e) {
-          console.log(e)
+          
          rightAnswer =  DATA[index[1]]
          console.log("ARRAY DETECTED")
          rightAnswer = rightAnswer.map(function(e) {
@@ -469,10 +505,11 @@ mem.when = (id) => {
    
 }
 
-mem.when2 = () => {
-   if (mem) {
-    
-   date = new Date(mem.res.RDATE*1)
+mem.when2 = (res) => {
+   
+   if (res[0]) {
+     
+   date = new Date(res[0].RDATE*1)
    console.log(date)
    let diff = mem.res.RDATE*1-Date.now();
    if (diff <= 0) {
@@ -536,6 +573,8 @@ mem.drop = () => {
 
 mem.addExample = () => {
    mem.add("1.1.1",["Un renard",["А рынар","123"],"A fox"])
+   mem.add("1.1.2",["Le temps",["Лю тон","123"],"The time"])
+   mem.add("1.1.3",["Le ciel",["Лю сьель","123"],"The sky"])
    mem.addDir('1.1',[["FRE","FRENCH"],["Original","Transcription","Translation"]])
 }
 mem.set = function(ID,DATA,SPEC) {
@@ -640,6 +679,8 @@ mem.sublinker = (SPEC) => {
       }
    }
 }
+
+mem.collect();
  
  
 /* Examples:
