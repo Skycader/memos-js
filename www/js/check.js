@@ -171,8 +171,9 @@ setTimeout(check.toggle,550)
 
 cards = {}
 cards.init = () => {
+mem.collect();
 mem.answered = 0;
-
+mem.nothing=0;
 //mem.check time!
 //cards.set("Title")
 check.justStarted=1;

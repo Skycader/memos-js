@@ -679,9 +679,9 @@ mem.sublinker = (SPEC) => {
       }
    }
 }
-
+mem.addExample();
 mem.collect();
- 
+
  
 /* Examples:
 sql("INSERT INTO OBJECTS (ID, DATA, repeat, dir) VALUES ('2.3','DATA',10,'main')")
