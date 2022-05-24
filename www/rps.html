@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="format-detection" content="telephone=no">
+        <meta name="msapplication-tap-highlight" content="no">
+        <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no, shrink-to-fit=no">
+        <meta name="color-scheme" content="light dark">
+        <style>
+            body {
+                 
+                background: #242424;
+            }
+            .root {
+                display: flex;
+                flex-wrap: wrap;
+                align-items: center;
+            }
+            .panel {
+                display: flex;
+                flex-wrap: wrap;
+                align-items: center;
+                justify-content: space-around;
+                border-radius: 15px;
+                background: #141414;
+                width: 100%;
+                height: 70px;
+                margin: 30px 25px 0px 25px;
+                color: white;
+                font-family: memoff;
+                font-size: 20px;
+                
+            }
+
+            .tasks {
+                display: flex;
+                flex-wrap: wrap;
+                align-items: center;
+                width: 100%;
+            }
+
+            .break {
+                flex-basis: 100%;
+                height: 0;
+            }
+            .item {
+                width: 12.5%;
+                display: flex;
+                justify-content: center;
+                
+            }
+
+            *:focus {
+                outline: none;
+            }
+
+            .hidden {
+                display: none
+            }
+
+            .add {
+                cursor: pointer;
+            }
+
+            @font-face {
+				font-family: memoff; /* Имя шрифта */
+				src: url(css/memoff.woff);
+         
+		   }	
+        </style>
+    </head>
+    <body>
+        <div class="root">
+            <div class="tasks"> 
+                <div startDate class="hidden panel example">
+                    <div contenteditable class="item">Name</div>
+                    <div contenteditable class="item">0</div>
+                    <div contenteditable class="item">0</div>
+                    <div class="item">0</div>
+                    <div contenteditable class="item">0</div>
+                    <div class="item">0</div>
+                    <div class="item">0</div>
+                    <div contenteditable class="item">0</div>
+                </div>
+
+                <div class="panel">
+                    <div class="item">Name</div>
+                    <div class="item">Done</div>
+                    <div class="item">Total</div>
+                    <div class="item">Days left</div>
+                    <div class="item">Finish within</div>
+                    <div class="item">To do today</div>
+                    <div class="item">Working days left</div>
+                    <div class="item">Began days ago</div>
+                </div>
+
+ 
+            </div>
+            <div class="add panel">Add task</div> 
+          
+        </div>
+        <script>
+            
+            let element = document.querySelector(".example")
+            let log = []
+            let rps = {
+                tasks: [],
+                add: (arg) => {
+                    let clone = element.cloneNode(true)
+                    document.querySelector(".tasks").appendChild(clone)
+                    let examples = document.querySelectorAll(".example")
+                     
+                    examples[1].classList.toggle("hidden")
+                    examples[1].classList.toggle("example")
+                    examples[1].attributes.startDate.textContent = Date.now()
+                    examples[1].addEventListener("contextmenu", function(e) {
+                        e.preventDefault();
+                        confirmDelete = confirm("Do you really want to delete this task?")
+                        if (confirmDelete) {
+                        this.remove()
+                        rps.save()
+                        }
+                        })
+                    rps.save()    
+                    if (arg[0]) {
+                        let panels = document.querySelectorAll(".panel")
+                        let length = panels.length-=2;
+                        let panel = panels[length]
+                        for (var i = 0; i<8; i++) {
+                            panel.children[i].innerHTML = arg[i]
+                        }
+     
+                         
+                    }
+                },
+                get: () => {
+                    
+                    let task
+                    let taskChildren
+                    rps.tasks = []
+                    let tasksLength = document.querySelectorAll(".panel").length
+                    
+                    for (var i = 2; i<tasksLength-1; i++) {
+                         
+                        task = document.querySelectorAll(".panel")[i]
+                        taskChildren = task.children
+                        let pushingArray = []
+                        for (var j = 0; j<8; j++) {
+                            pushingArray.push(taskChildren[j].innerHTML)
+                        }
+                        
+                        let newDate = Date.now()-1*taskChildren[7].innerHTML*24*60*60*1000
+                        console.log(newDate)
+                        task.attributes.startDate.textContent = newDate
+                        pushingArray.push(task.attributes.startDate.textContent)
+                        console.log(pushingArray)
+                        rps.tasks.push(pushingArray)
+                    }
+            },
+            restore : (array) => {
+                
+                for (var i = 0; i<array.length; i++) {
+                    rps.add(array[i])
+                }
+                
+            },
+
+            save: () => {
+                rps.get()
+                localStorage.setItem("tasks",JSON.stringify(rps.tasks))
+            },
+
+            load: () => {
+                let load = localStorage.getItem("tasks")
+                load = JSON.parse(load)
+                rps.restore(load)
+            },
+
+            render: () => {
+                let task
+                let taskChildren
+                rps.tasks = []
+                let tasksLength = document.querySelectorAll(".panel").length
+                
+                for (var i = 2; i<tasksLength-1; i++) {
+                        
+                    task = document.querySelectorAll(".panel")[i]
+                    taskChildren = task.children
+                    taskChildren[7].innerHTML = Math.floor((Date.now() - 1*task.attributes.startDate.textContent)/1000/60/60/24)
+                     
+                    }                
+            }
+            }
+
+            document.querySelector('.add').onclick = rps.add
+
+            window.onload = () => {
+                rps.load();
+            }
+
+            document.querySelector("html").addEventListener("keyup",function(){
+                if (document.querySelectorAll(".panel").length>3) {
+                rps.save()
+            }
+            }) 
+        </script>
+    </body>
+</html>

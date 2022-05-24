@@ -85,9 +85,13 @@
 
 .memobject {
     margin-top: 10px;
+    padding: 10px;
     background: #1d1d1d;
     width: calc(100% - 10px);
     height: 80px;
     border-radius: 25px;
+    display: flex;
+    align-items: center;
+    font-size: 15px;
 }
 

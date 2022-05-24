@@ -152,9 +152,18 @@ check.clear = () => {
 
 }
 check.exit = () => {
-	mem.list = [];
-	mem.dirList = [];
-	mem.idList = [];
+	//mem.list = [];
+	//mem.dirList = [];
+	//mem.idList = [];
+	if (mem.list[0] !== undefined) {
+	if (mem.list[0] == null) {
+	 
+			mem.list.shift();
+			mem.idList.shift();
+			mem.dirList.shift();
+			
+	}
+	}
 
 document.getElementById("memosInput").classList.remove("td5")
 document.getElementById("memosInput").classList.add("opacity0")
