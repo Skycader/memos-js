@@ -15,6 +15,9 @@ $("#editMenu").on("click tap touch touchmove touchend touchstart mousedown", fun
     
 });
 
+document.querySelector("#thatcircle").addEventListener("touchend", function() {
+	check.toggle();
+})
 var globalScreen = 1;
 var anim = false;
 var dir = false;
