@@ -83,7 +83,7 @@
      
 }
 
-.memobject {
+.memobject2 {
     margin-top: 10px;
     padding: 10px;
     background: #1d1d1d;
@@ -95,3 +95,44 @@
     font-size: 15px;
 }
 
+.memobject {
+    margin-top: 10px;
+    padding: 10px;
+    width: calc(100% - 10px);
+    border-bottom: 2px solid #151515;
+    height: 80px;
+    display: flex;
+    align-items: center;
+    font-size: 15px;
+}
+
+.memid {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 10px;
+    margin-left: 20px;
+    border-radius: 5px;
+    padding: 10px;
+    height: 100%;
+    font-size: 33px;
+    font-family: memoff;
+    color: white
+   }
+  
+   .memdata {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: calc(100% - 60px);
+    overflow-x: hidden;
+    overflow-y: hidden;
+    margin-left: 13px;
+    border-radius: 5px;
+    padding: 10px 60px 10px 10px;
+    height: 100%;
+    font-size: 33px;
+    font-family: memoff;
+    color: white
+   }
+   

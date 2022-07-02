@@ -9,6 +9,7 @@ $("#stick").on("click tap touch touchmove touchend touchstart mousedown", functi
     
 }); 
 
+ 
 $("#editMenu").on("click tap touch touchmove touchend touchstart mousedown", function( event ) {
      event.stopPropagation();
     
@@ -117,7 +118,7 @@ window.addEventListener('resize', function(event) {
 keyboard.open = () => {
 		defaultWindowHeight = window.innerHeight
 		document.getElementById("memosInput").classList.remove("opacity0")
-		document.getElementById("memosInput").classList.add("td5")
+		//document.getElementById("memosInput").classList.add("td5")
 		document.getElementById("memosInput").focus();
 
 		inner = () => {
@@ -151,10 +152,16 @@ check.get = () => {
 }
 
 check.clear = () => {
-	document.querySelector("#memosInput").value = ''
+	 
+	document.querySelector("#memosInput").innerHTML = ''
+	document.querySelector("#memosInput").style.height = 49 + "px"
+	document.querySelector("#memosInput").style.height = $("#memosInput").get(0).scrollHeight + "px"
+	document.querySelector(".memokeyboard").scrollBy(0,1000000)
 
 }
 check.exit = () => {
+	check.clear()
+	document.querySelector("#thatcircle").classList.remove("omniscale2");
 	//mem.list = [];
 	//mem.dirList = [];
 	//mem.idList = [];
@@ -168,7 +175,7 @@ check.exit = () => {
 	}
 	}
 
-document.getElementById("memosInput").classList.remove("td5")
+//document.getElementById("memosInput").classList.remove("td5")
 document.getElementById("memosInput").classList.add("opacity0")
  
 document.getElementById("memosInput").value = ""
@@ -178,7 +185,7 @@ cards.close()
 inititated=false;
 document.querySelector("#memosInput").value = "";
 document.querySelector("#memosInput").classList.remove("padding")
-setTimeout(check.toggle,550)
+setTimeout(check.toggle,2000)
 }
 
 cards = {}
@@ -225,10 +232,11 @@ cards.p1 = () => {
 	}
 
 	cards.call = () => {
-	cards.p3();
+	//cards.p3();
 //cards.set("Title")
-setTimeout(cards.p2,100)
-setTimeout(cards.p1,200)
+setTimeout(cards.p3,300)
+setTimeout(cards.p2,1000)
+setTimeout(cards.p1,1400)
 	}
 
 cards.insert = (amount) => {
@@ -298,11 +306,13 @@ if (success) {
 	cards.color = "wrongcolor"
 }
  
-	if ((success>0)&&(!mem.nothing)) {
-		check.subNext();
-	} else {
-		check.subNext();
-	}
+	// if ((success>0)&&(!mem.nothing)) {
+	// 	check.subNext();
+	// } else {
+	// 	check.subNext();
+	// }
+
+	check.subNext();
  
 }
 check.right = () => {
@@ -314,9 +324,9 @@ check.p1 = () => {
 	try {
 		document.querySelector(".pos1").classList.add("work")
 		document.querySelector(".work").classList.remove("pos1")
-		document.querySelector(".work").classList.add("pos0")
+		document.querySelector(".work").classList.add("pos00")
 		document.querySelector(".work").classList.add(cards.color)
-		document.querySelector(".pos0").classList.remove("work")
+		document.querySelector(".pos00").classList.remove("work")
 		} catch(e) {}
 }
 
@@ -367,13 +377,13 @@ check.subNext = () => {
 		setTimeout(check.p4,200)
 		setTimeout(check.p5,250)
 		
-		setTimeout(cards.rem0,300);
+		setTimeout(cards.rem0,500);
 	 
 	}
  
 cards.rem0 = () => {
 	try {
-		document.querySelector(".pos0").remove()
+		document.querySelector(".pos00").remove()
 		} catch(e){}
 
 }
@@ -392,7 +402,7 @@ cards.set = (data,pos) => {
 				renderedCard = renderedCard.replace("$title",mem.res.question);
 				renderedCard = renderedCard.replace("$subTitle",mem.res.reqFieldName)
 			} else {
-				renderedCard = cardwin;
+				renderedCard = cardWin;
 				check.win = 1;
 			}
 				console.log("!" + renderedCard)
@@ -404,17 +414,82 @@ cards.set = (data,pos) => {
 				console.log(e)
 			}
 		}
-		 
 
-cardSample = '<div><div class="forpicture">$icon</div> <div class="prepare2"> <div class="prepare3"> <p class="tip">$subTitle</p> </div> </div> </div> <div class="table"> <div class="table2"> <div class="cell prepare0"> <div class="prepare">$title</div>  </div> </div> </div>'
+cardSample = `
+	<div class='infopanel'>
+	<div class='diricon'>
+		<div class="forpicture">🇫🇷</div>
+		<div class="prepare2"> 
+			<div class="prepare3">
+				<p class="tip">$subTitle</p>
+			</div>
+	</div>
+	</div>
+	<div class='dirname'>French</div>
+	</div>
+
+	<div class='datapanel'>
+		<div class='innerdata'>
+		$title
+		</div>
+	</div>
+`
+
+cardWin = `
+	<div class='infopanel'>
+	<div class='diricon'>
+		<div class="forpicture"><div class='medal'><img src='assets/medal.svg'/></div></div>
+		<div class="prepare2"> 
+			<div class="prepare3">
+				<p class="tip"></p>
+			</div>
+	</div>
+	</div>
+	<div class='dirname'>All complete</div>
+	</div>
+
+	<div class='datapanel'>
+		<div class='innerdata'>
+		Pay us a visit in 3 hours
+		</div>
+	</div>
+`
+		 
+cardSampleDebug = `
+	<div class='infopanel'>
+	<div class='diricon'>
+		<div class="forpicture">🇫🇷</div>
+		<div class="prepare2"> 
+			<div class="prepare3">
+				<p class="tip">Transcription</p>
+			</div>
+	</div>
+	</div>
+	<div class='dirname'>French</div>
+	</div>
+
+	<div class='datapanel'>
+		<div class='innerdata'>
+		${"Un renard".repeat(50)}
+		</div>
+	</div>
+`
+
+
+cardSampleWAS = '<div><div class="forpicture">$icon</div> <div class="prepare2"> <div class="prepare3"> <p class="tip">$subTitle</p> </div> </div> </div> <div class="table"> <div class="table2"> <div class="cell prepare0"> <div class="prepare">$title</div>  </div> </div> </div>'
 cardSample2 = "<div class='forpicture'>$icon</div> <div class='table'> <div class='table2'> <div class='cell prepare0'> <div class='prepare'>$title</div> <div class='prepare2'> <div class='prepare3'> <p class='tip'>$subTitle</p> </div> </div> </div> </div> </div>"
-cardwin = " <div class='forpicture'><img src='assets/medal.svg'></div> <div class='table'> <div class='table2'> <div class='cell prepare0'> <div class='prepare'>All complete!</div> <div class='prepare2'> <div class='prepare3'> <p class='tip'>Pay us a visit in 3 hours.</p> </div> </div> </div> </div> </div> "	
+cardwinWAS = " <div class='forpicture'><img src='assets/medal.svg'></div> <div class='table'> <div class='table2'> <div class='cell prepare0'> <div class='prepare'>All complete!</div> <div class='prepare2'> <div class='prepare3'> <p class='tip'>Pay us a visit in 3 hours.</p> </div> </div> </div> </div> </div> "	
 
 cardid= "<div class='table'> <div class='table2'> <div class='cell pad'> <div> $id </div> </div></div></div> "
 cardid2 = "<div class='pos4 card'><div class='table'> <div class='table2'> <div class='cell pad'> <div> $id </div> </div></div></div></div>"
  
 
 cards.close = () => {
+
+document.querySelector(".pos1").style.height = $(".pos1").height()
+document.querySelector(".pos2").style.height = $(".pos2").height()
+document.querySelector(".pos3").style.height = $(".pos3").height()
+
 
 function p1(){
 try {
@@ -446,34 +521,70 @@ document.querySelector(".pos00").classList.remove("work")
 }
 
 function rem(){
-	 for (var i = 0; i < 58; i++) {
+	 for (var i = 0; i < 4; i++) {
 		 document.querySelector(".card").remove()
 		 console.log( document.querySelector(".card"))
 	 }
 }
 
-p1()
-setTimeout(p2,35)
-setTimeout(p3, 65)
-setTimeout(rem,500)
+setTimeout(p1,400)
+setTimeout(p2,800)
+setTimeout(p3, 1200)
+setTimeout(rem,2000)
 
  
 }
  
 check.toggled = 0;
-
+var height = 0
+var prevHeight = 0
 check.check = (ans) => {
- 
-		ans = ans.toLowerCase()
+		height = document.querySelector("#memosInput2").style.height.slice(0,-2)*1
+		document.querySelector("#memosInput2").innerHTML = document.querySelector("#memosInput").innerHTML
+		document.querySelector("#memosInput2").style.height = 49 + "px"
+		document.querySelector("#memosInput2").style.height = $("#memosInput2").get(0).scrollHeight + "px"
 		
-		if (document.querySelector("#textarea").value.length >= 24) {
-			document.querySelector("#textarea").classList.add("padding")
-		} else {
-			document.querySelector("#textarea").classList.remove("padding")
-		}
+		// var temp = document.querySelector("#memosInput").innerHTML
+		// count = (temp.match(/<div>/g) || []).length;
+		
+		setTimeout(check.check2,0,ans)
+		
+		 
 }
 
+check.check2 = (ans) => {
+	
+	if (document.querySelector("#memosInput2").style.height.slice(0,-2)*1 < prevHeight) {
+		 
+		document.querySelector(".memokeyboard").scrollBy(0,-34)
+		setTimeout(inner,100)
+	}
+	if (document.querySelector("#memosInput2").style.height.slice(0,-2)*1 > prevHeight) {
+		
+		inner()
+		//document.querySelector(".memokeyboard").scrollBy(0,34)
+		
+	}
+	function inner() {
+		 
+		document.querySelector("#memosInput").style.height = $("#memosInput2").get(0).scrollHeight + "px"
+		console.log(document.querySelector("#memosInput").style.height, " ", document.querySelector("#memosInput2").style.height)
+	}
+	prevHeight = document.querySelector("#memosInput2").style.height.slice(0,-2)*1
+	 
+	//document.querySelector("#memosInput").style.height = $("#memosInput").get(0).scrollHeight + "px" 
+	
+	ans = ans || ""
+	ans = ans.toLowerCase()
+}
 
+check.start = () => {
+	if (!check.toggled) {
+		check.toggle()
+		
+	}
+	 
+}
 check.toggle = () => {
 
 
@@ -494,7 +605,8 @@ check.toggled = 1;
 
 document.querySelector("#keyboard2").classList.remove("donotdisplay")
  
-setTimeout(keyboard.open,800);
+setTimeout(keyboard.open,300);
+
 document.querySelector("svg").onclick = ''
 }
  
@@ -502,32 +614,13 @@ document.querySelector("#keyboard").classList.toggle("hidekeyboard")
 document.querySelector("#menu").classList.toggle("remove-up")
 document.querySelector("#simplex").classList.toggle("remove-down")
 
+ 
+
 if (check.toggled) {
-document.querySelector("#info1").classList.add("hideT")
-document.querySelector("#info2").classList.add("hideT")
-document.querySelector("#info3").classList.add("hideT")
-document.querySelector("#info4").classList.add("hideT")
-document.querySelector("#info5").classList.add("hideT")
-
-document.querySelector("#info1").classList.remove("hideT2")
-document.querySelector("#info2").classList.remove("hideT2")
-document.querySelector("#info3").classList.remove("hideT2")
-document.querySelector("#info4").classList.remove("hideT2")
-document.querySelector("#info5").classList.remove("hideT2")
+document.querySelector("#info").classList.add("hideT")
 } else {
-document.querySelector("#info1").classList.add("hideT2")
-document.querySelector("#info2").classList.add("hideT2")
-document.querySelector("#info3").classList.add("hideT2")
-document.querySelector("#info4").classList.add("hideT2")
-document.querySelector("#info5").classList.add("hideT2")
-
-document.querySelector("#info1").classList.remove("hideT")
-document.querySelector("#info2").classList.remove("hideT")
-document.querySelector("#info3").classList.remove("hideT")
-document.querySelector("#info4").classList.remove("hideT")
-document.querySelector("#info5").classList.remove("hideT")
+document.querySelector("#info").classList.remove("hideT")
 }
-
 
 if (check.toggled) {
 document.querySelector("html").classList.toggle("omniflow");
@@ -538,6 +631,12 @@ document.querySelector("body").classList.toggle("omniflow");
  
 
 document.querySelector("#thatcircle").classList.toggle("omniscale");
+function inner() {
+	document.querySelector("#thatcircle").classList.add("omniscale2");
+}
+if (check.toggled) {
+setTimeout(inner,500)
+}
  }
 }
 

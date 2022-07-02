@@ -40,19 +40,31 @@
 <body>
    <!--opacity 0 stands for curtain thing...-->
    <div class='menu ' style="opacity-0">
-      <div id='papers' class='donotdisplay'>
+      <div id='papers' onclick='document.getElementById("memosInput").focus();' class='donotdisplay'>
       </div>
       <div id='keyboard' onclick='document.getElementById("memosInput").focus();' oninput='check()' class='hidekeyboard'
-         style="position: absolute; width: 100%; height: calc(100vh - 0px); top: 0px; z-index: 999; opacity: 0; ">
+         style="display: none; position: absolute; width: 100%; margin-top: 50vh; height: 50vh; top: 0px; z-index: 999; opacity: 0; ">
       </div>
       <div id='keyboard2' class='donotdisplay'
          style='display: flex; overflow: hidden; position: absolute; border: 0px solid red; width: 100vw; height: 100vh; align-items: flex-end; justify-content: center'>
-         <div
+         <!--<div
             style="min-width: 20%;right: 80%; position: absolute; height: 49px; z-index: 999;background: linear-gradient(90deg, rgba(36,36,36,1) 20%, rgba(36,36,36,0) 100%);">
-         </div>
-         <input id='memosInput' oninput="check.check(this.value)" class='opacity0'
+         </div>-->
+         <!--<input id='memosInput' oninput="check.check(this.value)" class='opacity0'
             style="  border: 0px solid red;font-family: Round;font-size: 25px;color: white;background: transparent;outline: none;resize: none;height: 34px;height: 49px;overflow: hidden;text-align: center; max-width: 360px; min-width: 100%;   opacity: 1;position: relative;"
-           >
+           >-->
+         <div class="memokeyboard" onclick='document.getElementById("memosInput").focus();' style="scroll-behavior: smooth; width: 100%; height: 100%; overflow-y: scroll">
+            <div style="width: 100%; height: calc(100% - 50px)"></div>
+            <div contenteditable id='memosInput' oninput='check.check(this.value)' style="max-width: 400px; padding: 10px; border-radius: 15px 15px 0px 0px; border: 0px solid red;font-family: Round;font-size: 25px;color: white; z-index: 99; box-shadow: 0 0 10px rgb(0 0 0 / 50%); background: #171717; outline: none;resize: none;height: 34px;height: 49px; text-align: center;  width: 100%; opacity: 1;position: relative;" class='opacity0'>
+            </div>
+             
+      </div>  
+      <div style='opacity: 0; margin-bottom: 100px; width: 100%; position: absolute' class="memokeyboard" onclick='document.getElementById("memosInput").focus();' style="scroll-behavior: smooth; width: 100%; height: 100%; overflow-y: scroll">
+         <div style="width: 100%; height: calc(100% - 50px)"></div>
+         <div contenteditable id='memosInput2' oninput='check.check(this.value)' style="max-width: 400px; padding: 10px; border-radius: 15px 15px 0px 0px; border: 0px solid red;font-family: Round;font-size: 25px;color: white; z-index: 99; box-shadow: 0 0 10px rgb(0 0 0 / 50%); background: #171717; outline: none;resize: none;height: 34px;height: 49px; text-align: center;  width: 100%; opacity: 1;position: relative;">
+         </div>
+          
+   </div> 
 
       </div>
       <div id='menu' class='aboveAll'
@@ -112,37 +124,38 @@
                            style="stroke-dasharray:  50 100; filter: drop-shadow( 0px 0px 1.2px rgb(255, 255, 255))" d="M18 2.0845
                            a 15.9155 15.9155 0 0 1 0 31.831
                            a 15.9155 15.9155 0 0 1 0 -31.831" />
-                        <text id='info1' x="50%" y="25%" text-anchor="middle" class='opacive' font-family="Round"
-                           fill="white" font-size="2.2px" dy=".3em">00:21:48</text>
-                        <text id='info2' x="50%" y="34%" text-anchor="middle" class='opacive' font-family="Round"
-                           fill="white" font-size="2.2px" stroke-width="1px" dy=".3em">160 | 512</text>
-                        <text id='info3' x="50%" y="50%" text-anchor="middle" font-family="Round" fill="white"
-                           font-size="5px" stroke-width="1px" dy=".3em">80</text>
-                        <text id='info4' x="50%" y="66%" text-anchor="middle" class='opacive' font-family="Round"
-                           fill="white" font-size="2.2px" stroke-width="1px" dy=".3em">0</text>
-                        <text id='info5' x="50%" y="75%" text-anchor="middle" class='opacive' font-family="Round"
-                           fill="white" font-size="2.2px" stroke-width="1px" dy=".3em">12:06:32</text>
+                           <g id="info">
+                           <text id='info1' x="50%" y="25%" text-anchor="middle" class='opacive' font-family="Round"
+                              fill="white" font-size="2.2px" dy=".3em">00:21:48</text>
+                           <text id='info2' x="50%" y="34%" text-anchor="middle" class='opacive' font-family="Round"
+                              fill="white" font-size="2.2px" stroke-width="1px" dy=".3em">160 | 512</text>
+                           <text id='info3' x="50%" y="50%" text-anchor="middle" font-family="Round" fill="white"
+                              font-size="5px" stroke-width="1px" dy=".3em">80</text>
+                           <text id='info4' x="50%" y="66%" text-anchor="middle" class='opacive' font-family="Round"
+                              fill="white" font-size="2.2px" stroke-width="1px" dy=".3em">0</text>
+                           <text id='info5' x="50%" y="75%" text-anchor="middle" class='opacive' font-family="Round"
+                              fill="white" font-size="2.2px" stroke-width="1px" dy=".3em">12:06:32</text>
 
-                        <rect x="16%" y="45%" rx="1" ry="1" width="5.5" height="2.5"
-                           style="fill:rgb(30, 255, 0); filter: drop-shadow( 0px 0px 2px rgb(2, 255, 14));" />
-                        <rect x="67%" y="45%" rx="1" ry="1" width="5.5" height="2.5"
-                           style="fill:rgb(30, 255, 0); filter: drop-shadow( 0px 0px 2px rgb(2, 255, 14));" />
-
+                           <rect x="16%" y="45%" rx="1" ry="1" width="5.5" height="2.5"
+                              style="fill:rgb(30, 255, 0); filter: drop-shadow( 0px 0px 2px rgb(2, 255, 14));" />
+                           <rect x="67%" y="45%" rx="1" ry="1" width="5.5" height="2.5"
+                              style="fill:rgb(30, 255, 0); filter: drop-shadow( 0px 0px 2px rgb(2, 255, 14));" />
+                           </g>
 
                      </g>
                   </svg>
 
                </div>
-            </div>
+         </div>
             <!-- 158px if does not fit  (115px if iPhone vertical)-->
             <!-- обратно -->
-            <div id='simplex' class='quickMenu container' onclick='check.toggle()'
+            <div id='simplex' class='quickMenu container' onclick='check.start()'
                style='position: absolute; scroll-behavior: smooth;  height: 100vh; width: 100vw; overflow: scroll;'>
                <!-- <div style='width: 100%; height: 100%; background: red'></div> -->
                <div id='simplexPadding' style='scroll-snap-align: start; width: 100vw' class='verticalSimplex'>
                   <div style='height: 35vh; border: 0px solid red'></div>
                </div>
-               <div id='stats' onclick='check.toggle()' class=' '
+               <div id='stats' onclick='check.start()' class=' '
                   style='scroll-snap-align: start; position: relative;  border: 0px solid red; width: 100%; min-height: 	100px;  display: flex; flex-direction: column; align-items: flex-start; justify-content: flex-end; transition-duration: 0.5s '>
                   <div id='stick' onclick='upIt()' class='quickMenu transition'
                      style='z-index: 9999; width: 100vw; position: absolute; height: 110px; background: #242424; padding-top: 10px; border-radius: 15px 15px 0px 0px'>
@@ -226,7 +239,7 @@
                   </div>
                </div>
             </div>
-            <div class="page2-node4 scrollBarNone">
+            <div  class="page2-node4 scrollBarNone">
                <div class="page2-node5">
                </div>
 
@@ -237,8 +250,9 @@
                   <div class="page2-node6" style="box-shadow: 0 0 10px rgb(0 0 0 / 50%); padding: 10px; width: 100%; background: #232323">
                   <div style="height: 5px"></div>
                   <div class="stick"></div>
-                  <div class="memobject">
-                     <div style="background: grey; border-radius: 5px; padding: 10px; height: 30px">1</div>
+                  <div onclick="mem.browser()" class="memobject">
+                     <div class="memid">🌐</div>
+                     <div class="memdata">Languages</div>
                   </div>
                   <div class="memobject"></div>
                   <div class="memobject"></div>
@@ -267,7 +281,7 @@
          </div>
 
          <div class='page3' style='     display: content'>
-
+               
          </div>
 
          <div class='page4' style='     display: content'>
@@ -364,6 +378,8 @@
       } catch (e) { alert(e) }
    }
 
+// check.toggle()
+// setTimeout(check.exit,4000)
 </script>
 
 </html>

@@ -2,8 +2,8 @@ method = null; //methods like need, set, get ... etc.
 var db = openDatabase('MEMODB', '1.0', 'OBJECTS DATABASE', null);
 db.transaction(function (tx) { 
    //rDATA - repeatition DATA; lrepeat - last repeat unix time; dur - duration;
-   tx.executeSql('CREATE TABLE IF NOT EXISTS OBJECTS (ID unique, DATA, RDATE, LREPEAT, SPEC)');
-   tx.executeSql('CREATE TABLE IF NOT EXISTS DIRS (ID unique, DATA)');
+   tx.executeSql('CREATE TABLE IF NOT EXISTS OBJECTS (PID, DATA, RDATE, LREPEAT, SPEC)'); //PID - PARENT ID
+   tx.executeSql('CREATE TABLE IF NOT EXISTS DIRS (ID unique, PID, DATA)'); 
    tx.executeSql('CREATE TABLE IF NOT EXISTS MEMOROUTES (ID unique, DATA)');
    tx.executeSql('CREATE TABLE IF NOT EXISTS HISTORY (ID unique, DATA)');
 }); 
@@ -22,7 +22,7 @@ db.transaction(function(tx) {
 */
 
 
-sql = (query,callback) => {
+sql = (query,callback,error) => {
    console.log('sql called: ', query)
    mem.query = query;
    db.transaction(function(tx) {
@@ -48,6 +48,7 @@ sql = (query,callback) => {
          }, 
          function(tx,results) {
             console.log(results, "ERROR")
+            error(results)
          })  
        })
     }
@@ -58,7 +59,7 @@ mem.list = [];
 mem.dirList = [];
 mem.idList = [];
 mem.collect = () => {
-   sql(`SELECT ID, DATA, RDATE, LREPEAT, SPEC FROM OBJECTS WHERE RDATE < '${Date.now()}' LIMIT 10`, mem.collectCallback)
+   sql(`SELECT PID, DATA, RDATE, LREPEAT, SPEC FROM OBJECTS WHERE RDATE < '${Date.now()}' LIMIT 10`, mem.collectCallback)
 }
 let ga = 0;
 mem.collectCallback = (res) => {
@@ -81,6 +82,7 @@ mem.collectCallback = (res) => {
    for (var i = 0; i<mem.list.length; i++) {
       mem.list[i].DIRID = mem.getDir(mem.list[i].ID);
       mem.getDirInfo(i,mem.list[i].DIRID)
+      console.log("123")
        
    }
    
@@ -551,7 +553,9 @@ mem.count2 = (data) => {
 
 
 mem.getDir = (string) => {
-   return string.split(".").slice(0,2).join(".");
+  // return string.split(".").slice(0,2).join(".");
+  //return string.split(":")[0]
+  return string.split(":")[0].split(".").slice(0,1).join(".")+":"+string.split(":")[0].split(".")[1]
 }
 
 mem.check2 = (res,callback) => {
@@ -572,23 +576,38 @@ mem.drop = () => {
 }
 
 mem.addExample = () => {
-   mem.add("1.1.1",["Un renard",["А рынар","123"],"A fox"])
-   mem.add("1.1.2",["Le temps",["Лю тон","123"],"The time"])
-   mem.add("1.1.3",["Le ciel",["Лю сьель","123"],"The sky"])
-   mem.addDir('1.1',[["FRE","FRENCH"],["Original","Transcription","Translation"]])
+   mem.addDir('/',[["FRE","FRENCH"],["Original","Transcription","Translation"]])
+    mem.add(G_ID,["Un renard",["А рынар","123"],"A fox"])
+   // mem.add("1.1:2",["Le temps",["Лю тон","123"],"The time"])
+   // mem.add("1.1:3",["Le ciel",["Лю сьель","123"],"The sky"])
+   
 }
-mem.set = function(ID,DATA,SPEC) {
+mem.setItem = function(PID,DATA,SPEC) {
    console.log(arguments)
-   var RDATE = (Date.now()+0.1*60*1000);
+   var RDATE = (Date.now()+0*60*1000);
    var LREPEAT = Date.now();
-   sql(`INSERT INTO OBJECTS (ID, DATA, RDATE, LREPEAT, SPEC) VALUES ("${ID}",'${DATA}',"${RDATE}", "${LREPEAT}", "${SPEC}")`)
+   sql(`INSERT INTO OBJECTS (PID, DATA, RDATE, LREPEAT, SPEC) VALUES ("${PID}",'${DATA}',"${RDATE}", "${LREPEAT}", "${SPEC}")`)
     
    //sql(`SELECT ID FROM OBJECTS WHERE ID = '${ID}'`);
  
 }
 
-mem.setDir = (ID,DATA) => {
-   sql(`INSERT INTO DIRS (ID, DATA) VALUES ("${ID}", '${DATA}')`)
+let G_PID = 0
+let G_DATA = ""
+let G_ID = ""
+let G_COUNT = 0
+mem.setDir = (PID,DATA) => {
+   let ID = makeid(6)
+   G_ID = ID
+   G_PID = PID
+   G_DATA = DATA
+   G_COUNT++
+   //let ID = "tZNZZV"
+   if (G_COUNT<1000) {
+   sql(`INSERT INTO DIRS (ID, PID, DATA) VALUES ("${ID}", "${G_PID}", '${G_DATA}')`,undefined, mem.setDir)
+   } else {
+      alert("CANNOT GENERATE UNIQUE ID")
+   }
 }
 
 mem.addDir = (ID,ARRAY) => {
@@ -622,7 +641,7 @@ mem.update = (FIELD,DATA,CON1,CON2,callback) => {
 }
 
 
-mem.add = (ID,ARRAY) => {
+mem.addItem = (ID,ARRAY) => {
    let DATA = {}
    let SPEC = [[[]],[0]]
     
@@ -637,7 +656,7 @@ mem.add = (ID,ARRAY) => {
    DATA = JSON.stringify(DATA);
    SPEC = JSON.stringify(SPEC);
    
-   mem.set(ID,DATA,SPEC);
+   mem.setItem(ID,DATA,SPEC);
 }
 
 mem.rem = (ID) => {
@@ -679,10 +698,100 @@ mem.sublinker = (SPEC) => {
       }
    }
 }
-mem.addExample();
-mem.collect();
 
+mem.listDirObj = (DIRID) => {
+   sql(`SELECT * FROM DIRS WHERE ID LIKE "${DIRID}:%"`,console.log)
+   sql(`SELECT * FROM OBJECTS WHERE ID LIKE "${DIRID}:%"`,console.log)
+}
+
+function makeid(length) {
+    var result           = '';
+    var characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    var charactersLength = characters.length;
+    for ( var i = 0; i < length; i++ ) {
+      result += characters.charAt(Math.floor(Math.random() * 
+ charactersLength));
+   }
+   return result;
+}
+
+mem.show = (DIRID,callback) => {
+   sql(`SELECT * FROM DIRS WHERE PID = "${DIRID}"`,callback)
+   sql(`SELECT * FROM OBJECTS WHERE PID = "${DIRID}"`,callback)
+}
+
+let browserCache= []
+let browserString = ""
+let choice = 0
+let counter = 0
+let path = ["/"]
+mem.browser = (goTo) => {
+   counter = 0
+   cached = 0
+   browserCache = []
+   browserString = ""
+   if (!goTo) {
+      goTo = "/"
+   }
+   mem.show(goTo,mem.setCache)
+}
+let cached = 0
+mem.setCache = (data) => {
+   
+   try {
+   cached++
+   browserCache.push(data)
+   if (cached==2) {
+      for (let i = 0; i<browserCache[0].length; i++) {
+         counter++
+         browserString += counter + ": "+JSON.parse(browserCache[0][i].DATA)[0] + "\n"
+      }
+      for (let i = 0; i<browserCache[1].length; i++) {
+         counter++
+         browserString += counter + ": "+browserCache[1][i].DATA + "\n"
+      }     
+      choice = prompt("1 -  go to (.. to go back); 2 - create; 3 - edit; 4 - delete; 5 - exit \n Current path: " + path + "\n" +  browserString)
+      
+      
+      if (choice[0] == "1") {   
+         newChoice = (1*choice.split(" ")[1])-1;
+         DIRID = browserCache[0][newChoice].ID
+         
+         path.push(DIRID)
+         mem.browser(DIRID)
+      }
+
+      if (choice[0] == ".") {
+         path.pop()
+         mem.browser(path[path.length-1])
+      }
+
+      if (choice[0] == "2") {
+         TYPE = choice.split(" ")[1]
+         DATA = choice.split(" ")[2]
+         if (TYPE==1) {
+            mem.addDir(path[path.length-1],JSON.parse(DATA))
+            mem.browser(path[path.length-1])
+         }
+         if (TYPE==2) {
+            mem.addItem(path[path.length-1],JSON.parse(DATA))
+            mem.browser(path[path.length-1])
+         }
+      }
+
+      if (choice[0] == "4") {
+         
+      }
+       
  
+      
+   }
+} catch(e) {console.log(e)}
+}
+mem.collect() //collect items to repeat
+
+
+
 /* Examples:
 sql("INSERT INTO OBJECTS (ID, DATA, repeat, dir) VALUES ('2.3','DATA',10,'main')")
 sql("INSERT INTO LOGS (ID, log) VALUES (3, 'three')")

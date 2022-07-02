@@ -10,6 +10,7 @@ transition: transform 0.5s, opacity 0.5s;
   .remove-down {
  transform: translateY(190px);
  opacity: 0;
+ 
  }
  .hideT {
  opacity: 0 !important;
@@ -24,6 +25,10 @@ transition: transform 0.5s, opacity 0.5s;
   
   html, body {
   overflow-y: hidden;
+  }
+  .omniscale2 {
+    opacity: 0 !important;
+    display: none !important;
   }
      @media screen and (min-width: 0px) and (max-width: 700px) {
   .omniscale {
@@ -45,7 +50,12 @@ transition: transform 0.5s, opacity 0.5s;
   }
  }
 
- 
+ .memobject::-webkit-scrollbar {
+  display: none;
+}
+
+
+
 #thatcircle {
 transform: perspective(500px) 
 }

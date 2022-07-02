@@ -1,7 +1,8 @@
  
 	.card {
 	font-family: Roboto;
-	overflow: hidden;
+	overflow-x: hidden;
+	overflow-y: scroll;
 	scroll-behavior: smooth;
 	max-width: 400px;
 	transition-duration: 0.5s;
@@ -9,12 +10,68 @@
 	box-shadow: 0 0 10px rgba(0,0,0,0.5);
 	border-radius: 10px;
 	width: 96%;
-	height: 100px;
-	align-items: center;
+	height: calc(100vh - 95px);
+ 
 	display: flex;
-	color: black
+	flex-direction: column;
+	background: #171717 !important;
+	color: white
+	}
+
+	.infopanel {
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+		height: 100px;
+		width: 100%;
+		border-bottom: 2px solid #373737
+	}
+
+	.diricon {
+		width: 100px;
+	}
+
+	.dirname {
+		font-family: memoff;
+		font-size: 26px;
+		color: white;
+		 
+		width: calc(100% - 100px);
+		text-align: center;
+		padding-right: 60px;
 	}
 	
+	.datapanel {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: 100%;
+		height: 100vh;
+		font-family: memoff;
+		font-size: 26px;
+		color: white;
+		overflow-y: scroll;
+		word-break: break-all;
+		word-wrap: break-word;
+		padding: 10px; /*top right bottom left */
+		
+
+	}
+
+	.medal {
+		padding-top: 30px;
+	}
+
+	.medal img {
+		transform: scale(0.8);
+		width: 100%;
+	}
+
+	.innerdata {
+		 /*otherwise scrollable content is not fully displated */
+		 
+		margin: auto;
+	}
 	.table {
 	
 		display: flex;
@@ -54,7 +111,7 @@
 	}
 	
 	.wrongcolor {
-	transition: 400ms background ease-out, 500ms padding; background: #ff3838  !important;
+	transition: 400ms background ease-out, 500ms padding; b: #ff3838; background: #af0101  !important;
 	}
 	
 	@keyframes wrong-animation {
@@ -83,49 +140,47 @@
   
 }
 	
-	.pos0 {
-	margin-top: -100px; background: white;
-	 
-z-index: 4;	
-	}
+ 
 	
 	.win {
-	transition: 400ms background ease-out, 500ms margin-top; background: #00ff00 !important; 
+	transition: 400ms background ease-out, 500ms margin-top; b: #00ff00; background: #06a906 !important; 
 	}
 		.loose {
 	transition: 400ms background ease-out, 500ms margin-top; background: red;
 	}
 	.pos00 {
-		margin-top: -150px;
+		margin-top: calc(-100vh);
+		transition-duration: 1000ms ease-in-out !important;
 	    background: white;
 	 
 z-index: 4;
 	}
 	.pos1 {
 	transition: background 0.3s, transform 0.5s, margin 0.5s;
-	margin-top: 15px; background: white;
+	margin-top: 5px; background: white;
 	z-index: 3;	 
 	}
 	.pos2 {
-	margin-top: 28px; transform: scale(0.92); background: #d6d6d6;
+	margin-top: 6vh; transform: scale(0.92); background: #d6d6d6;
 	z-index: 2;	
 	}
 	.pos3 {
-	margin-top: 41px; transform: scale(0.84);
+	margin-top: 11vh; transform: scale(0.84);
 	background: #c2c2c2;
 	z-index: 1;	
 	 
 	}
+
 	.pos4 {
 	background: #a8a7a7;
-	 margin-top: 52px; opacity: 0; transform: scale(0.76);
+	margin-top: 16vh; opacity: 0; transform: scale(0.76);
 	z-index: 0;	
 	}
 	
 	
 	
 	#papers {
-	transition-duration: 0.5s; position: absolute; display: flex; justify-content: center; width: 100%;
+	transition-duration: 0.8s; position: absolute; display: flex; justify-content: center; width: 100%; height: 100vh;
 	}
 	
 	.hidekeyboard {
@@ -195,6 +250,7 @@ z-index: 4;
 		padding-left: 11px;
 		font-size: 15px;
 		font-family: 'memoff';
+		padding-top: 10px;
 		padding-bottom: 21px;
 			   }
 	 }
@@ -266,8 +322,20 @@ z-index: 4;
   display: none;
 }
 
+.card::-webkit-scrollbar {
+	display: none;
+  }
+
+  .datapanel::-webkit-scrollbar {
+	display: none;
+  }
+
 	 .scrollBarNone::-webkit-scrollbar {
   display: none;
+}
+
+.memokeyboard::-webkit-scrollbar {
+	display: none;
 }
 
 .opacity0 {
