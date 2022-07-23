@@ -40,7 +40,7 @@ function curtain(){
 }
 function onDeviceReady() {
     // Cordova is now initialized. Have fun!
-   
+    
     document.querySelector(".curtain").scrollBy(0,$("#red").height()+100) 
     setTimeout(curtain,1000)
    // openMemos()

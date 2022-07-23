@@ -71,3 +71,12 @@ window.addEventListener('touchend', r);
  
   
 })
+
+/*
+document.getElementById('myID').scrollIntoView({
+            behavior: 'auto',
+            block: 'center',
+            inline: 'center'
+        });
+
+        */

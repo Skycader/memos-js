@@ -173,15 +173,24 @@ z-index: 4;
 
 	.pos4 {
 	background: #a8a7a7;
-	margin-top: 16vh; opacity: 0; transform: scale(0.76);
+	margin-top: 21vh; opacity: 0; transform: scale(0.76);
 	z-index: 0;	
 	}
-	
-	
+ 
+	.pos5 {
+	background: #a8a7a7;
+	 
+	margin-top: 21vh; opacity: 0; transform: scale(0.76);
+	z-index: 0;	
+	}	
 	
 	#papers {
 	transition-duration: 0.8s; position: absolute; display: flex; justify-content: center; width: 100%; height: 100vh;
+	perspective: 1000px;
+	 
 	}
+
+	
 	
 	.hidekeyboard {
 	display: none;

@@ -34,7 +34,8 @@
       "cordova-plugin-vibration": {},
       "cordova-plugin-webserver": {},
       "cordova-plugin-websocket-server": {},
-      "cordova-plugin-android-permissions": {}
+      "cordova-plugin-android-permissions": {},
+      "cordova-plugin-local-notification": {}
     },
     "platforms": [
       "android"
@@ -42,6 +43,10 @@
   },
   "dependencies": {
     "cordova": "^9.0.0",
-    "cordova-android": "^8.1.0"
+    "cordova-android": "^8.1.0",
+    "cordova-plugin-badge": "^0.8.8",
+    "cordova-plugin-device": "^2.1.0",
+    "cordova-plugin-local-notification": "^0.9.0-beta.2",
+    "cordova-plugin-local-notifications": "^1.0.0"
   }
 }
