@@ -39,7 +39,7 @@
 
 <body>
    <!--opacity 0 stands for curtain thing...-->
-   <div class='menu ' style="opacity-0">
+   <div class='menu' style="opacity-0">
       <div id='papers' onclick='document.getElementById("memosInput").focus();' class='donotdisplay'>
       </div>
       <div id='keyboard' onclick='document.getElementById("memosInput").focus();' oninput='check()' class='hidekeyboard'
@@ -286,8 +286,11 @@
             <div class='page4' style='     display: content'>
                <div style="position: absolute; margin-top: 110px; width: 100%; height: calc(100% - 100px)">
                
-                 <textarea onchange="terminal()" id="terminal" style="background: #161616; color: white; width: 100%; height: calc(100vh - 110px); font-size: 25px; font-family: memoff"
+                 <textarea id="terminal" style="background: #161616; color: white; width: 100%; height: calc(100vh - 180px); font-size: 25px; font-family: memoff"
                  ></textarea>
+                 <textarea onchange="terminal()" id="terminalCommands" style="background: #161616; color: white; width: 100%; overflow: hidden; height: calc(50px); font-size: 25px; font-family: memoff"
+                 ></textarea>
+                 <!-- <button style="width: 100%; height: 50px" onclick=" mem.terminalCommand(terminal.lastLine)">Send</button> -->
                    
                </div>
                

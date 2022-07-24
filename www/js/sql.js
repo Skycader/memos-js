@@ -68,6 +68,9 @@ mem.collect = () => {
 };
 
 mem.collectCallback = (res) => {
+  mem.list = []
+  mem.idList = []
+  mem.dirList = []
   for (var i = 0; i < res.length; i++) {
     if (mem.idList.indexOf(res[i].ID) == -1) {
       //console.log(mem.list.indexOf(res[i]))
@@ -108,26 +111,29 @@ mem.getDirInfoCallback = (res) => {
 
 mem.answered = 0;
 mem.lastAnswered = null;
+mem.checkCalled = 0
 mem.check = (answer) => {
+let DATA;
+let SPEC;
+  mem.checkCalled+=1
+  if (mem.checkCalled > 100)
+  mem.check = null
   mem.res.obj = mem.list[mem.answered];
   if (mem.res.obj) {
     mem.res.dir = mem.dirList[mem.answered];
 
     mem.lastAnswered = mem.answered;
-  } else {
-    console.log("No more objects to repeat");
-    mem.nothing = 1;
-  }
 
-  method = null; //nullificate method, so it's not checked next sql request
+    method = null; //nullificate method, so it's not checked next sql request
 
   console.log(mem.res);
-  let DATA = JSON.parse(mem.res.obj.DATA);
-  let SPEC = JSON.parse(mem.res.obj.SPEC);
+ DATA = JSON.parse(mem.res.obj.DATA);
+SPEC = JSON.parse(mem.res.obj.SPEC);
 
   let result = mem.linker(SPEC); //calculate links, meaning what field is asked and which field is considered as answer
   let index = result[0];
   SPEC = JSON.stringify(result[1]);
+   
   //index looks like this [n,m], where n and m are numbers from 0 to N,M (integers)
   //n -> answer field
   //m -> question field, this needs to be taken from structure table by sql query
@@ -150,64 +156,41 @@ mem.check = (answer) => {
   let answerIsCorrect;
   rightAnswer = DATA[index[1]];
   mem.rightAnswer = rightAnswer;
-  if (answer) {
-    console.log("DATA");
-    console.log(DATA[index[1]]);
-    try {
-      rightAnswer = DATA[index[1]];
-      mem.rightAnswer = rightAnswer;
-      answerIsCorrect = answer.toLowerCase() == rightAnswer.toLowerCase();
-    } catch (e) {
-      console.log(e);
-      rightAnswer = DATA[index[1]];
 
-      console.log("ARRAY DETECTED");
-      rightAnswer = rightAnswer.map(function (e) {
-        return e.toLowerCase();
-      });
-      mem.rightAnswer = rightAnswer;
-      /*
-     const lower = arr.map(element => {
-     return element.toLowerCase();
-     });
-     */
-
-      answer = answer.toLowerCase();
-      answerIsCorrect = rightAnswer.indexOf(answer) > -1 ? true : false;
-      //alert(answerIsCorrect)
-    }
+  } else {
+    console.log("No more objects to repeat");
+    mem.nothing = 1;
   }
-  mem.res.rightAnswer = rightAnswer;
-  try {
-    callback(mem);
-  } catch (e) {}
 
-  //console.log("Right answer: " + rightAnswer)
-  if (answer) {
+  if (answer == "1") {
+    answerIsCorrect = 1
+  }
+ 
+
+  if (answer&&!mem.nothing) {
+    try {
     //if there's any answer provided, then check, else just show question
 
-    if (answerIsCorrect) {
+    if (answerIsCorrect=="1") {
       console.log("OK");
+       
       mem.code = 1; //code OK
 
-      console.log(rightAnswer.indexOf(answer) > -1 ? true : false);
-      console.log(rightAnswer);
-      console.log(answer);
-      console.log(mem.res);
-      console.log(mem.res.obj.LREPEAT);
+      
 
       let diff = Date.now() - mem.res.obj.LREPEAT * 1;
       console.log("Different in hours: " + diff / 1000 / 60 / 60);
 
-      diff = 1.5 * diff + Date.now();
-      let repeatIn = diff-Date.now()
-      repeatIn = repeatIn/1000/60/60
+      diff = 2 * diff + Date.now();
+      let repeatIn = diff - Date.now();
+      repeatIn = repeatIn / 1000 / 60 / 60;
       console.log("New RDATE: " + new Date(diff));
-      console.log(`Repeat in ${repeatIn} hours`)
+      console.log(`Repeat in ${repeatIn} hours`);
       mem.update("RDATE", diff, "ID", mem.res.obj.ID);
       mem.update("LREPEAT", Date.now(), "ID", mem.res.obj.ID);
 
-      mem.update("SPEC", SPEC, "ID", mem.res.obj.ID);
+       console.log("SPEC: ", SPEC)
+       mem.update("SPEC", SPEC, "ID", mem.res.obj.ID);
 
       //mem.get(res.ID)
       check.clear();
@@ -218,15 +201,15 @@ mem.check = (answer) => {
       }
     } else {
       check.wrong();
-      console.log(rightAnswer.indexOf(answer) > -1 ? true : false);
-      console.log(rightAnswer);
-      console.log(answer);
-      console.log("BAD");
+      mem.update("RDATE", Date.now(), "ID", mem.res.obj.ID);
+      mem.update("LREPEAT", Date.now(), "ID", mem.res.obj.ID);
+      console.log("ZEROING FILE");
       mem.code = 0;
     }
     ask = null;
 
     answer = null;
+  } catch(e) { console.log("ERROR!: ", e)}
   }
 
   if (mem.code != null) {
@@ -616,7 +599,33 @@ mem.update = (FIELD, DATA, CON1, CON2, callback) => {
   );
 };
 
+//Memos item is a lexical unit
+//Memos advice: always write down sententes or phrases and never just words alone
+mem.itemExample = 
+[//field 1
+  [
+    //Meaning 1
+    [
+      
+      ["Line 1",
+      "Line 2",
+      "Line 3"],
+    ],
+    //Possible Meaning 2
+    [
+      ["A dog"]
+    ],
+  ],
+  []
+]
+
+//a = [ [["a cat","a dog"]], [["кошка","собака"]] ]
+
+mem.itemExample2 = [ [["a cat"]],[["кот"]] ]
+//ID: @String,
+//ArRAY: @Array
 mem.addItem = (ID, ARRAY) => {
+ 
   let DATA = {};
   let SPEC = [[], []];
 
@@ -627,8 +636,11 @@ mem.addItem = (ID, ARRAY) => {
 
   DATA = JSON.stringify(DATA);
   SPEC = JSON.stringify(SPEC);
-
-  mem.setItem(ID, DATA, SPEC);
+  console.log(DATA)
+  if (ARRAY.length>1) {
+    mem.setItem(ID, DATA, SPEC);
+  }
+  
 };
 
 mem.rem = (ID) => {
@@ -782,35 +794,37 @@ mem.browser = (goTo) => {
 let cached = 0;
 mem.objectsStartAt = 0;
 mem.cacheCalled = 0;
-let quit = false
+let quit = false;
 mem.setCache = (data) => {
-   
-    cached++;
-    browserCache.push(data);
-    console.log("BrowserCache: ", browserCache);
-    if (cached == 2) {
-      mem.cacheCalled++;
-      for (let i = 0; i < browserCache[0].length; i++) {
-        counter++;
-        browserString +=
-          counter +
-          ": " +
-          JSON.parse(browserCache[0][i].DATA)[0] +
-          "/" +
-          JSON.parse(browserCache[0][i].DATA)[1] +
-          "\n";
-      }
+  cached++;
+  browserCache.push(data);
+  console.log("BrowserCache: ", browserCache);
+  if (cached == 2) {
+    mem.cacheCalled++;
+    for (let i = 0; i < browserCache[0].length; i++) {
+      counter++;
+      browserString +=
+        counter +
+        ": " +
+        JSON.parse(browserCache[0][i].DATA)[0] +
+        "/" +
+        JSON.parse(browserCache[0][i].DATA)[1] +
+        "\n";
+    }
 
-      mem.objectsStartAt = counter + 1;
-      for (let i = 0; i < browserCache[1].length; i++) {
-        counter++;
-        browserString += counter + ": " + browserCache[1][i].DATA + "\n";
-      }
+    mem.objectsStartAt = counter + 1;
+    for (let i = 0; i < browserCache[1].length; i++) {
+      counter++;
+      browserString += counter + ": " + browserCache[1][i].DATA + "\n";
+    }
 
-      document.querySelector("#terminal").value = `${browserString}\n`
+    if (browserString == '') {
+      browserString = "Nothing here yet"
+    }
+    document.querySelector("#terminal").value = `Memos Terminal v 0.1.5 \n${pathNames}\n${browserString}\n`;
 
-      //help
-      /*
+    //help
+    /*
       cd -  go to dir (cd .. to go back);  
         mkdir - create dir;  
         touch - create file;  
@@ -819,37 +833,28 @@ mem.setCache = (data) => {
         rm (dir/file) - delete; 
         exit - exit 
         */
-        // quit=false
-      // choice = prompt(
-      //   "Current path: " + pathNames.join("/") + "\n" + browserString
-      // );
+    // quit=false
+    // choice = prompt(
+    //   "Current path: " + pathNames.join("/") + "\n" + browserString
+    // );
 
-      // command = choice.split(" ")[0];
-      // terminal.e.value += browserString + "\n"
-      // command = terminal.lastLine.split(" ")[0]
-      // choice = terminal.lastLine
-
-
-       
-    }
-   
-   
+    // command = choice.split(" ")[0];
+    // terminal.e.value += browserString + "\n"
+    // command = terminal.lastLine.split(" ")[0]
+    // choice = terminal.lastLine
+  }
 };
 
 mem.terminalCommand = (choice) => {
+  if (pathNames.length == 0) {
+    pathNames[0] = "/";
+  }
   // alert(choice)
-  command = choice.split(" ")[0]
+  command = choice.split(" ")[0];
   switch (command) {
     //0: list content
     case "ls":
       mem.browser(path[path.length - 1]);
-      break;
-    //print path
-    case "pwd":
-      if (pathNames.length == 0) {
-        pathNames[0] = "/"
-      }
-      document.querySelector("#terminal").value = `${pathNames }\n`
       break;
     //1: going around
     case "cd":
@@ -915,12 +920,13 @@ mem.terminalCommand = (choice) => {
     case "q":
       path = [];
       pathNames = [];
-      quit=true
+      quit = true;
       break;
     default:
     // mem.browser(path[path.length - 1]);
   }
-}
+  mem.browser(path[path.length - 1]);
+};
 mem.collect(); //collect items to repeat
 
 /* Examples:

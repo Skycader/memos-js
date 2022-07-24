@@ -69,8 +69,8 @@
 
 	.innerdata {
 		 /*otherwise scrollable content is not fully displated */
-		 
-		margin: auto;
+		 text-align: center;
+		 word-break: break-word;
 	}
 	.table {
 	

@@ -144,8 +144,45 @@ document
     }
   });
 
+  check.answer = ""
+  check.mistakes = 0
   document.getElementById("memosInput").addEventListener("input", function() {
     console.log("input event fired");
+    
+    // console.log(document.getElementById("memosInput").innerHTML.replaceAll("</div>","").split("<div>"))
+    // check.answer = document.getElementById("memosInput").innerHTML.replaceAll("&nbsp;"," ")
+    check.answer = document.getElementById("memosInput").innerHTML.replaceAll("</div>","").split("<div>")
+    check.answer = check.answer.map( item => item.replaceAll("&nbsp;"," "))
+
+    let countSymbols=0
+    for (var i = 0; i<check.answer.length; i++) {
+      for (var j = 0; j<check.answer[i].length; j++) {
+        console.log("i: ",i,"j:", i, "count:",countSymbols)
+        countSymbols++
+        if (check.answer[i] != "<br>") {
+        console.log(check.answer[i][j] + "==" + mem.rightAnswer[0][i][j])
+        if (check.answer[i][j] != mem.rightAnswer[0][i][j]) {
+          check.mistakes+=1
+          console.log("MISTAKES: ",check.mistakes)
+          
+          check.wrong()
+          if (check.mistakes==4) {
+            check.mistakes=0
+            mem.check("2")
+          }
+           
+        } else if (check.answer.join("").length == mem.rightAnswer[0].join("").length) {
+          check.mistakes=0
+          mem.check("1")
+        }
+      }
+      }
+      
+    }
+
+    
+
+
 }, false);
 check.onEnter = () => {
   console.log(check.get())
@@ -180,12 +217,12 @@ check.exit = () => {
   //document.getElementById("memosInput").classList.remove("td5")
   document.getElementById("memosInput").classList.add("opacity0");
 
-  document.getElementById("memosInput").value = "";
+  document.getElementById("memosInput").innerHTML = "";
   document.getElementById("memosInput").blur();
   cards.close();
 
   inititated = false;
-  document.querySelector("#memosInput").value = "";
+  document.querySelector("#memosInput").innerHTML = "";
   document.querySelector("#memosInput").classList.remove("padding");
   setTimeout(check.toggle, 2300); 
 };
@@ -279,18 +316,7 @@ cards.insert = (amount) => {
       );
   }
 };
-/*
-cards.autoSet = () => {
-  let renderedCard = cardSample.replace("$icon", "🇫🇷");
-  renderedCard = renderedCard.replace("$title", mem.res.question);
-  renderedCard = renderedCard.replace("$dirName",JSON.parse(mem.res.dir)[0][1])
-  renderedCard = renderedCard.replace("$subTitle", mem.res.reqFieldName);
-  console.log(JSON.stringify(mem.res));
-  document.querySelector(".pos4").innerHTML = renderedCard;
 
-  cards.call();
-};
-*/
 check.wrong = () => {
   document.querySelector(".pos1").classList.add("wrong-animation");
   document.querySelector(".pos1").classList.add("wrongcolor");
@@ -432,8 +458,8 @@ cards.set = (data, pos) => {
     if (!mem.nothing) {
       renderedCard = cardSample.replace("$icon", JSON.parse(mem.res.dir)[0][0]);
 	  renderedCard = renderedCard.replace("$dirName",JSON.parse(mem.res.dir)[0][1])
-      renderedCard = renderedCard.replace("$title", mem.res.question);
-      renderedCard = renderedCard.replace("$subTitle", mem.res.reqFieldName);
+      renderedCard = renderedCard.replace("$question", mem.res.question[0].join("<br>"));
+      renderedCard = renderedCard.replace("$reqFieldName", mem.res.reqFieldName);
     } else {
       renderedCard = cardWin;
       check.win = 1;
@@ -457,7 +483,7 @@ cardSample = `
 		<div class="forpicture">$icon</div>
 		<div class="prepare2"> 
 			<div class="prepare3">
-				<p class="tip">$subTitle</p>
+				<p class="tip">$reqFieldName</p>
 			</div>
 	</div>
 	</div>
@@ -466,7 +492,7 @@ cardSample = `
 
 	<div class='datapanel'>
 		<div class='innerdata'>
-		$title
+		$question
 		</div>
 	</div>
 `;
@@ -670,6 +696,8 @@ check.start = () => {
 };
 check.toggle = () => {
   document.querySelector("#papers").classList.toggle("aboveAll")
+  document.querySelector("#menu").classList.add("aboveAll")
+  document.querySelector("#memosInput").innerHTML = ""
   if (p() == 0) {
     closeStats();
 

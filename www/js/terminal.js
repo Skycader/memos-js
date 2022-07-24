@@ -1,44 +1,32 @@
-document.querySelector("#terminal").value = "";
+
 let terminal = {};
-terminal.e = document.querySelector("#terminal");
+terminal.e = document.querySelector("#terminalCommands");
 terminal.value = terminal.lastLine = "";
 terminal.command = "";
 terminal.lock = 2;
 terminal.lines = 0;
 terminal.historyLength = 1;
+terminal.lastTwo = ""
 terminal.init = () => {
-  document.querySelector("#terminal").value = "Memos Terminal v 0.1.5 \n";
+
+  mem.terminalCommand(terminal.lastLine)
   mem.browser(path[path.length - 1]);
 };
 terminal.run = () => {
-   
-  terminal.lastLine = terminal.e.value.split("\n")[terminal.e.value.split("\n").length - 1];
-  if (terminal.lastLine == '') {
-    terminal.e.value =  terminal.e.value.slice(0,-1)
-    terminal.run()
+  terminal.lastLine = terminal.e.value.split("\n")[terminal.e.value.split("\n").length - 2];
+  terminal.lastTwo = terminal.e.value[terminal.e.value.length-2]+terminal.e.value[terminal.e.value.length-1]
+  if (terminal.e.value.indexOf("\n") != -1) {
+    terminal.e.value = ""
+    mem.terminalCommand(terminal.lastLine)
   }
+  
+   
 };
 
-$("#terminal").on("keyup", function (e) {
-  var key = e.keyCode;
-
-  // If the user has pressed enter
-  if (key == 13) {
-    
-    //    terminal.e.value += "New line \n"
+$("#terminalCommands").on("keyup", function (e) {
    
-    // alert(terminal.lastLine)
-    if (terminal.lastLine == '') {
-        alert(terminal.e.value.split("\n"))
-        alert(  terminal.lines)
-    }
-    mem.terminalCommand(terminal.lastLine)
-    
-     
-    
-  } else {
-    terminal.run();
-  }
+  terminal.run()
+ 
 });
 
 terminal.init();
