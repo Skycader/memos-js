@@ -5,7 +5,7 @@
 	overflow-y: scroll;
 	scroll-behavior: smooth;
 	max-width: 400px;
-	transition-duration: 0.5s;
+	transition-duration: 0.6s !important;
 	position: absolute;
 	box-shadow: 0 0 10px rgba(0,0,0,0.5);
 	border-radius: 10px;

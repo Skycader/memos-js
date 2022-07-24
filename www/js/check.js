@@ -171,16 +171,17 @@ document
             mem.check("2")
           }
            
-        } else if (check.answer.join("").length == mem.rightAnswer[0].join("").length) {
-          check.mistakes=0
-          mem.check("1")
-        }
+        }  
       }
       }
       
     }
 
-    
+    if (check.answer.join("").length == mem.rightAnswer[0].join("").length) {
+      check.mistakes=0
+      
+      mem.check("1")
+    }
 
 
 }, false);
@@ -436,7 +437,7 @@ check.subNext = () => {
   setTimeout(check.p4, 200);
   setTimeout(check.p5, 250);
   setTimeout(cards.fixSize,600)
-  setTimeout(cards.rem0, 500);
+  setTimeout(cards.rem0, 2000);
 };
 
 cards.rem0 = () => {

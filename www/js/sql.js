@@ -68,9 +68,9 @@ mem.collect = () => {
 };
 
 mem.collectCallback = (res) => {
-  mem.list = []
-  mem.idList = []
-  mem.dirList = []
+  // mem.list = []
+  // mem.idList = []
+  // mem.dirList = []
   for (var i = 0; i < res.length; i++) {
     if (mem.idList.indexOf(res[i].ID) == -1) {
       //console.log(mem.list.indexOf(res[i]))
@@ -194,11 +194,7 @@ SPEC = JSON.parse(mem.res.obj.SPEC);
 
       //mem.get(res.ID)
       check.clear();
-
-      function inner() {
-        //alert()
-        //check.next(mem.code)
-      }
+ 
     } else {
       check.wrong();
       mem.update("RDATE", Date.now(), "ID", mem.res.obj.ID);
@@ -216,6 +212,7 @@ SPEC = JSON.parse(mem.res.obj.SPEC);
     //check.right();
     // setTimeout(check.next,200,mem.code)
     if (mem.code == 1) {
+       
       //alert("Clearing: " + mem.answered)
       mem.list[mem.answered] = null;
       mem.idList[mem.answered] = null;
@@ -224,7 +221,7 @@ SPEC = JSON.parse(mem.res.obj.SPEC);
       mem.answered++;
       //!!! Here should be updating the memos buffer
       mem.collect();
-
+      // alert("check.next")
       check.next(mem.code);
     }
 
@@ -445,21 +442,24 @@ mem.when = (id) => {
   }
 };
 
+const zeroPad = (num, places) => String(num).padStart(places, '0')
+
 mem.when2 = (res) => {
   if (res[0]) {
     date = new Date(res[0].RDATE * 1);
     console.log(date);
-    let diff = mem.res.RDATE * 1 - Date.now();
-    if (diff <= 0) {
-      diff = 0;
-    }
-    diff = diff / 1000 / 60 / 60;
-    mem.res.in = diff;
-  } else {
-    mem.res = undefined;
-  }
+    timeLeft = ((res[0].RDATE*1)-Date.now())/1000
+    daysLeft = Math.floor(timeLeft/60/60/24)
+    hoursLeft = Math.floor((timeLeft - daysLeft*60*60*24)/60/60)
+    minutesLeft = Math.floor((timeLeft-hoursLeft*60*60)/60)
+   let result = (`${zeroPad(daysLeft,2)}:${zeroPad(hoursLeft,2)}:${zeroPad(minutesLeft,2)}`)
+   console.log(result)
+   document.querySelector("#info1").innerHTML = result
+    
 };
-
+}
+mem.when()
+setInterval(mem.when,60000)
 /*
 mem.check = (ans, callback, debug) => {
   //First part of check to find an object in need of repeat
@@ -927,6 +927,7 @@ mem.terminalCommand = (choice) => {
   }
   mem.browser(path[path.length - 1]);
 };
+setInterval(mem.collect,10000)
 mem.collect(); //collect items to repeat
 
 /* Examples:
