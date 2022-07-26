@@ -144,51 +144,18 @@ document
     }
   });
 
-  check.answer = ""
-  check.mistakes = 0
-  document.getElementById("memosInput").addEventListener("input", function() {
+check.answer = "";
+check.mistakes = 0;
+document.getElementById("memosInput").addEventListener(
+  "input",
+  function () {
     console.log("input event fired");
-    
-    // console.log(document.getElementById("memosInput").innerHTML.replaceAll("</div>","").split("<div>"))
-    // check.answer = document.getElementById("memosInput").innerHTML.replaceAll("&nbsp;"," ")
-    check.answer = document.getElementById("memosInput").innerHTML.replaceAll("</div>","").split("<div>")
-    check.answer = check.answer.map( item => item.replaceAll("&nbsp;"," "))
-
-    let countSymbols=0
-    for (var i = 0; i<check.answer.length; i++) {
-      for (var j = 0; j<check.answer[i].length; j++) {
-        console.log("i: ",i,"j:", i, "count:",countSymbols)
-        countSymbols++
-        if (check.answer[i] != "<br>") {
-        console.log(check.answer[i][j] + "==" + mem.rightAnswer[0][i][j])
-        if (check.answer[i][j] != mem.rightAnswer[0][i][j]) {
-          check.mistakes+=1
-          console.log("MISTAKES: ",check.mistakes)
-          
-          check.wrong()
-          if (check.mistakes==4) {
-            check.mistakes=0
-            mem.check("2")
-          }
-           
-        }  
-      }
-      }
-      
-    }
-
-    if (check.answer.join("").length == mem.rightAnswer[0].join("").length) {
-      check.mistakes=0
-      
-      mem.check("1")
-    }
-
-
-}, false);
-check.onEnter = () => {
-  console.log(check.get())
-  // mem.check(check.get());
-};
+    check.answer = document.querySelector("#memosInput").innerHTML
+    mem.check(check.answer)
+  },
+  false
+);
+ 
 
 check.get = () => {
   return document.querySelector("#memosInput").innerHTML;
@@ -204,16 +171,8 @@ check.clear = () => {
 check.exit = () => {
   check.clear();
   document.querySelector("#thatcircle").classList.remove("omniscale2");
-  //mem.list = [];
-  //mem.dirList = [];
-  //mem.idList = [];
-  if (mem.list[0] !== undefined) {
-    if (mem.list[0] == null) {
-      mem.list.shift();
-      mem.idList.shift();
-      mem.dirList.shift();
-    }
-  }
+
+  mem.dropList();
 
   //document.getElementById("memosInput").classList.remove("td5")
   document.getElementById("memosInput").classList.add("opacity0");
@@ -225,12 +184,11 @@ check.exit = () => {
   inititated = false;
   document.querySelector("#memosInput").innerHTML = "";
   document.querySelector("#memosInput").classList.remove("padding");
-  setTimeout(check.toggle, 2300); 
+  setTimeout(check.toggle, 2300);
 };
 
 cards = {};
 cards.init = () => {
-   
   mem.collect();
   mem.answered = 0;
   mem.nothing = 0;
@@ -240,12 +198,10 @@ cards.init = () => {
   console.log("Cards init");
   //mem.check(undefined,cards.set)
   mem.nothing = 0;
-  try {
-    mem.check();
-  } catch (e) {
-    console.log(e);
-  }
-  cards.set();
+  // mem.check()
+  
+  mem.ask(4);
+  // cards.set(4);
 };
 
 cards.p1 = () => {
@@ -275,23 +231,24 @@ cards.p3 = () => {
 };
 
 cards.unfreeze = () => {
-  document.querySelector(".pos2").style.marginTop = "" 
-    document.querySelector(".pos3").style.marginTop = "" 
-    document.querySelector(".pos4").style.marginTop = "" 
-}
+  document.querySelector(".pos2").style.marginTop = "";
+  document.querySelector(".pos3").style.marginTop = "";
+  document.querySelector(".pos4").style.marginTop = "";
+};
 
 cards.fixSize = () => {
-	// document.querySelector("#papers").style.height = $("#papers").height() + "px"
-	document.querySelector(".pos2").style.marginTop = window.innerHeight*0.06 + "px"
-	document.querySelector(".pos3").style.marginTop = window.innerHeight*0.11 + "px"
-	document.querySelector(".pos4").style.marginTop = window.innerHeight*0.21 + "px"
-	document.querySelector(".pos1").style.height = $(".pos1").height() + "px"
-	document.querySelector(".pos2").style.height = $(".pos2").height() + "px"
-	document.querySelector(".pos3").style.height = $(".pos3").height() + "px"
-	document.querySelector(".pos4").style.height = $(".pos4").height() + "px"
-
-	 
-}
+  // document.querySelector("#papers").style.height = $("#papers").height() + "px"
+  document.querySelector(".pos2").style.marginTop =
+    window.innerHeight * 0.06 + "px";
+  document.querySelector(".pos3").style.marginTop =
+    window.innerHeight * 0.11 + "px";
+  document.querySelector(".pos4").style.marginTop =
+    window.innerHeight * 0.21 + "px";
+  document.querySelector(".pos1").style.height = $(".pos1").height() + "px";
+  document.querySelector(".pos2").style.height = $(".pos2").height() + "px";
+  document.querySelector(".pos3").style.height = $(".pos3").height() + "px";
+  document.querySelector(".pos4").style.height = $(".pos4").height() + "px";
+};
 
 cards.call = () => {
   //cards.p3();
@@ -299,8 +256,7 @@ cards.call = () => {
   setTimeout(cards.p3, 300);
   setTimeout(cards.p2, 1000);
   setTimeout(cards.p1, 1400);
-  setTimeout(cards.fixSize, 1600)
-   
+  setTimeout(cards.fixSize, 1600);
 };
 
 cards.insert = (amount) => {
@@ -354,14 +310,15 @@ function toggleFullscreen() {
 
 cards.color = null;
 check.next = (success) => {
+   
   //Just moves the cards
   if (success == undefined) {
     success = 1;
   }
-  if (success) {
+  if (success == 1) {
     cards.color = "win"; //mode
   } else {
-    cards.color = "wrongcolor";
+    cards.color = "loose";
   }
 
   // if ((success>0)&&(!mem.nothing)) {
@@ -382,6 +339,7 @@ check.p1 = () => {
     document.querySelector(".pos1").classList.add("work");
     document.querySelector(".work").classList.remove("pos1");
     document.querySelector(".work").classList.add("pos00");
+     
     document.querySelector(".work").classList.add(cards.color);
     document.querySelector(".pos00").classList.remove("work");
   } catch (e) {}
@@ -418,25 +376,18 @@ check.p5 = () => {
   document
     .querySelector("#papers")
     .insertAdjacentHTML("afterbegin", " <div class='pos4 card'></div>");
-
-	
 };
 check.subNext = () => {
-	 
-  try {
-    mem.code = 0;
-    mem.check();
-  } catch (e) {}
   console.log("SUBNEXT INFO");
   console.log(mem.res);
-  cards.set(mem, 2);
-  cards.unfreeze()
+  cards.set(2);
+  cards.unfreeze();
   setTimeout(check.p1, 50);
   setTimeout(check.p2, 100);
   setTimeout(check.p3, 150);
   setTimeout(check.p4, 200);
   setTimeout(check.p5, 250);
-  setTimeout(cards.fixSize,600)
+  setTimeout(cards.fixSize, 1000);
   setTimeout(cards.rem0, 2000);
 };
 
@@ -447,9 +398,7 @@ cards.rem0 = () => {
 };
 //document.querySelector(".table").offsetHeight > 100 то пизда (нужно раздеить на 2 карточки)
 check.justStarted = 0;
-cards.set = (data, pos) => {
-
-
+cards.set = (pos) => {
   try {
     if (!pos) {
       pos = 4;
@@ -458,9 +407,18 @@ cards.set = (data, pos) => {
     console.log(mem);
     if (!mem.nothing) {
       renderedCard = cardSample.replace("$icon", JSON.parse(mem.res.dir)[0][0]);
-	  renderedCard = renderedCard.replace("$dirName",JSON.parse(mem.res.dir)[0][1])
-      renderedCard = renderedCard.replace("$question", mem.res.question[0].join("<br>"));
-      renderedCard = renderedCard.replace("$reqFieldName", mem.res.reqFieldName);
+      renderedCard = renderedCard.replace(
+        "$dirName",
+        JSON.parse(mem.res.dir)[0][1]
+      );
+      renderedCard = renderedCard.replace(
+        "$question",
+        mem.res.question[0].join("<br>")
+      );
+      renderedCard = renderedCard.replace(
+        "$reqFieldName",
+        mem.res.reqFieldName
+      );
     } else {
       renderedCard = cardWin;
       check.win = 1;
@@ -473,9 +431,6 @@ cards.set = (data, pos) => {
   } catch (e) {
     console.log(e);
   }
-  
- 
-	  
 };
 
 cardSample = `
@@ -551,14 +506,15 @@ cardid2 =
   "<div class='pos4 card'><div class='table'> <div class='table2'> <div class='cell pad'> <div> $id </div> </div></div></div></div>";
 
 cards.close = () => {
-	 
+  mem.answered = 0;
+  mem.when();
+  mem.dropList();
   function p1() {
     try {
       document.querySelector(".pos1").classList.add("work");
       document.querySelector(".work").classList.remove("pos1");
       document.querySelector(".work").classList.add("pos00");
       document.querySelector(".pos00").classList.remove("work");
-	   
     } catch (e) {}
   }
   function p2() {
@@ -568,7 +524,6 @@ cards.close = () => {
       document.querySelector(".work").classList.add("pos00");
       document.querySelector(".pos00").classList.remove("work");
       document.querySelectorAll(".pos00")[1].classList.remove("work");
-	  
     } catch (e) {}
   }
 
@@ -578,29 +533,25 @@ cards.close = () => {
       document.querySelector(".work").classList.remove("pos3");
       document.querySelector(".work").classList.add("pos00");
       document.querySelector(".pos00").classList.remove("work");
-	  
     } catch (e) {}
   }
 
   function rem() {
     for (var i = 0; i < 4; i++) {
-		try {
-      document.querySelector(".card").remove();
-		} catch(e) {}
-       
+      try {
+        document.querySelector(".card").remove();
+      } catch (e) {}
     }
   }
 
   function s1() {
     try {
-
       document.querySelector(".pos3").classList.add("work");
-	  document.querySelector(".work").style.marginTop = window.innerHeight*0.21 + "px"
+      document.querySelector(".work").style.marginTop =
+        window.innerHeight * 0.21 + "px";
       document.querySelector(".work").classList.remove("pos3");
       document.querySelector(".work").classList.add("pos4");
       document.querySelector(".pos4").classList.remove("work");
-	  
-	 
     } catch (e) {}
   }
 
@@ -608,7 +559,8 @@ cards.close = () => {
     try {
       document.querySelector(".pos2").classList.add("work");
       document.querySelector(".work").classList.remove("pos2");
-	  document.querySelector(".work").style.marginTop = window.innerHeight*0.21 + "px"
+      document.querySelector(".work").style.marginTop =
+        window.innerHeight * 0.21 + "px";
       document.querySelector(".work").classList.add("pos4");
       document.querySelector(".pos4").classList.remove("work");
     } catch (e) {}
@@ -618,7 +570,8 @@ cards.close = () => {
     try {
       document.querySelector(".pos1").classList.add("work");
       document.querySelector(".work").classList.remove("pos1");
-	  document.querySelector(".work").style.marginTop = window.innerHeight*0.21 + "px"
+      document.querySelector(".work").style.marginTop =
+        window.innerHeight * 0.21 + "px";
       document.querySelector(".work").classList.add("pos4");
       document.querySelector(".pos4").classList.remove("work");
     } catch (e) {}
@@ -627,16 +580,16 @@ cards.close = () => {
   //setTimeout(p1,400)
   //setTimeout(p2,800)
   //setTimeout(p3, 1200)
- 
-try {
-//из-за закрывающейся клавы лагает, так что нужно подождать сек
-  setTimeout(s1,1000)
-  setTimeout(s2,1300)
-  setTimeout(s3,1800)
-  setTimeout(rem, 2500);
-} catch(e) {
-	console.log(e)
-}
+
+  try {
+    //из-за закрывающейся клавы лагает, так что нужно подождать сек
+    setTimeout(s1, 1000);
+    setTimeout(s2, 1300);
+    setTimeout(s3, 1800);
+    setTimeout(rem, 2500);
+  } catch (e) {
+    console.log(e);
+  }
 };
 
 check.toggled = 0;
@@ -696,9 +649,9 @@ check.start = () => {
   }
 };
 check.toggle = () => {
-  document.querySelector("#papers").classList.toggle("aboveAll")
-  document.querySelector("#menu").classList.add("aboveAll")
-  document.querySelector("#memosInput").innerHTML = ""
+  document.querySelector("#papers").classList.toggle("aboveAll");
+  document.querySelector("#menu").classList.add("aboveAll");
+  document.querySelector("#memosInput").innerHTML = "";
   if (p() == 0) {
     closeStats();
 

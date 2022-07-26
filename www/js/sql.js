@@ -60,6 +60,12 @@ let mem = {};
 mem.list = [];
 mem.dirList = [];
 mem.idList = [];
+
+mem.dropList = () => {
+  mem.list = [];
+  mem.dirList = [];
+  mem.idList = [];
+};
 mem.collect = () => {
   sql(
     `SELECT ID, PID, DATA, RDATE, LREPEAT, SPEC FROM OBJECTS WHERE RDATE < '${Date.now()}' LIMIT 10`,
@@ -109,125 +115,115 @@ mem.getDirInfoCallback = (res) => {
   }
 };
 
-mem.answered = 0;
-mem.lastAnswered = null;
-mem.checkCalled = 0
-mem.check = (answer) => {
-let DATA;
-let SPEC;
-  mem.checkCalled+=1
-  if (mem.checkCalled > 100)
-  mem.check = null
+mem.answered = 0; //move forward in a list of files to answer
+
+mem.define = (increment) => {
+  if (increment) {
+    mem.answered++;
+  }
+  let DATA;
+  let SPEC;
   mem.res.obj = mem.list[mem.answered];
   if (mem.res.obj) {
     mem.res.dir = mem.dirList[mem.answered];
+    DATA = JSON.parse(mem.res.obj.DATA);
+    SPEC = JSON.parse(mem.res.obj.SPEC);
+    let result = mem.linker(SPEC); //calculate links, meaning what field is asked and which field is considered as answer
+    let index = result[0];
+    mem.res.obj.SPEC = JSON.stringify(result[1]);
 
-    mem.lastAnswered = mem.answered;
+    let question = DATA[index[0]];
 
-    method = null; //nullificate method, so it's not checked next sql request
+    mem.res.question = question;
+    console.log("Question: " + question);
+    let dirData = JSON.parse(mem.res.dir);
+    console.log("dirData", dirData);
+    //console.log(requestedFieldName)
+    let reqFieldName = dirData[1][index[1]];
+    console.log("REQ: ", dirData[1][index[1]]);
+    mem.res.reqFieldName = reqFieldName;
+    console.log(reqFieldName);
+    let rightAnswer;
 
-  console.log(mem.res);
- DATA = JSON.parse(mem.res.obj.DATA);
-SPEC = JSON.parse(mem.res.obj.SPEC);
-
-  let result = mem.linker(SPEC); //calculate links, meaning what field is asked and which field is considered as answer
-  let index = result[0];
-  SPEC = JSON.stringify(result[1]);
-   
-  //index looks like this [n,m], where n and m are numbers from 0 to N,M (integers)
-  //n -> answer field
-  //m -> question field, this needs to be taken from structure table by sql query
-  // [DIR] n [data] ---> m [type]
-  //example: [FRENCH] un renard -> [translation] would be [1,3] as linker
-
-  //console.log("INDEX: " + index)
-  console.log("INDEX: ", index);
-  let question = DATA[index[0]];
-  mem.res.question = question;
-  console.log("Question: " + question);
-  let dirData = JSON.parse(mem.res.dir);
-  console.log("dirData", dirData);
-  //console.log(requestedFieldName)
-  let reqFieldName = dirData[1][index[1]];
-  console.log("REQ: ", dirData[1][index[1]]);
-  mem.res.reqFieldName = reqFieldName;
-  console.log(reqFieldName);
-  let rightAnswer;
-  let answerIsCorrect;
-  rightAnswer = DATA[index[1]];
-  mem.rightAnswer = rightAnswer;
-
+    rightAnswer = DATA[index[1]];
+    mem.rightAnswer = rightAnswer;
   } else {
     console.log("No more objects to repeat");
     mem.nothing = 1;
   }
+};
 
-  if (answer == "1") {
-    answerIsCorrect = 1
-  }
- 
+mem.ask = (pos) => {
+  mem.define()
+  cards.set(pos);
+};
 
-  if (answer&&!mem.nothing) {
-    try {
-    //if there's any answer provided, then check, else just show question
+mem.answer = (answerIsCorrect) => {
+  if (answerIsCorrect) {
+    console.log("OK");
 
-    if (answerIsCorrect=="1") {
-      console.log("OK");
-       
-      mem.code = 1; //code OK
+    mem.code = 1; //code OK
 
-      
+    let diff = Date.now() - mem.res.obj.LREPEAT * 1;
+    console.log("Different in hours: " + diff / 1000 / 60 / 60);
 
-      let diff = Date.now() - mem.res.obj.LREPEAT * 1;
-      console.log("Different in hours: " + diff / 1000 / 60 / 60);
+    diff = 2 * diff + Date.now() + 10 * 1000;
+    let repeatIn = diff - Date.now();
+    repeatIn = repeatIn / 1000 / 60 / 60;
+    console.log("New RDATE: " + new Date(diff));
+    console.log(`Repeat in ${repeatIn} hours`);
+    mem.update("RDATE", diff, "ID", mem.res.obj.ID);
+    mem.update("LREPEAT", Date.now(), "ID", mem.res.obj.ID);
 
-      diff = 2 * diff + Date.now();
-      let repeatIn = diff - Date.now();
-      repeatIn = repeatIn / 1000 / 60 / 60;
-      console.log("New RDATE: " + new Date(diff));
-      console.log(`Repeat in ${repeatIn} hours`);
-      mem.update("RDATE", diff, "ID", mem.res.obj.ID);
-      mem.update("LREPEAT", Date.now(), "ID", mem.res.obj.ID);
-
-       console.log("SPEC: ", SPEC)
-       mem.update("SPEC", SPEC, "ID", mem.res.obj.ID);
-
-      //mem.get(res.ID)
-      check.clear();
- 
-    } else {
-      check.wrong();
-      mem.update("RDATE", Date.now(), "ID", mem.res.obj.ID);
-      mem.update("LREPEAT", Date.now(), "ID", mem.res.obj.ID);
-      console.log("ZEROING FILE");
-      mem.code = 0;
-    }
-    ask = null;
-
-    answer = null;
-  } catch(e) { console.log("ERROR!: ", e)}
-  }
-
-  if (mem.code != null) {
-    //check.right();
-    // setTimeout(check.next,200,mem.code)
-    if (mem.code == 1) {
-       
-      //alert("Clearing: " + mem.answered)
-      mem.list[mem.answered] = null;
-      mem.idList[mem.answered] = null;
-      mem.dirList[mem.answered] = null;
-      // alert("++", mem.answered)
-      mem.answered++;
-      //!!! Here should be updating the memos buffer
-      mem.collect();
-      // alert("check.next")
-      check.next(mem.code);
-    }
-
-    //check.next(mem.code);
+    console.log("SPEC: ", mem.res.obj.SPEC);
+    mem.update("SPEC", mem.res.obj.SPEC, "ID", mem.res.obj.ID);
+  } else {
+    mem.update("RDATE", Date.now(), "ID", mem.res.obj.ID);
+    mem.update("LREPEAT", Date.now(), "ID", mem.res.obj.ID);
+    console.log("ZEROING FILE");
     mem.code = 0;
   }
+
+  check.clear();
+  mem.collect();
+  mem.define(1)
+  check.next(mem.code);
+};
+
+mem.check = (answer) => {
+  answer = answer.replaceAll("</div>", "").split("<div>");
+  answer = answer.map((item) => item.replaceAll("&nbsp;", " "));
+
+  let countSymbols = 0;
+  for (var i = 0; i < answer.length; i++) {
+    for (var j = 0; j < answer[i].length; j++) {
+      countSymbols++;
+      if (answer[i] != "<br>") {
+        //there is a <br> tag on empty <enter>
+        console.log(answer[i][j], " ", mem.rightAnswer[0][i][j]);
+        if (answer[i][j] != mem.rightAnswer[0][i][j]) {
+          check.mistakes += 1;
+
+          console.log("MISTAKES: ", check.mistakes);
+
+          check.wrong();
+          if (check.mistakes == 4) {
+            check.mistakes = 0;
+
+            mem.answer(2);
+          }
+        }
+      }
+      console.log(":", ((answer.join("").length == mem.rightAnswer[0].join("").length)&&( (i+1) == answer.length) && ((j+1) == answer[i].length)))
+      if ((answer.join("").length == mem.rightAnswer[0].join("").length)&&( (i+1) == answer.length) && ((j+1) == answer[i].length)) {
+        check.mistakes = 0;
+    
+        mem.answer(1);
+      }
+    }
+  }
+
+
 };
 
 mem.query = null;
@@ -399,7 +395,7 @@ notify = (res, callback) => {
       if (!mem.res) {
         mem.res = {};
       }
-
+      alert();
       mem.res.obj = res;
 
       if (mem.res) {
@@ -442,24 +438,52 @@ mem.when = (id) => {
   }
 };
 
-const zeroPad = (num, places) => String(num).padStart(places, '0')
+const zeroPad = (num, places) => String(num).padStart(places, "0");
 
 mem.when2 = (res) => {
   if (res[0]) {
     date = new Date(res[0].RDATE * 1);
     console.log(date);
-    timeLeft = ((res[0].RDATE*1)-Date.now())/1000
-    daysLeft = Math.floor(timeLeft/60/60/24)
-    hoursLeft = Math.floor((timeLeft - daysLeft*60*60*24)/60/60)
-    minutesLeft = Math.floor((timeLeft-hoursLeft*60*60)/60)
-   let result = (`${zeroPad(daysLeft,2)}:${zeroPad(hoursLeft,2)}:${zeroPad(minutesLeft,2)}`)
-   console.log(result)
-   document.querySelector("#info1").innerHTML = result
-    
+    timeLeft = (res[0].RDATE * 1 - Date.now()) / 1000;
+    if (timeLeft < 0) {
+      timeLeft = 0;
+    }
+    daysLeft = Math.floor(timeLeft / 60 / 60 / 24); //ok
+    hoursLeft = Math.floor((timeLeft - daysLeft * 60 * 60 * 24) / 60 / 60);
+    minutesLeft = Math.floor(
+      (timeLeft - daysLeft * 60 * 60 * 24 - hoursLeft * 60 * 60) / 60
+    );
+    if ((timeLeft>0)&&(timeLeft<60)) {
+      minutesLeft = 1
+    }
+    let result = `${zeroPad(daysLeft, 2)}:${zeroPad(hoursLeft, 2)}:${zeroPad(
+      minutesLeft,
+      2
+    )}`;
+    console.log(result);
+    document.querySelector("#info1").innerHTML = result;
+  }
 };
-}
-mem.when()
-setInterval(mem.when,60000)
+
+mem.calcRepeat = (date) => {
+  timeLeft = (date * 1 - Date.now()) / 1000;
+  if (timeLeft < 0) {
+    timeLeft = 0;
+  }
+  console.log(timeLeft);
+  daysLeft = Math.floor(timeLeft / 60 / 60 / 24); //ok
+  hoursLeft = Math.floor((timeLeft - daysLeft * 60 * 60 * 24) / 60 / 60);
+  minutesLeft = Math.floor(
+    (timeLeft - daysLeft * 60 * 60 * 24 - hoursLeft * 60 * 60) / 60
+  );
+  let result = `${zeroPad(daysLeft, 2)}:${zeroPad(hoursLeft, 2)}:${zeroPad(
+    minutesLeft,
+    2
+  )}`;
+  return result;
+};
+mem.when();
+setInterval(mem.when, 60000);
 /*
 mem.check = (ans, callback, debug) => {
   //First part of check to find an object in need of repeat
@@ -601,31 +625,23 @@ mem.update = (FIELD, DATA, CON1, CON2, callback) => {
 
 //Memos item is a lexical unit
 //Memos advice: always write down sententes or phrases and never just words alone
-mem.itemExample = 
-[//field 1
+mem.itemExample = [
+  //field 1
   [
     //Meaning 1
-    [
-      
-      ["Line 1",
-      "Line 2",
-      "Line 3"],
-    ],
+    [["Line 1", "Line 2", "Line 3"]],
     //Possible Meaning 2
-    [
-      ["A dog"]
-    ],
+    [["A dog"]],
   ],
-  []
-]
+  [],
+];
 
 //a = [ [["a cat","a dog"]], [["кошка","собака"]] ]
 
-mem.itemExample2 = [ [["a cat"]],[["кот"]] ]
+mem.itemExample2 = [[["a cat"]], [["кот"]]];
 //ID: @String,
 //ArRAY: @Array
 mem.addItem = (ID, ARRAY) => {
- 
   let DATA = {};
   let SPEC = [[], []];
 
@@ -636,11 +652,10 @@ mem.addItem = (ID, ARRAY) => {
 
   DATA = JSON.stringify(DATA);
   SPEC = JSON.stringify(SPEC);
-  console.log(DATA)
-  if (ARRAY.length>1) {
+  console.log(DATA);
+  if (ARRAY.length > 1) {
     mem.setItem(ID, DATA, SPEC);
   }
-  
 };
 
 mem.rem = (ID) => {
@@ -780,6 +795,7 @@ let counter = 0;
 let path = ["/"];
 let pathNames = [];
 mem.browser = (goTo) => {
+  mem.when();
   counter = 0;
   cached = 0;
   browserCache = [];
@@ -796,6 +812,7 @@ mem.objectsStartAt = 0;
 mem.cacheCalled = 0;
 let quit = false;
 mem.setCache = (data) => {
+  mem.dropList();
   cached++;
   browserCache.push(data);
   console.log("BrowserCache: ", browserCache);
@@ -806,22 +823,30 @@ mem.setCache = (data) => {
       browserString +=
         counter +
         ": " +
-        JSON.parse(browserCache[0][i].DATA)[0] +
+        JSON.parse(browserCache[0][i].DATA)[0] + //diricon and name
         "/" +
-        JSON.parse(browserCache[0][i].DATA)[1] +
+        JSON.parse(browserCache[0][i].DATA)[1] + //fields
         "\n";
     }
 
     mem.objectsStartAt = counter + 1;
     for (let i = 0; i < browserCache[1].length; i++) {
       counter++;
-      browserString += counter + ": " + browserCache[1][i].DATA + "\n";
+      browserString +=
+        counter +
+        ": " +
+        browserCache[1][i].DATA +
+        "/" +
+        mem.calcRepeat(browserCache[1][i].RDATE) +
+        "\n"; //files data
     }
 
-    if (browserString == '') {
-      browserString = "Nothing here yet"
+    if (browserString == "") {
+      browserString = "Nothing here yet";
     }
-    document.querySelector("#terminal").value = `Memos Terminal v 0.1.5 \n${pathNames}\n${browserString}\n`;
+    document.querySelector(
+      "#terminal"
+    ).value = `Memos Terminal v 0.1.5 \n${pathNames}\n${browserString}\n`;
 
     //help
     /*
@@ -854,7 +879,7 @@ mem.terminalCommand = (choice) => {
   switch (command) {
     //0: list content
     case "ls":
-      mem.browser(path[path.length - 1]);
+      // mem.browser(path[path.length - 1]);
       break;
     //1: going around
     case "cd":
@@ -927,7 +952,7 @@ mem.terminalCommand = (choice) => {
   }
   mem.browser(path[path.length - 1]);
 };
-setInterval(mem.collect,10000)
+setInterval(mem.collect, 10000);
 mem.collect(); //collect items to repeat
 
 /* Examples:

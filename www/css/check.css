@@ -145,8 +145,11 @@
 	.win {
 	transition: 400ms background ease-out, 500ms margin-top; b: #00ff00; background: #06a906 !important; 
 	}
-		.loose {
-	transition: 400ms background ease-out, 500ms margin-top; background: red;
+	.loose {
+		transition: 400ms background ease-out, 500ms margin-top; b: #00ff00; background: red !important; 
+		}
+		.loosewas {
+	transition: 400ms background ease-out, 500ms margin-top; background: red !important;
 	}
 	.pos00 {
 		margin-top: calc(-100vh);
