@@ -125,6 +125,7 @@ keyboard.open = () => {
   document.getElementById("memosInput").classList.remove("opacity0");
   //document.getElementById("memosInput").classList.add("td5")
   document.getElementById("memosInput").focus();
+  document.querySelector(".memokeyboard").scrollBy(0, 1000000);
 
   inner = () => {
     keyboard.opened = true;
@@ -152,6 +153,7 @@ check.get = () => {
 };
 
 check.clear = () => {
+  document.querySelector(".progressBar").style.width = 0 + "%"
   document.querySelector("#memosInput").innerHTML = "";
   document.querySelector("#memosInput").style.height = 49 + "px";
   document.querySelector("#memosInput").style.height =
@@ -213,6 +215,9 @@ cards.init = () => {
   // mem.check()
   
   mem.ask(4);
+  if (!mem.nothing)
+  setTimeout(cards.startTimer,1000)
+ 
   // cards.set(4);
 };
 
@@ -341,9 +346,9 @@ check.next = (success) => {
 
   check.subNext();
 };
-check.right = () => {
+check.setColor = () => {
   try {
-    document.querySelector(".pos1").classList.add("win");
+    document.querySelector(".pos1").classList.add(cards.color);
   } catch (e) {}
 };
 check.p1 = () => {
@@ -352,7 +357,7 @@ check.p1 = () => {
     document.querySelector(".work").classList.remove("pos1");
     document.querySelector(".work").classList.add("pos00");
      
-    document.querySelector(".work").classList.add(cards.color);
+    
     document.querySelector(".pos00").classList.remove("work");
   } catch (e) {}
 };
@@ -389,12 +394,21 @@ check.p5 = () => {
     .querySelector("#papers")
     .insertAdjacentHTML("afterbegin", " <div class='pos4 card'></div>");
 };
+cards.timeout = 0
+cards.startTimer = () => {
+  document.querySelector(".cardTimer").classList.add("timerStarted")
+  
+  cards.timeout = setTimeout(mem.answer,10000,0)
+}
 check.subNext = () => {
   console.log("SUBNEXT INFO");
   console.log(mem.res);
   cards.set(2);
+  cards.startTimer();
+  
+  
   cards.unfreeze();
-  setTimeout(check.right, 0);
+  setTimeout(check.setColor, 0);
   setTimeout(check.p1, 500);
   setTimeout(check.clear,500)
   setTimeout(check.p2, 600);
@@ -405,6 +419,8 @@ check.subNext = () => {
   setTimeout(cards.rem0, 2000);
   // setTimeout(check.checkNext,3000)
 };
+
+
 
 check.checkNext = () => {
   if (!document.querySelector(".pos1")) {
@@ -466,12 +482,14 @@ cardSample = `
 	</div>
 	<div class='dirname'>$dirName</div>
 	</div>
-
+  <div class="cardTimer"></div>
+  <div class="cardTimer"></div>
 	<div class='datapanel'>
 		<div class='innerdata'>
 		$question
 		</div>
 	</div>
+ 
 `;
 
 cardWin = `
@@ -486,7 +504,7 @@ cardWin = `
 	</div>
 	<div class='dirname'>All complete</div>
 	</div>
-
+  <div class="cardTimer"></div>
 	<div class='datapanel'>
 		<div class='innerdata'>
 		Pay us a visit in 3 hours
@@ -558,7 +576,7 @@ cards.close = () => {
   }
 
   function rem() {
-    for (var i = 0; i < 4; i++) {
+    for (var i = 0; i < 8; i++) {
       try {
         document.querySelector(".card").remove();
       } catch (e) {}

@@ -160,6 +160,7 @@ mem.ask = (pos) => {
 
 mem.answered = 0
 mem.answer = (answerIsCorrect) => {
+  mem.maxRightSymbols = 0
   mem.answered = 1
   if (answerIsCorrect) {
     console.log("OK");
@@ -179,8 +180,7 @@ mem.answer = (answerIsCorrect) => {
 
     console.log("SPEC: ", mem.res.obj.SPEC);
     mem.update("SPEC", mem.res.obj.SPEC, "ID", mem.res.obj.ID);
-    check.right()
-
+     
   } else {
     mem.update("RDATE", Date.now(), "ID", mem.res.obj.ID);
     mem.update("LREPEAT", Date.now(), "ID", mem.res.obj.ID);
@@ -204,11 +204,49 @@ mem.focus = (focus) => {
     document.querySelector("#memosInput3").focus()
   }
 }
-check.answerLength = 0
-check.event = 0
-check.mistaken = 0
-check.mistakenPoint = 0
+
+mem.maxRightSymbols = 0
+mem.percentage = 0
+mem.progress = 0
 mem.check = (answer) => {
+  answer = answer.replaceAll("&nbsp;"," ")
+
+  
+  
+  answer = answer.replaceAll("</div>", "").split("<div>");
+  answer = answer.map((item) => item.replaceAll("&nbsp;", " "));
+
+  let rightSymbols = 0;
+  let block = 0
+  for (var i = 0; i < answer.length; i++) {
+    for (var j = 0; j < answer[i].length; j++) {
+        if (answer[i][j] != mem.rightAnswer[0][i][j]) {
+          block=1
+        } else {
+          if (!block)
+          rightSymbols++
+        }
+        if ((!block)&&(answer.join("").length == mem.rightAnswer[0].join("").length)&&( (i+1) == answer.length) && ((j+1) == answer[i].length)) {
+          mem.answer(1)
+        }
+    }
+    if (rightSymbols>mem.maxRightSymbols) {
+      document.querySelector(".cardTimer").classList.remove("timerStarted")
+      clearTimeout(cards.timeout)
+      setTimeout(()=>{
+        document.querySelector(".cardTimer").classList.add("timerStarted")
+        cards.startTimer()
+      },500)
+      
+       
+    mem.maxRightSymbols = rightSymbols
+    }
+    mem.percentage = rightSymbols/mem.rightAnswer[0].join("").length
+    document.querySelector(".progressBar").style.width = mem.percentage*100 + "%"
+  }
+};
+
+mem.checkWAS = (answer) => {
   answer = answer.replaceAll("&nbsp;","")
   console.log(answer.length, " ", check.answerLength)
   if (answer.length > check.answerLength) {
@@ -244,26 +282,26 @@ mem.check = (answer) => {
         //there is a <br> tag on empty <enter>
         console.log(i, j, "[",answer[i][j], "] [", mem.rightAnswer[0][i][j],"]");
         if (answer[i][j] != mem.rightAnswer[0][i][j]) {
-          check.mistakes += 1;
+          // check.mistakes += 1;
            
-          check.mistaken=1
-          check.mistakenPoint = check.answerLength
-          // mem.focus(0)
-          // setTimeout(mem.focus,1000,1)
-          block=1
-          console.log("MISTAKES: ", check.mistakes);
+          // check.mistaken=1
+          // check.mistakenPoint = check.answerLength
+          // // mem.focus(0)
+          // // setTimeout(mem.focus,1000,1)
+          // block=1
+          // console.log("MISTAKES: ", check.mistakes);
 
-          check.wrong();
-          if (check.mistakes == 4) {
-            check.mistakes = 0;
-            check.mistaken=0
-            check.answerLength = 0
-            // check.blocked=1
-            setTimeout(function(){
-              check.blocked=0
-            },1500)
-            mem.answer(0);
-          }
+          // check.wrong();
+          // if (check.mistakes == 4) {
+          //   check.mistakes = 0;
+          //   check.mistaken=0
+          //   check.answerLength = 0
+          //   // check.blocked=1
+          //   setTimeout(function(){
+          //     check.blocked=0
+          //   },1500)
+          //   mem.answer(0);
+          // }
         }
       }
       console.log(":", ((answer.join("").length == mem.rightAnswer[0].join("").length)&&( (i+1) == answer.length) && ((j+1) == answer[i].length)))

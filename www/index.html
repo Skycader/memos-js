@@ -47,17 +47,13 @@
       </div>
       <div id='keyboard2' class='donotdisplay'
          style='display: flex; overflow: hidden; position: absolute; border: 0px solid red; width: 100vw; height: 100vh; align-items: flex-end; justify-content: center; flex-direction: column'>
-         <!--<div
-            style="min-width: 20%;right: 80%; position: absolute; height: 49px; z-index: 999;background: linear-gradient(90deg, rgba(36,36,36,1) 20%, rgba(36,36,36,0) 100%);">
-         </div>-->
-         <!--<input id='memosInput' oninput="check.check(this.value)" class='opacity0'
-            style="  border: 0px solid red;font-family: Round;font-size: 25px;color: white;background: transparent;outline: none;resize: none;height: 34px;height: 49px;overflow: hidden;text-align: center; max-width: 360px; min-width: 100%;   opacity: 1;position: relative;"
-           >-->
+
          <div class="memokeyboard aboveAll" onclick='check.focus()' style="scroll-behavior: smooth; width: 100%; height: 100%; overflow-y: scroll">
-            <div style="width: 100%; height: calc(100% - 50px)"></div>
+            <div style="width: 100%; height: calc(100% - 52px)"></div>
             <div contenteditable id='memosInput' oninput='check.check(this.value)' style=" max-width: 400px; margin: 0 auto; padding: 10px; border-radius: 15px 15px 0px 0px; border: 0px solid red;font-family: Round;font-size: 25px;color: white; z-index: 99; box-shadow: 0 0 10px rgb(0 0 0 / 50%); background: #171717; outline: none;resize: none;height: 34px;height: 49px; text-align: center;  width: 100%; opacity: 1;position: relative;" class='opacity0'>
                
             </div>
+            <div class='progressBar' style="width: 0%; height: 2px; background: lime"></div>
              
       </div>  
       <div style='opacity: 0; margin-bottom: 100px; width: 100%; position: absolute' class="memokeyboard" onclick='check.focus()' style="scroll-behavior: smooth; width: 100%; height: 100%; overflow-y: scroll">
