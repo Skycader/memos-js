@@ -158,7 +158,9 @@ mem.ask = (pos) => {
   cards.set(pos);
 };
 
+mem.answered = 0
 mem.answer = (answerIsCorrect) => {
+  mem.answered = 1
   if (answerIsCorrect) {
     console.log("OK");
 
@@ -177,6 +179,8 @@ mem.answer = (answerIsCorrect) => {
 
     console.log("SPEC: ", mem.res.obj.SPEC);
     mem.update("SPEC", mem.res.obj.SPEC, "ID", mem.res.obj.ID);
+    check.right()
+
   } else {
     mem.update("RDATE", Date.now(), "ID", mem.res.obj.ID);
     mem.update("LREPEAT", Date.now(), "ID", mem.res.obj.ID);
@@ -184,7 +188,7 @@ mem.answer = (answerIsCorrect) => {
     mem.code = 0;
   }
 
-  check.clear();
+  
   mem.collect();
   mem.define(1)
   check.next(mem.code);

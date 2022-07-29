@@ -174,7 +174,10 @@ document.getElementById("memosInput").addEventListener(
   },
   false
 );
-
+check.focus = () => {
+  document.getElementById("memosInput").focus()
+ 
+}
 check.exit = () => {
   check.clear();
   document.querySelector("#thatcircle").classList.remove("omniscale2");
@@ -391,11 +394,13 @@ check.subNext = () => {
   console.log(mem.res);
   cards.set(2);
   cards.unfreeze();
-  setTimeout(check.p1, 50);
-  setTimeout(check.p2, 100);
-  setTimeout(check.p3, 150);
-  setTimeout(check.p4, 200);
-  setTimeout(check.p5, 250);
+  setTimeout(check.right, 0);
+  setTimeout(check.p1, 500);
+  setTimeout(check.clear,500)
+  setTimeout(check.p2, 600);
+  setTimeout(check.p3, 750);
+  setTimeout(check.p4, 800);
+  setTimeout(check.p5, 950);
   setTimeout(cards.fixSize, 1000);
   setTimeout(cards.rem0, 2000);
   // setTimeout(check.checkNext,3000)
