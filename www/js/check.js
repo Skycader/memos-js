@@ -144,17 +144,7 @@ document
     }
   });
 
-check.answer = "";
-check.mistakes = 0;
-document.getElementById("memosInput").addEventListener(
-  "input",
-  function () {
-    console.log("input event fired");
-    check.answer = document.querySelector("#memosInput").innerHTML
-    mem.check(check.answer)
-  },
-  false
-);
+
  
 
 check.get = () => {
@@ -168,11 +158,29 @@ check.clear = () => {
     $("#memosInput").get(0).scrollHeight + "px";
   document.querySelector(".memokeyboard").scrollBy(0, 1000000);
 };
+
+check.answer = "";
+check.mistakes = 0;
+document.getElementById("memosInput").addEventListener(
+  "input",
+  function () {
+    console.log("input event fired");
+    check.answer = document.querySelector("#memosInput").innerHTML
+    if (!check.blocked) {
+    mem.check(check.answer)
+    } else {
+      check.clear()
+    }
+  },
+  false
+);
+
 check.exit = () => {
   check.clear();
   document.querySelector("#thatcircle").classList.remove("omniscale2");
 
   mem.dropList();
+  mem.collect()
 
   //document.getElementById("memosInput").classList.remove("td5")
   document.getElementById("memosInput").classList.add("opacity0");
@@ -184,7 +192,8 @@ check.exit = () => {
   inititated = false;
   document.querySelector("#memosInput").innerHTML = "";
   document.querySelector("#memosInput").classList.remove("padding");
-  setTimeout(check.toggle, 2300);
+  // setTimeout(check.toggle, 2900);
+  setTimeout(check.toggle, 0);
 };
 
 cards = {};
@@ -389,7 +398,14 @@ check.subNext = () => {
   setTimeout(check.p5, 250);
   setTimeout(cards.fixSize, 1000);
   setTimeout(cards.rem0, 2000);
+  // setTimeout(check.checkNext,3000)
 };
+
+check.checkNext = () => {
+  if (!document.querySelector(".pos1")) {
+    check.next(mem.code)
+  } 
+}
 
 cards.rem0 = () => {
   try {
@@ -583,10 +599,12 @@ cards.close = () => {
 
   try {
     //из-за закрывающейся клавы лагает, так что нужно подождать сек
-    setTimeout(s1, 1000);
-    setTimeout(s2, 1300);
-    setTimeout(s3, 1800);
-    setTimeout(rem, 2500);
+    // setTimeout(s1, 1000);
+    // setTimeout(s2, 1500);
+    // setTimeout(s3, 2000);
+
+    // setTimeout(rem, 2500);
+    setTimeout(rem, 0);
   } catch (e) {
     console.log(e);
   }

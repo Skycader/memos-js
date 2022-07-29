@@ -190,38 +190,93 @@ mem.answer = (answerIsCorrect) => {
   check.next(mem.code);
 };
 
+mem.focus = (focus) => {
+  if (focus) {
+    let save =  document.querySelector("#memosInput").innerHTML
+    document.querySelector("#memosInput").innerHTML = ""
+    document.querySelector("#memosInput").focus()
+    document.querySelector("#memosInput").innerHTML = save
+  } else {
+    document.querySelector("#memosInput3").focus()
+  }
+}
+check.answerLength = 0
+check.event = 0
+check.mistaken = 0
+check.mistakenPoint = 0
 mem.check = (answer) => {
+  answer = answer.replaceAll("&nbsp;","")
+  console.log(answer.length, " ", check.answerLength)
+  if (answer.length > check.answerLength) {
+    check.answerLength = answer.length;
+    check.event = 1
+    console.log("++")
+  } else if (answer.length == check.answerLength) {
+      console.log("==")
+      check.answerLength = answer.length;
+      check.event=1
+      check.mistaken=0
+  } else 
+   {
+    check.answerLength = answer.length;
+    check.event = -1
+    console.log("--")
+    if (check.answerLength<check.mistakenPoint) {
+      block=0
+      check.mistaken = 0
+    }
+  }
+  
+  if ((check.event==1)&&(!check.mistaken)) {
   answer = answer.replaceAll("</div>", "").split("<div>");
   answer = answer.map((item) => item.replaceAll("&nbsp;", " "));
 
   let countSymbols = 0;
+  let block = 0
   for (var i = 0; i < answer.length; i++) {
     for (var j = 0; j < answer[i].length; j++) {
       countSymbols++;
       if (answer[i] != "<br>") {
         //there is a <br> tag on empty <enter>
-        console.log(answer[i][j], " ", mem.rightAnswer[0][i][j]);
+        console.log(i, j, "[",answer[i][j], "] [", mem.rightAnswer[0][i][j],"]");
         if (answer[i][j] != mem.rightAnswer[0][i][j]) {
           check.mistakes += 1;
-
+           
+          check.mistaken=1
+          check.mistakenPoint = check.answerLength
+          // mem.focus(0)
+          // setTimeout(mem.focus,1000,1)
+          block=1
           console.log("MISTAKES: ", check.mistakes);
 
           check.wrong();
           if (check.mistakes == 4) {
             check.mistakes = 0;
-
-            mem.answer(2);
+            check.mistaken=0
+            check.answerLength = 0
+            // check.blocked=1
+            setTimeout(function(){
+              check.blocked=0
+            },1500)
+            mem.answer(0);
           }
         }
       }
       console.log(":", ((answer.join("").length == mem.rightAnswer[0].join("").length)&&( (i+1) == answer.length) && ((j+1) == answer[i].length)))
-      if ((answer.join("").length == mem.rightAnswer[0].join("").length)&&( (i+1) == answer.length) && ((j+1) == answer[i].length)) {
+      if ((!block)&&(answer.join("").length == mem.rightAnswer[0].join("").length)&&( (i+1) == answer.length) && ((j+1) == answer[i].length)) {
         check.mistakes = 0;
-    
+        check.answerLength = 0
+        // check.blocked=1
+        //     setTimeout(function(){
+        //       check.blocked=0
+               
+        //     },1500)
         mem.answer(1);
       }
+      
     }
   }
+}
 
 
 };
@@ -553,6 +608,7 @@ mem.setItem = function (PID, DATA, SPEC) {
   var RDATE = Date.now() + 0 * 60 * 1000;
   var LREPEAT = Date.now();
   if (ITEM_G_COUNT < 1000) {
+    ITEM_G_COUNT++
     sql(
       `INSERT INTO OBJECTS (ID,PID, DATA, RDATE, LREPEAT, SPEC) VALUES ("${ID}","${PID}",'${DATA}',"${RDATE}", "${LREPEAT}", "${SPEC}")`,
       undefined,
@@ -651,8 +707,9 @@ mem.addItem = (ID, ARRAY) => {
   }
 
   DATA = JSON.stringify(DATA);
+  console.log(DATA)
   SPEC = JSON.stringify(SPEC);
-  console.log(DATA);
+
   if (ARRAY.length > 1) {
     mem.setItem(ID, DATA, SPEC);
   }
@@ -785,7 +842,7 @@ function makeid(length) {
 
 mem.show = (DIRID, callback) => {
   sql(`SELECT * FROM DIRS WHERE PID = "${DIRID}" ORDER BY DATA`, callback);
-  sql(`SELECT * FROM OBJECTS WHERE PID = "${DIRID}" ORDER BY DATA`, callback);
+  sql(`SELECT * FROM OBJECTS WHERE PID = "${DIRID}" ORDER BY RDATE`, callback);
 };
 
 let browserCache = [];
@@ -811,6 +868,7 @@ let cached = 0;
 mem.objectsStartAt = 0;
 mem.cacheCalled = 0;
 let quit = false;
+mem.terminalHelpMessage = ""
 mem.setCache = (data) => {
   mem.dropList();
   cached++;
@@ -844,9 +902,16 @@ mem.setCache = (data) => {
     if (browserString == "") {
       browserString = "Nothing here yet";
     }
+    if (!mem.terminalHelpMessage.length) {
     document.querySelector(
       "#terminal"
     ).value = `Memos Terminal v 0.1.5 \n${pathNames}\n${browserString}\n`;
+    } else {
+      document.querySelector(
+        "#terminal"
+      ).value = `Memos Terminal v 0.1.5 \n ${mem.terminalHelpMessage}`;
+      mem.terminalHelpMessage = ""
+    }
 
     //help
     /*
@@ -870,6 +935,24 @@ mem.setCache = (data) => {
   }
 };
 
+mem.terminalHelp = () => {
+  mem.terminalHelpMessage = `
+  List of commands available at the moment:
+  1. Create a directory: mkdir [["<icon>","<dir name>"],["field 1","field 2","field n"]]
+  2. Create a file: touch [ [["Line 1","Line 2","Line n"],["Possible second meaning"] ]], 
+     [["<Second field]] ]
+  An easier example: [ [["Le chat"]], [["The cat"]] ]
+  3. Remove directory: rm dir <number of a directory> (numbers are displayed by each line)
+  4. Remove file: rm file <number>
+  5. Go between directories: cd <number>
+  6. Go up level: cd ..
+  7. Restore previous command: --
+  8. Show directories and files in current directory: ls (usually autamically)
+  8. Print this message: help
+  `
+}
+
+mem.terminalChoice = ""
 mem.terminalCommand = (choice) => {
   if (pathNames.length == 0) {
     pathNames[0] = "/";
@@ -880,6 +963,13 @@ mem.terminalCommand = (choice) => {
     //0: list content
     case "ls":
       // mem.browser(path[path.length - 1]);
+      break;
+      //restore previous command
+    case "--":
+      document.querySelector("#terminalCommands").value = mem.terminalChoice;
+      break;
+    case "help":
+      mem.terminalHelp();
       break;
     //1: going around
     case "cd":
@@ -922,11 +1012,12 @@ mem.terminalCommand = (choice) => {
       break;
 
     case "touch":
-      choice = choice.replace("'", '"');
+      // choice = choice.replace("'", '"');
+      try {
       let [, ...DATA] = choice.split(" ");
       DATA = DATA.join(" ");
       mem.addItem(path[path.length - 1], JSON.parse(DATA));
-      // mem.browser(path[path.length - 1]);
+      } catch(e) {console.warn(e)}
       break;
 
     case "rm":
@@ -951,6 +1042,7 @@ mem.terminalCommand = (choice) => {
     // mem.browser(path[path.length - 1]);
   }
   mem.browser(path[path.length - 1]);
+  mem.terminalChoice = choice;
 };
 setInterval(mem.collect, 10000);
 mem.collect(); //collect items to repeat
