@@ -220,7 +220,7 @@ mem.check = (answer) => {
   let block = 0
   for (var i = 0; i < answer.length; i++) {
     for (var j = 0; j < answer[i].length; j++) {
-        if (answer[i][j] != mem.rightAnswer[0][i][j]) {
+        if (answer[i][j].toLowerCase() != mem.rightAnswer[0][i][j].toLowerCase()) {
           block=1
         } else {
           if (!block)

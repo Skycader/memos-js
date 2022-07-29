@@ -169,6 +169,7 @@ document.getElementById("memosInput").addEventListener(
     console.log("input event fired");
     check.answer = document.querySelector("#memosInput").innerHTML
     if (!check.blocked) {
+      if (!mem.nothing)
     mem.check(check.answer)
     } else {
       check.clear()
