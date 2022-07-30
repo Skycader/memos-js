@@ -145,15 +145,12 @@ document
     }
   });
 
-
- 
-
 check.get = () => {
   return document.querySelector("#memosInput").innerHTML;
 };
 
 check.clear = () => {
-  document.querySelector(".progressBar").style.width = 0 + "%"
+  document.querySelector(".progressBar").style.width = 0 + "%";
   document.querySelector("#memosInput").innerHTML = "";
   document.querySelector("#memosInput").style.height = 49 + "px";
   document.querySelector("#memosInput").style.height =
@@ -167,26 +164,24 @@ document.getElementById("memosInput").addEventListener(
   "input",
   function () {
     console.log("input event fired");
-    check.answer = document.querySelector("#memosInput").innerHTML
+    check.answer = document.querySelector("#memosInput").innerHTML;
     if (!check.blocked) {
-      if (!mem.nothing)
-    mem.check(check.answer)
+      if (!mem.nothing) mem.check(check.answer);
     } else {
-      check.clear()
+      check.clear();
     }
   },
   false
 );
 check.focus = () => {
-  document.getElementById("memosInput").focus()
- 
-}
+  document.getElementById("memosInput").focus();
+};
 check.exit = () => {
   check.clear();
   document.querySelector("#thatcircle").classList.remove("omniscale2");
 
   mem.dropList();
-  mem.collect()
+  mem.collect();
 
   //document.getElementById("memosInput").classList.remove("td5")
   document.getElementById("memosInput").classList.add("opacity0");
@@ -202,7 +197,9 @@ check.exit = () => {
   setTimeout(check.toggle, 0);
 };
 
+
 cards = {};
+cards.timerInterval = 0
 cards.init = () => {
   mem.collect();
   mem.answered = 0;
@@ -214,11 +211,14 @@ cards.init = () => {
   //mem.check(undefined,cards.set)
   mem.nothing = 0;
   // mem.check()
-  
+
   mem.ask(4);
-  if (!mem.nothing)
-  setTimeout(cards.startTimer,1000)
- 
+  if (!mem.nothing) {
+  setTimeout(cards.initTimer, 1000);
+  cards.timerInterval = setInterval(cards.checkTimer,100)
+  }
+
+
   // cards.set(4);
 };
 
@@ -328,7 +328,6 @@ function toggleFullscreen() {
 
 cards.color = null;
 check.next = (success) => {
-   
   //Just moves the cards
   if (success == undefined) {
     success = 1;
@@ -357,8 +356,7 @@ check.p1 = () => {
     document.querySelector(".pos1").classList.add("work");
     document.querySelector(".work").classList.remove("pos1");
     document.querySelector(".work").classList.add("pos00");
-     
-    
+
     document.querySelector(".pos00").classList.remove("work");
   } catch (e) {}
 };
@@ -395,39 +393,56 @@ check.p5 = () => {
     .querySelector("#papers")
     .insertAdjacentHTML("afterbegin", " <div class='pos4 card'></div>");
 };
-cards.timeout = 0
-cards.startTimer = () => {
-  document.querySelector(".cardTimer").classList.add("timerStarted")
-  
-  cards.timeout = setTimeout(mem.answer,10000,0)
+
+cards.timeout = 0;
+cards.initTimer = () => {
+  if (!mem.nothing) {
+    document.querySelector(".cardTimer").classList.add("timerStarted");
+  }
+  console.log(document.querySelector(".cardTimer"))
+};
+
+theTime = 0
+cards.checkTimer = () => {
+  theTime = new Date()
+  let width = $(".cardTimer").width()
+  if (width == 0) {
+    mem.answer(0)
+    clearInterval(cards.timerInterval)
+  }
+  if ((mem.nothing)||(!check.toggled)) {
+    clearInterval(cards.timerInterval)
+  }
+
 }
+
 check.subNext = () => {
   console.log("SUBNEXT INFO");
   console.log(mem.res);
-  cards.set(2);
-  cards.startTimer();
-  
-  
+  // cards.set(2);
+  mem.ask(2)
   cards.unfreeze();
   setTimeout(check.setColor, 0);
   setTimeout(check.p1, 500);
-  setTimeout(check.clear,500)
+  setTimeout(check.clear, 500);
   setTimeout(check.p2, 600);
   setTimeout(check.p3, 750);
   setTimeout(check.p4, 800);
   setTimeout(check.p5, 950);
   setTimeout(cards.fixSize, 1000);
   setTimeout(cards.rem0, 2000);
+  setTimeout(cards.initTimer,2100)
+  setTimeout(()=> {
+    cards.timerInterval = setInterval(cards.checkTimer,100)
+  },2100)
   // setTimeout(check.checkNext,3000)
 };
 
-
-
 check.checkNext = () => {
   if (!document.querySelector(".pos1")) {
-    check.next(mem.code)
-  } 
-}
+    check.next(mem.code);
+  }
+};
 
 cards.rem0 = () => {
   try {
@@ -469,6 +484,7 @@ cards.set = (pos) => {
   } catch (e) {
     console.log(e);
   }
+  
 };
 
 cardSample = `
@@ -546,6 +562,9 @@ cardid2 =
   "<div class='pos4 card'><div class='table'> <div class='table2'> <div class='cell pad'> <div> $id </div> </div></div></div></div>";
 
 cards.close = () => {
+  
+  mem.maxRightSymbols = 0;
+  cards.timeLeft = 20;
   mem.answered = 0;
   mem.when();
   mem.dropList();

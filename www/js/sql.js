@@ -119,6 +119,7 @@ mem.answered = 0; //move forward in a list of files to answer
 
 mem.define = (increment) => {
   if (increment) {
+    
     mem.answered++;
   }
   let DATA;
@@ -161,7 +162,8 @@ mem.ask = (pos) => {
 mem.answered = 0
 mem.answer = (answerIsCorrect) => {
   mem.maxRightSymbols = 0
-  mem.answered = 1
+  
+   
   if (answerIsCorrect) {
     console.log("OK");
 
@@ -232,12 +234,9 @@ mem.check = (answer) => {
     }
     if (rightSymbols>mem.maxRightSymbols) {
       document.querySelector(".cardTimer").classList.remove("timerStarted")
-      clearTimeout(cards.timeout)
       setTimeout(()=>{
-        document.querySelector(".cardTimer").classList.add("timerStarted")
-        cards.startTimer()
+        cards.initTimer();
       },500)
-      
        
     mem.maxRightSymbols = rightSymbols
     }
