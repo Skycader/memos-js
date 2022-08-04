@@ -64,6 +64,9 @@
   width: 100%;
 }
 
+.no-trunsition {
+  transition-duration: 0s !important;
+}
 .innerdata {
   /*otherwise scrollable content is not fully displated */
   text-align: center;
@@ -214,7 +217,11 @@
 }
 
 .progressBar {
+  position: fixed;
+  bottom: 0px;
+  z-index: 9999;
 	transition-duration: 0.5s;
+  background: lime;
 }
 
 .hidekeyboard {

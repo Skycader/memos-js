@@ -156,6 +156,7 @@ check.clear = () => {
   document.querySelector("#memosInput").style.height =
     $("#memosInput").get(0).scrollHeight + "px";
   document.querySelector(".memokeyboard").scrollBy(0, 1000000);
+  mem.maxRightSymbols = 0
 };
 
 check.answer = "";
@@ -165,7 +166,7 @@ document.getElementById("memosInput").addEventListener(
   function () {
     console.log("input event fired");
     check.answer = document.querySelector("#memosInput").innerHTML;
-    if (!check.blocked) {
+    if (!cards.animation) {
       if (!mem.nothing) mem.check(check.answer);
     } else {
       check.clear();
@@ -188,6 +189,9 @@ check.exit = () => {
 
   document.getElementById("memosInput").innerHTML = "";
   document.getElementById("memosInput").blur();
+   
+  mem.circleData(1)
+  mem.circleData(1)
   cards.close();
 
   inititated = false;
@@ -274,7 +278,7 @@ cards.call = () => {
   setTimeout(cards.p3, 300);
   setTimeout(cards.p2, 1000);
   setTimeout(cards.p1, 1400);
-  setTimeout(cards.fixSize, 1600);
+  // setTimeout(cards.fixSize, 1600);
 };
 
 cards.insert = (amount) => {
@@ -327,7 +331,9 @@ function toggleFullscreen() {
 }
 
 cards.color = null;
+cards.animation = 0
 check.next = (success) => {
+  cards.animation=1
   //Just moves the cards
   if (success == undefined) {
     success = 1;
@@ -389,9 +395,11 @@ check.p4 = () => {
 };
 
 check.p5 = () => {
+  
   document
     .querySelector("#papers")
     .insertAdjacentHTML("afterbegin", " <div class='pos4 card'></div>");
+    
 };
 
 cards.timeout = 0;
@@ -402,18 +410,22 @@ cards.initTimer = () => {
   console.log(document.querySelector(".cardTimer"))
 };
 
-theTime = 0
+// theTime = 0
+
 cards.checkTimer = () => {
-  theTime = new Date()
+  // theTime = new Date()
   let width = $(".cardTimer").width()
+  if (width != undefined) 
+  {
   if (width == 0) {
+    cards.allowNull=0
     mem.answer(0)
     clearInterval(cards.timerInterval)
   }
   if ((mem.nothing)||(!check.toggled)) {
     clearInterval(cards.timerInterval)
   }
-
+  }
 }
 
 check.subNext = () => {
@@ -421,7 +433,7 @@ check.subNext = () => {
   console.log(mem.res);
   // cards.set(2);
   mem.ask(2)
-  cards.unfreeze();
+  //cards.unfreeze();
   setTimeout(check.setColor, 0);
   setTimeout(check.p1, 500);
   setTimeout(check.clear, 500);
@@ -429,11 +441,13 @@ check.subNext = () => {
   setTimeout(check.p3, 750);
   setTimeout(check.p4, 800);
   setTimeout(check.p5, 950);
-  setTimeout(cards.fixSize, 1000);
+  //setTimeout(cards.fixSize, 1000);
   setTimeout(cards.rem0, 2000);
   setTimeout(cards.initTimer,2100)
+  
   setTimeout(()=> {
     cards.timerInterval = setInterval(cards.checkTimer,100)
+    cards.animation=0
   },2100)
   // setTimeout(check.checkNext,3000)
 };

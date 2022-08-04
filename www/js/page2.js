@@ -105,6 +105,6 @@ document.querySelector(".page2-node4").addEventListener('scroll', function() {
     }
     timer = setTimeout(function() {
           r()
-          console.log("R")
+        //   console.log("R")
     }, 150);
 }, false);

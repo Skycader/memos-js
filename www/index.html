@@ -122,21 +122,21 @@
                            style="stroke-dasharray: 100 100" d="M18 2.0845
                            a 15.9155 15.9155 0 0 1 0 31.831
                            a 15.9155 15.9155 0 0 1 0 -31.831" />
-                        <path transition-duration="2s" id='mycircle' class="circle-anim circle"
-                           style="stroke-dasharray:  50 100; filter: drop-shadow( 0px 0px 1.2px rgb(255, 255, 255))" d="M18 2.0845
+                        <path transition-duration="2s" id='mycircle' class="circle-anim circle hidden"
+                           style="stroke-dasharray:  0 100; filter: drop-shadow( 0px 0px 1.2px rgb(255, 255, 255))" d="M18 2.0845
                            a 15.9155 15.9155 0 0 1 0 31.831
                            a 15.9155 15.9155 0 0 1 0 -31.831" />
                            <g id="info">
                            <text id='info1' x="50%" y="25%" text-anchor="middle" class='opacive' font-family="Round"
                               fill="white" font-size="2.2px" dy=".3em">00:00:00</text>
                            <text id='info2' x="50%" y="34%" text-anchor="middle" class='opacive' font-family="Round"
-                              fill="white" font-size="2.2px" stroke-width="1px" dy=".3em">160 | 512</text>
+                              fill="white" font-size="2.2px" stroke-width="1px" dy=".3em">000 | 000 | 000</text>
                            <text id='info3' x="50%" y="50%" text-anchor="middle" font-family="Round" fill="white"
-                              font-size="5px" stroke-width="1px" dy=".3em">80</text>
+                              font-size="5px" stroke-width="1px" dy=".3em">0</text>
                            <text id='info4' x="50%" y="66%" text-anchor="middle" class='opacive' font-family="Round"
-                              fill="white" font-size="2.2px" stroke-width="1px" dy=".3em">0</text>
+                              fill="white" font-size="2.2px" stroke-width="1px" dy=".3em">000 | 000 | 000</text>
                            <text id='info5' x="50%" y="75%" text-anchor="middle" class='opacive' font-family="Round"
-                              fill="white" font-size="2.2px" stroke-width="1px" dy=".3em">12:06:32</text>
+                              fill="white" font-size="2.2px" stroke-width="1px" dy=".3em">000:000:000</text>
 
                            <rect x="16%" y="45%" rx="1" ry="1" width="5.5" height="2.5"
                               style="fill:rgb(30, 255, 0); filter: drop-shadow( 0px 0px 2px rgb(2, 255, 14));" />
@@ -288,9 +288,9 @@
             <div class='page4' style='     display: content'>
                <div style="position: absolute; margin-top: 110px; width: 100%; height: calc(100% - 100px)">
                
-                 <textarea id="terminal" style="background: #161616; color: white; width: 100%; height: calc(100vh - 180px); font-size: 25px; font-family: memoff"
+                 <textarea id="terminal" style="background: #161616; color: white; width: 100%; height: calc(100vh - 280px); font-size: 25px; font-family: memoff"
                  ></textarea>
-                 <textarea onchange="terminal()" id="terminalCommands" style="background: #161616; color: white; width: 100%; overflow: hidden; height: calc(50px); font-size: 25px; font-family: memoff"
+                 <textarea onchange="terminal()" id="terminalCommands" style="background: #161616; color: white; width: 100%; overflow: hidden; height: calc(150px); font-size: 25px; font-family: memoff"
                  ></textarea>
                  <!-- <button style="width: 100%; height: 50px" onclick=" mem.terminalCommand(terminal.lastLine)">Send</button> -->
                    
