@@ -410,7 +410,7 @@ mem.when2 = (res) => {
     // console.log(date);
     timeLeft = (res[0].RDATE * 1 - Date.now()) / 1000;
     if (timeLeft < 0) {
-      timeLeft = 0;
+      timeLeft = Math.abs(timeLeft);
     }
     daysLeft = Math.floor(timeLeft / 60 / 60 / 24); //ok
     hoursLeft = Math.floor((timeLeft - daysLeft * 60 * 60 * 24) / 60 / 60);
@@ -506,7 +506,7 @@ mem.countTotal2 = (data) => {
   // console.log(toRepeat);
   let result = zeroPad(toRepeat, 3);
   mem.countTotalResult = result;
-  mem.countTotalResult2 = numberWithCommas(zeroPad(result, 9), ":");
+  mem.countTotalResult2 = numberWithCommas(zeroPad(result, 9), ".");
   mem.circleData();
 };
 
@@ -523,7 +523,7 @@ mem.memoPower2 = (data) => {
   
   let result = Math.floor(res / 1000 / 60 / 60)
   result = zeroPad(result,9)
-  result = numberWithCommas(result," | ")
+  result = numberWithCommas(result," · ")
   mem.memoPowerResult = result
   mem.circleData();
 };
