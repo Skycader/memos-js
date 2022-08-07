@@ -68,7 +68,7 @@ mem.dropList = () => {
 };
 mem.collect = () => {
   sql(
-    `SELECT ID, PID, DATA, RDATE, LREPEAT, SPEC FROM OBJECTS WHERE RDATE < '${Date.now()}' LIMIT 10`,
+    `SELECT ID, PID, DATA, RDATE, LREPEAT, SPEC FROM OBJECTS WHERE 1*RDATE < ${Date.now()} LIMIT 10`,
     mem.collectCallback
   );
 };
@@ -90,7 +90,6 @@ mem.collectCallback = (res) => {
     }
   }
 
-   
   /*
   for (var i = 0; i < mem.list.length; i++) {
     mem.list[i].DIRID = mem.list[i].PID; //mem.getDir(mem.list[i].ID);
@@ -121,7 +120,6 @@ mem.answered = 0; //move forward in a list of files to answer
 mem.define = (increment) => {
   if (increment) {
     mem.answered++;
-    
   }
   let DATA;
   let SPEC;
@@ -163,48 +161,50 @@ mem.ask = (pos) => {
 };
 
 mem.answered = 0;
-mem.blockAnswer = 0
+mem.blockAnswer = 0;
 mem.answer = (answerIsCorrect) => {
   if (!mem.blockAnswer) {
-  mem.blockAnswer = 1
-  document.querySelector(".cardTimer").classList.add("no-trunsition");
-  document.querySelector(".cardTimer").classList.remove("timerStarted");
-  document.querySelector(".cardTimer").classList.remove("no-trunsition");
+    mem.blockAnswer = 1;
+    document.querySelector(".cardTimer").classList.add("no-trunsition");
+    document.querySelector(".cardTimer").classList.remove("timerStarted");
+    document.querySelector(".cardTimer").classList.remove("no-trunsition");
 
-  if (answerIsCorrect) {
-    console.log("OK");
+    if (answerIsCorrect) {
+      console.log("OK");
 
-    mem.code = 1; //code OK
+      mem.code = 1; //code OK
 
-    let diff = Date.now() - mem.res.obj.LREPEAT * 1;
-    console.log("Different in hours: " + diff / 1000 / 60 / 60);
+      let diff = Date.now() - mem.res.obj.LREPEAT * 1;
+      console.log("Different in hours: " + diff / 1000 / 60 / 60);
 
-    if (answerIsCorrect != 0.5) {
-    diff = 2 * diff + Date.now() + 10 * 1000;
+      if (answerIsCorrect != 0.5) {
+        diff = 2 * diff + Date.now() + 10 * 1000;
+      } else {
+        diff = diff + Date.now() + 10 * 1000;
+      }
+      let repeatIn = diff - Date.now();
+      repeatIn = repeatIn / 1000 / 60 / 60;
+      console.log("New RDATE: " + new Date(diff));
+      console.log(`Repeat in ${repeatIn} hours`);
+      mem.update("RDATE", diff, "ID", mem.res.obj.ID);
+      mem.update("LREPEAT", Date.now(), "ID", mem.res.obj.ID);
+      mem.res.obj.SPEC = JSON.stringify(mem.res.obj.result[1]);
+      mem.update("SPEC", mem.res.obj.SPEC, "ID", mem.res.obj.ID);
+    } else {
+      mem.update("RDATE", Date.now(), "ID", mem.res.obj.ID);
+      mem.update("LREPEAT", Date.now(), "ID", mem.res.obj.ID);
+      console.log("ZEROING FILE");
+      mem.code = 0;
     }
-    let repeatIn = diff - Date.now();
-    repeatIn = repeatIn / 1000 / 60 / 60;
-    console.log("New RDATE: " + new Date(diff));
-    console.log(`Repeat in ${repeatIn} hours`);
-    mem.update("RDATE", diff, "ID", mem.res.obj.ID);
-    mem.update("LREPEAT", Date.now(), "ID", mem.res.obj.ID);
-    mem.res.obj.SPEC = JSON.stringify(mem.res.obj.result[1]);
-    mem.update("SPEC", mem.res.obj.SPEC, "ID", mem.res.obj.ID);
-  } else {
-    mem.update("RDATE", Date.now(), "ID", mem.res.obj.ID);
-    mem.update("LREPEAT", Date.now(), "ID", mem.res.obj.ID);
-    console.log("ZEROING FILE");
-    mem.code = 0;
-  }
 
-  mem.collect();
-  
-  mem.define(1);
-  check.next(mem.code);
-  setTimeout(()=>{
-    mem.blockAnswer = 0
-  },1000)
-}
+    mem.collect();
+
+    mem.define(1);
+    check.next(mem.code);
+    setTimeout(() => {
+      mem.blockAnswer = 0;
+    }, 1000);
+  }
   //end of mem.answer
 };
 
@@ -263,7 +263,7 @@ mem.check = (answer) => {
     }
     if (rightSymbols > mem.maxRightSymbols) {
       document.querySelector(".cardTimer").classList.remove("timerStarted");
-       
+
       setTimeout(() => {
         cards.initTimer();
       }, 500);
@@ -463,103 +463,140 @@ mem.calcRepeat = (date) => {
 };
 
 mem.circleData = (update) => {
-  let res = `${mem.todayAnsweredResult} | ${mem.countResult} | ${mem.countDailyResult}`
-  if ((mem.todayAnsweredResult != undefined)&&(mem.countResult != undefined)&&(mem.countDailyResult != undefined))
-  document.querySelector("#info2").innerHTML = res
-  let percentage = Math.floor(((mem.countTotalResult*1 - mem.countResult*1)/mem.countTotalResult*1)*100)
-  if ((!isNaN(percentage))&&(Math.abs(percentage) != Infinity)) {
-  document.querySelector("#info3").innerHTML = percentage
-  if (percentage > 0) {
-  document.querySelector("#mycircle").classList.remove("hidden")
-  } else {
-    document.querySelector("#mycircle").classList.add("hidden")
+  let res = `${mem.todayAnsweredResult} | ${mem.countResult} | ${mem.countDailyResult}`;
+  if (
+    mem.todayAnsweredResult != undefined &&
+    mem.countResult != undefined &&
+    mem.countDailyResult != undefined
+  )
+    document.querySelector("#info2").innerHTML = res;
+  let percentage = Math.floor(
+    ((mem.countTotalResult * 1 - mem.countResult * 1) / mem.countTotalResult) *
+      1 *
+      100
+  );
+  if (!isNaN(percentage) && Math.abs(percentage) != Infinity) {
+    document.querySelector("#info3").innerHTML = percentage;
+    document.querySelector("#info4").innerHTML = mem.memoPowerResult;
+    document.querySelector("#info5").innerHTML = mem.countTotalResult2;
+    if (percentage > 0) {
+      document.querySelector("#mycircle").classList.remove("hidden");
+    } else {
+      document.querySelector("#mycircle").classList.add("hidden");
+    }
   }
-  }
-  document.querySelector("#mycircle").style['stroke-dasharray'] = percentage + ", 100"
+  document.querySelector("#mycircle").style["stroke-dasharray"] =
+    percentage + ", 100";
   if (update) {
-  mem.todayAnswered();
-  mem.countDaily();
-  mem.countTotal()
-  mem.count();
+    mem.todayAnswered();
+    mem.countDaily();
+    mem.countTotal();
+    mem.count();
+    mem.memoPower();
   }
-}
-
-mem.countTotalResult = 0
-mem.countTotal = () => {
-  sql(
-    `SELECT COUNT(ID) FROM OBJECTS`,
-    mem.countTotal2
-  ); 
-}
-mem.countTotal2 = (data) => {
-  
-  let toRepeat = data[0]['COUNT(ID)']
-  // console.log(toRepeat);
-  let result = zeroPad(toRepeat,3)  
-  mem.countTotalResult = result;
-  mem.circleData()
 };
+
+mem.countTotalResult = 0;
+mem.countTotal = () => {
+  sql(`SELECT COUNT(ID) FROM OBJECTS`, mem.countTotal2);
+};
+mem.countTotalResult2 = "";
+mem.countTotal2 = (data) => {
+  let toRepeat = data[0]["COUNT(ID)"];
+  // console.log(toRepeat);
+  let result = zeroPad(toRepeat, 3);
+  mem.countTotalResult = result;
+  mem.countTotalResult2 = numberWithCommas(zeroPad(result, 9), ":");
+  mem.circleData();
+};
+
+mem.memoPowerResult = 0;
+mem.memoPower = () => {
+  sql("SELECT SUM(RDATE-LREPEAT) FROM OBJECTS", mem.memoPower2);
+};
+
+mem.memoPower2 = (data) => {
+  let res = data[0]['SUM(RDATE-LREPEAT)'];
+   
+  res = 1*res
+
+  
+  let result = Math.floor(res / 1000 / 60 / 60)
+  result = zeroPad(result,9)
+  result = numberWithCommas(result," | ")
+  mem.memoPowerResult = result
+  mem.circleData();
+};
+
+function numberWithCommas(num, sep) {
+  return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, sep);
+}
 
 mem.count = () => {
   sql(
-    `SELECT COUNT(ID) FROM OBJECTS WHERE RDATE < '${Date.now()}'`,
+    `SELECT COUNT(ID) FROM OBJECTS WHERE 1*RDATE < ${Date.now()}`,
     mem.count2
   );
 };
 
 mem.count2 = (data) => {
-  
-  let toRepeat = data[0]['COUNT(ID)']
+  let toRepeat = data[0]["COUNT(ID)"];
   // console.log(toRepeat);
-  let result = zeroPad(toRepeat,3)  
+  let result = zeroPad(toRepeat, 3);
   mem.countResult = result;
-  mem.circleData()
+  mem.circleData();
 };
 
 function getNewDay(arg = 0) {
-
-  let h = new Date()
-  let hours = h.getHours()
-  let minutes = h.getMinutes()
-  let seconds = h.getSeconds()
-  let res = Date.now()-hours*60*60*1000-minutes*60*1000-seconds*1000 + arg*24*60*60*1000
+  let h = new Date();
+  let hours = h.getHours();
+  let minutes = h.getMinutes();
+  let seconds = h.getSeconds();
+  let res =
+    Date.now() -
+    hours * 60 * 60 * 1000 -
+    minutes * 60 * 1000 -
+    seconds * 1000 +
+    arg * 24 * 60 * 60 * 1000;
   return res;
 }
 
 mem.countDaily = () => {
   sql(
-    `SELECT COUNT(ID) FROM OBJECTS WHERE RDATE < '${getNewDay(1)}' AND RDATE > '${Date.now()}'`,
+    `SELECT COUNT(ID) FROM OBJECTS WHERE 1*RDATE < ${getNewDay(
+      1
+    )} AND 1*RDATE > ${Date.now()}`,
     mem.countDaily2
   );
-}
+};
 
 mem.todayAnswered = () => {
   sql(
-    `SELECT COUNT(ID) FROM OBJECTS WHERE (LREPEAT > '${getNewDay(0)}') AND (RDATE != LREPEAT)`,
+    `SELECT COUNT(ID) FROM OBJECTS WHERE (1*LREPEAT > ${getNewDay(
+      0
+    )}) AND (1*RDATE != 1*LREPEAT)`,
     mem.todayAnswered2
   );
-}
+};
 
-mem.todayAnsweredResult = 0
+mem.todayAnsweredResult = 0;
 mem.todayAnswered2 = (data) => {
-
-  let toRepeat = data[0]['COUNT(ID)']
+  let toRepeat = data[0]["COUNT(ID)"];
   // console.log(toRepeat);
-  let result = zeroPad(toRepeat,3)
+  let result = zeroPad(toRepeat, 3);
   mem.todayAnsweredResult = result;
-  mem.circleData()
-}
+  mem.circleData();
+};
 
-mem.countDailyResult = 0
+mem.countDailyResult = 0;
 mem.countDaily2 = (data) => {
-  
-  let toRepeat = data[0]['COUNT(ID)']
+  let toRepeat = data[0]["COUNT(ID)"];
   // console.log(toRepeat);
-  
-  let result = zeroPad(toRepeat,3)
+
+  let result = zeroPad(toRepeat, 3);
   mem.countDailyResult = result;
-  mem.circleData()
-}
+  mem.circleData();
+};
 
 mem.getDir = (string) => {
   // return string.split(".").slice(0,2).join(".");
@@ -696,9 +733,8 @@ mem.itemExample2 = [[["a cat"]], [["кот"]]];
 mem.addItem = (ID, ARRAY) => {
   let DATA = {};
   let SPEC = [];
-
+  DATA = ARRAY;
   for (var i = 0; i < ARRAY.length; i++) {
-    DATA[i] = ARRAY[i];
     SPEC.push([]);
   }
 
@@ -842,34 +878,26 @@ mem.show = (DIRID, callback) => {
   sql(`SELECT * FROM OBJECTS WHERE PID = "${DIRID}" ORDER BY RDATE`, callback);
 };
 
-mem.editItem = (ID,DATA,callback) => {
-  sql(`UPDATE OBJECTS SET DATA = '${DATA}' WHERE ID = '${ID}'`,callback)
-}
-mem.editDir = (ID,DATA,callback) => {
-  sql(`UPDATE DIRS SET DATA = '${DATA}' WHERE ID = '${ID}'`,callback)
-}
+mem.editItem = (ID, DATA, callback) => {
+  sql(`UPDATE OBJECTS SET DATA = '${DATA}' WHERE ID = '${ID}'`, callback);
+};
+mem.editDir = (ID, DATA, callback) => {
+  sql(`UPDATE DIRS SET DATA = '${DATA}' WHERE ID = '${ID}'`, callback);
+};
 
-mem.moveItem = (ID,PID,callback) => {
-  sql(`UPDATE OBJECTS SET PID = '${PID}' WHERE ID = '${ID}'`,callback)
-}
-mem.moveDir = (ID,PID,callback) => {
-  sql(`UPDATE DIRS SET PID = '${PID}' WHERE ID = '${ID}'`,callback)
-}
-mem.cutFile = () => {
+mem.moveItem = (ID, PID, callback) => {
+  sql(`UPDATE OBJECTS SET PID = '${PID}' WHERE ID = '${ID}'`, callback);
+};
+mem.moveDir = (ID, PID, callback) => {
+  sql(`UPDATE DIRS SET PID = '${PID}' WHERE ID = '${ID}'`, callback);
+};
+mem.cutFile = () => {};
 
-}
+mem.cutDir = () => {};
 
-mem.cutDir = () => {
+mem.pasteFile = () => {};
 
-}
-
-mem.pasteFile = () => {
-
-}
-
-mem.pasteDir = () => {
-
-}
+mem.pasteDir = () => {};
 
 let browserCache = [];
 let browserString = "";
@@ -991,7 +1019,6 @@ mem.terminalHelp = () => {
 
 mem.terminalChoice = "";
 mem.terminalCommand = (choice) => {
-  
   ITEM_G_COUNT = 0;
   if (pathNames.length == 0) {
     pathNames[0] = "/";
@@ -1008,14 +1035,16 @@ mem.terminalCommand = (choice) => {
       sql("UPDATE OBJECTS SET SPEC = '[[],[]]' WHERE ID LIKE '%'", console.log);
       break;
     case "/new":
+      let currentDate = Date.now();
       sql(
-        `UPDATE OBJECTS SET RDATE = '${Date.now()}' WHERE ID LIKE '%'`,
+        `UPDATE OBJECTS SET LREPEAT = '${currentDate}' WHERE ID LIKE '%'`,
         console.log
       );
       sql(
-        `UPDATE OBJECTS SET LREPEAT = '${Date.now()}' WHERE ID LIKE '%'`,
+        `UPDATE OBJECTS SET RDATE = '${currentDate}' WHERE ID LIKE '%'`,
         console.log
       );
+
       break;
     case "--":
       document.querySelector("#terminalCommands").value = mem.terminalChoice;
@@ -1033,7 +1062,7 @@ mem.terminalCommand = (choice) => {
         pathNames.pop();
         mem.browser(path[path.length - 1]);
       } else if (choice.split(" ")[1] == "/") {
-        path = ["/"]
+        path = ["/"];
         mem.browser(path[path.length - 1]);
       } else {
         newChoice = 1 * choice.split(" ")[1] - 1;
@@ -1075,32 +1104,32 @@ mem.terminalCommand = (choice) => {
       } catch (e) {
         console.warn(e);
       }
+      mem.collect();
       break;
 
-      case "edit":
-        // choice = choice.replace("'", '"');
-        if (choice.split(" ")[1] == "file") {
-          let [,,, ...DATA] = choice.split(" ");
-          DATA = DATA.join(" ");
-          DATA = DATA+'';
-          FILID = 1 * choice.split(" ")[2] - 1 - browserCache[0].length;
-          UNIQUID = browserCache[1][FILID].ID;
-          mem.editItem(UNIQUID, DATA);
-        }
-        if (choice.split(" ")[1] == "dir") {
-          let [,,, ...DATA] = choice.split(" ");
-          DATA = DATA.join(" ");
-          DATA = DATA+'';
-          DIRID = browserCache[0][1 * choice.split(" ")[2] - 1].ID;
-          mem.editDir(DIRID, DATA);
-        }
-        break;
+    case "edit":
+      // choice = choice.replace("'", '"');
+      if (choice.split(" ")[1] == "file") {
+        let [, , , ...DATA] = choice.split(" ");
+        DATA = DATA.join(" ");
+        DATA = DATA + "";
+        FILID = 1 * choice.split(" ")[2] - 1 - browserCache[0].length;
+        UNIQUID = browserCache[1][FILID].ID;
+        mem.editItem(UNIQUID, DATA);
+      }
+      if (choice.split(" ")[1] == "dir") {
+        let [, , , ...DATA] = choice.split(" ");
+        DATA = DATA.join(" ");
+        DATA = DATA + "";
+        DIRID = browserCache[0][1 * choice.split(" ")[2] - 1].ID;
+        mem.editDir(DIRID, DATA);
+      }
+      break;
 
-        case "cut":
-          if (choice.split(" ")[1] == "file") {
-
-          }
-          break;
+    case "cut":
+      if (choice.split(" ")[1] == "file") {
+      }
+      break;
     case "rm":
       if (choice.split(" ")[1] == "file") {
         FILID = 1 * choice.split(" ")[2] - 1 - browserCache[0].length;
@@ -1126,7 +1155,6 @@ mem.terminalCommand = (choice) => {
   mem.terminalChoice = choice;
 };
 
-
 mem.collect(); //collect items to repeat
 setInterval(mem.collect, 5000);
 mem.when();
@@ -1135,8 +1163,11 @@ mem.todayAnswered();
 mem.countDaily();
 mem.count();
 mem.countTotal();
+mem.memoPower();
 setInterval(mem.when, 5000);
-setInterval(() => {mem.circleData(1)}, 5000);
+setInterval(() => {
+  mem.circleData(1);
+}, 5000);
 
 // setTimeout(()=> {
 //   document.querySelector("#mycircle").classList.remove("hidden")
