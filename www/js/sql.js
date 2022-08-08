@@ -880,6 +880,14 @@ mem.show = (DIRID, callback) => {
 
 mem.editItem = (ID, DATA, callback) => {
   sql(`UPDATE OBJECTS SET DATA = '${DATA}' WHERE ID = '${ID}'`, callback);
+  ARRAY = JSON.parse(DATA)
+  let SPEC = []
+  for (let i = 0; i<ARRAY.length; i++) {
+    SPEC.push([])
+  }
+  SPEC = JSON.stringify(SPEC)
+  sql(`UPDATE OBJECTS SET SPEC = '${SPEC}' WHERE ID = '${ID}'`, callback);
+
 };
 mem.editDir = (ID, DATA, callback) => {
   sql(`UPDATE DIRS SET DATA = '${DATA}' WHERE ID = '${ID}'`, callback);
@@ -1100,6 +1108,7 @@ mem.terminalCommand = (choice) => {
       try {
         let [, ...DATA] = choice.split(" ");
         DATA = DATA.join(" ");
+        DATA = DATA.replaceAll("'","''")
         mem.addItem(path[path.length - 1], JSON.parse(DATA));
       } catch (e) {
         console.warn(e);
