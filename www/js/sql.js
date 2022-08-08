@@ -1121,6 +1121,7 @@ mem.terminalCommand = (choice) => {
       if (choice.split(" ")[1] == "file") {
         let [, , , ...DATA] = choice.split(" ");
         DATA = DATA.join(" ");
+        DATA = DATA.replaceAll("'","''")
         DATA = DATA + "";
         FILID = 1 * choice.split(" ")[2] - 1 - browserCache[0].length;
         UNIQUID = browserCache[1][FILID].ID;
@@ -1163,6 +1164,13 @@ mem.terminalCommand = (choice) => {
   mem.browser(path[path.length - 1]);
   mem.terminalChoice = choice;
 };
+
+function htmlEntities(str) {
+var str = str.replace(/[\u00A0-\u9999<>\&]/g, function(i) {
+  return '&#'+i.charCodeAt(0)+';';
+});
+return str;
+}
 
 mem.collect(); //collect items to repeat
 setInterval(mem.collect, 5000);
