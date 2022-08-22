@@ -169,7 +169,9 @@ document.getElementById("memosInput").addEventListener(
     if (!cards.animation) {
       if (!mem.nothing) mem.check(check.answer);
     } else {
-      check.clear();
+    //  check.clear();
+      // setTimeout(()=>mem.check(check.answer),500)
+      if (!mem.nothing) mem.check(check.answer);
     }
   },
   false
@@ -205,6 +207,7 @@ check.exit = () => {
 cards = {};
 cards.timerInterval = 0
 cards.init = () => {
+  cards.animation=1
   mem.collect();
   mem.answered = 0;
   mem.nothing = 0;
@@ -232,6 +235,7 @@ cards.p1 = () => {
     document.querySelector(".work").classList.remove("pos4");
     document.querySelector(".work").classList.add("pos3");
     document.querySelector(".pos3").classList.remove("work");
+    cards.animation=0
   } catch (e) {}
 };
 cards.p2 = () => {
@@ -496,7 +500,7 @@ cards.set = (pos) => {
       cards.call();
     }
   } catch (e) {
-    console.log(e);
+    console.error(e);
   }
   
 };

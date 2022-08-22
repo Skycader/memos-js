@@ -258,7 +258,12 @@ mem.check = (answer) => {
         i + 1 == answer.length &&
         j + 1 == answer[i].length
       ) {
+        if (!cards.animation) {
         mem.answer(1);
+        } else {
+          document.querySelector(".pos1").classList.add("win");
+          setTimeout(()=>mem.answer(1),1000)
+        }
       }
     }
     if (rightSymbols > mem.maxRightSymbols) {
@@ -281,94 +286,7 @@ mem.check = (answer) => {
   }
 };
 
-mem.checkWAS = (answer) => {
-  answer = answer.replaceAll("&nbsp;", "");
-  console.log(answer.length, " ", check.answerLength);
-  if (answer.length > check.answerLength) {
-    check.answerLength = answer.length;
-    check.event = 1;
-    console.log("++");
-  } else if (answer.length == check.answerLength) {
-    console.log("==");
-    check.answerLength = answer.length;
-    check.event = 1;
-    check.mistaken = 0;
-  } else {
-    check.answerLength = answer.length;
-    check.event = -1;
-    console.log("--");
-    if (check.answerLength < check.mistakenPoint) {
-      block = 0;
-      check.mistaken = 0;
-    }
-  }
 
-  if (check.event == 1 && !check.mistaken) {
-    answer = answer.replaceAll("</div>", "").split("<div>");
-    answer = answer.map((item) => item.replaceAll("&nbsp;", " "));
-
-    let countSymbols = 0;
-    let block = 0;
-    for (var i = 0; i < answer.length; i++) {
-      for (var j = 0; j < answer[i].length; j++) {
-        countSymbols++;
-        if (answer[i] != "<br>") {
-          //there is a <br> tag on empty <enter>
-          console.log(
-            i,
-            j,
-            "[",
-            answer[i][j],
-            "] [",
-            mem.rightAnswer[0][i][j],
-            "]"
-          );
-          if (answer[i][j] != mem.rightAnswer[0][i][j]) {
-            // check.mistakes += 1;
-            // check.mistaken=1
-            // check.mistakenPoint = check.answerLength
-            // // mem.focus(0)
-            // // setTimeout(mem.focus,1000,1)
-            // block=1
-            // console.log("MISTAKES: ", check.mistakes);
-            // check.wrong();
-            // if (check.mistakes == 4) {
-            //   check.mistakes = 0;
-            //   check.mistaken=0
-            //   check.answerLength = 0
-            //   // check.blocked=1
-            //   setTimeout(function(){
-            //     check.blocked=0
-            //   },1500)
-            //   mem.answer(0);
-            // }
-          }
-        }
-        console.log(
-          ":",
-          answer.join("").length == mem.rightAnswer[0].join("").length &&
-            i + 1 == answer.length &&
-            j + 1 == answer[i].length
-        );
-        if (
-          !block &&
-          answer.join("").length == mem.rightAnswer[0].join("").length &&
-          i + 1 == answer.length &&
-          j + 1 == answer[i].length
-        ) {
-          check.mistakes = 0;
-          check.answerLength = 0;
-          // check.blocked=1
-          //     setTimeout(function(){
-          //       check.blocked=0
-
-          //     },1500)
-          mem.answer(1);
-        }
-      }
-    }
-  }
-};
 
 mem.query = null;
 mem.test = () => {
@@ -1102,7 +1020,12 @@ mem.terminalCommand = (choice) => {
         console.log(e);
       }
       break;
-
+	case "save":
+		  save2()
+		  break
+	case "read":
+		  read()
+		  break
     case "touch":
       // choice = choice.replace("'", '"');
       try {

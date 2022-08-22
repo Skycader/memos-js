@@ -26,6 +26,7 @@
    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no, shrink-to-fit=no">
    <meta name="color-scheme" content="light dark">
    <link rel="stylesheet" href="css/page2.css">
+   <link rel="stylesheet" href="css/home.css">
    <link rel="stylesheet" href="css/index.css">
    <link rel="stylesheet" href="css/style2.css">
    <link rel="stylesheet" href="css/circle.css">
@@ -155,12 +156,12 @@
             <div id='simplex' class='quickMenu container' onclick='check.start()'
                style='position: absolute; scroll-behavior: smooth;  height: 100vh; width: 100vw; overflow: scroll;'>
                <!-- <div style='width: 100%; height: 100%; background: red'></div> -->
-               <div id='simplexPadding' style='scroll-snap-align: start; width: 100vw' class='verticalSimplex'>
+               <div id='simplexPadding' style='width: 100vw' class='verticalSimplex scrollSnapAlignStart'>
                   <div style='height: 35vh; border: 0px solid red'></div>
                </div>
-               <div id='stats' onclick='check.start()' class=' '
-                  style='scroll-snap-align: start; position: relative;  border: 0px solid red; width: 100%; min-height: 	100px;  display: flex; flex-direction: column; align-items: flex-start; justify-content: flex-end; transition-duration: 0.5s '>
-                  <div id='stick' onclick='upIt()' class='quickMenu transition'
+               <div id='stats' onclick='check.start()' class='scrollSnapAlignStart'
+                  style='position: relative;  border: 0px solid red; width: 100%; min-height: 	100px;  display: flex; flex-direction: column; align-items: flex-start; justify-content: flex-end; transition-duration: 0.5s '>
+                  <div id='stick' onclick='upIt()' touchstart='allowStats()' class='quickMenu transition'
                      style='z-index: 9999; width: 100vw; position: absolute; height: 110px; background: #242424; padding-top: 10px; border-radius: 15px 15px 0px 0px'>
                      <div
                         style='display: flex; flex-direction: row; align-items: center; justify-content: center; width: 100%'>
@@ -322,6 +323,7 @@
 <script src="js/sql.js"></script>
 <script src="js/file.js"></script>
 <script src="js/terminal.js"></script>
+<script src="js/home.js"></script>
 <script>
     
    function save2() {
@@ -329,6 +331,7 @@
 
 
       a = prompt()
+	  a = "test save"
       html = a
       var way;
       //html = html.repeat(30)
@@ -395,6 +398,36 @@
       } catch (e) { alert(e) }
    }
 
+	function read(){
+			try {
+			window.resolveLocalFileSystemURL(cordova.file.externalApplicationStorageDirectory + "memos/backup.txt", gotFile, fail);
+				} catch(e) {
+						document.querySelector("#terminalCommands").value = e
+					}
+		}
+
+
+function fail(e) {
+	console.log("FileSystem Error");
+			document.querySelector("#terminalCommands").value = "Filesystem error"
+	console.dir(e);
+}
+
+function gotFile(fileEntry) {
+
+	fileEntry.file(function(file) {
+		var reader = new FileReader();
+
+		reader.onloadend = function(e) {
+			console.log("Text is: "+this.result);
+				alert(this.result)
+			document.querySelector("#terminalCommands").value = this.result;
+		}
+
+		reader.readAsText(file);
+	});
+
+}
 // check.toggle()
 // setTimeout(check.exit,4000)
 </script>
