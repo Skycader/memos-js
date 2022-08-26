@@ -5,9 +5,12 @@ db.transaction(function (tx) {
   tx.executeSql(
     "CREATE TABLE IF NOT EXISTS OBJECTS (ID unique, PID, DATA, RDATE, LREPEAT, SPEC)"
   ); //PID - PARENT ID
-  tx.executeSql("CREATE TABLE IF NOT EXISTS DIRS (ID unique, PID, DATA)");
+  tx.executeSql("CREATE TABLE IF NOT EXISTS DIRS (ID unique, PID, DIRDATA)");
   tx.executeSql("CREATE TABLE IF NOT EXISTS MEMOROUTES (ID unique, DATA)");
   tx.executeSql("CREATE TABLE IF NOT EXISTS HISTORY (ID unique, DATA)");
+  // tx.executeSql("ALTER TABLE DIRS RENAME COLUMN DIRDATA TO DATA;")
+  // tx.executeSql("ALTER TABLE OBJECTS RENAME TO ITEMS ")
+
 });
 
 //The executeSql method is the following: executeSql(sqlStatement, arguments, callback, errorCallback)
@@ -68,7 +71,8 @@ mem.dropList = () => {
 };
 mem.collect = () => {
   sql(
-    `SELECT ID, PID, DATA, RDATE, LREPEAT, SPEC FROM OBJECTS WHERE 1*RDATE < ${Date.now()} LIMIT 10`,
+    // `SELECT * FROM OBJECTS  LEFT JOIN DIRS ON OBJECTS.PID=DIRS.ID AND 1*RDATE < ${Date.now()} LIMIT 10`,
+    `SELECT OBJECTS.ID, OBJECTS.DATA, RDATE, LREPEAT, SPEC, DIRS.DATA AS DIRDATA FROM OBJECTS JOIN DIRS ON OBJECTS.PID=DIRS.ID AND 1*RDATE < ${Date.now()} LIMIT 10`,
     mem.collectCallback
   );
 };
@@ -82,9 +86,11 @@ mem.collectCallback = (res) => {
       //console.log(mem.list.indexOf(res[i]))
       //console.log("pushing")
       //console.log(res[i])
+      
       mem.list.push(res[i]);
       mem.idList.push(res[i].ID);
-      mem.getDirInfo(res[i].PID);
+      
+      // mem.getDirInfo(res[i].PID);
     } else {
       // console.log("Already in");
     }
@@ -125,7 +131,8 @@ mem.define = (increment) => {
   let SPEC;
   mem.res.obj = mem.list[mem.answered];
   if (mem.res.obj) {
-    mem.res.dir = mem.dirList[mem.answered];
+    // mem.res.dir = mem.dirList[mem.answered];
+    mem.res.dir=mem.list[mem.answered].DIRDATA
     DATA = JSON.parse(mem.res.obj.DATA);
     SPEC = JSON.parse(mem.res.obj.SPEC);
 
@@ -989,6 +996,7 @@ mem.terminalCommand = (choice) => {
         mem.browser(path[path.length - 1]);
       } else if (choice.split(" ")[1] == "/") {
         path = ["/"];
+        pathNames = ["/"]
         mem.browser(path[path.length - 1]);
       } else {
         newChoice = 1 * choice.split(" ")[1] - 1;
@@ -1094,6 +1102,7 @@ var str = str.replace(/[\u00A0-\u9999<>\&]/g, function(i) {
 });
 return str;
 }
+
 
 mem.collect(); //collect items to repeat
 setInterval(mem.collect, 5000);
