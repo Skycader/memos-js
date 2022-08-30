@@ -342,11 +342,16 @@ check.next = (success) => {
   if (success == undefined) {
     success = 1;
   }
-  if (success == 1) {
-    cards.color = "win"; //mode
-  } else {
-    cards.color = "loose";
+  switch (success) {
+    case 1: cards.color = "win"; break;
+    case 0.5: cards.color = "skip"; break;
+    case 0: cards.color = "loose"; break;
   }
+  // if (success == 1) {
+  //   cards.color = "win"; //mode
+  // } else {
+  //   cards.color = "loose";
+  // }
 
   // if ((success>0)&&(!mem.nothing)) {
   // 	check.subNext();

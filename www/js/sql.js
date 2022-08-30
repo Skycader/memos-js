@@ -229,10 +229,16 @@ mem.focus = (focus) => {
 mem.maxRightSymbols = 0;
 mem.percentage = 0;
 mem.progress = 0;
-
+mem.userAnswer = ""
 mem.check = (answer) => {
   answer = answer.replaceAll("&nbsp;", " ");
   answer = answer.replaceAll("<br>", "");
+   
+  mem.userAnswer = answer
+
+  answer = answer.replaceAll("</div>", "").split("<div>");
+  answer = answer.map((item) => item.replaceAll("&nbsp;", " "));
+ 
 
   if (answer == "/right") {
     check.next(1);
@@ -243,9 +249,11 @@ mem.check = (answer) => {
   if (answer == "/wrong") {
     check.next(0);
   }
+  if (answer == "/skip") {
+    mem.answered++
+    check.next(0.5)
 
-  answer = answer.replaceAll("</div>", "").split("<div>");
-  answer = answer.map((item) => item.replaceAll("&nbsp;", " "));
+  }
 
   let rightSymbols = 0;
   let block = 0;
@@ -1028,11 +1036,11 @@ mem.terminalCommand = (choice) => {
         console.log(e);
       }
       break;
-	case "save":
-		  save2()
+	case "export":
+		  mem.export()
 		  break
-	case "read":
-		  read()
+	case "import":
+		  importData()
 		  break
     case "touch":
       // choice = choice.replace("'", '"');
@@ -1103,6 +1111,22 @@ var str = str.replace(/[\u00A0-\u9999<>\&]/g, function(i) {
 return str;
 }
 
+mem.exportedData = []
+mem.export = () => {
+  mem.exportedData = []
+  sql(`SELECT * FROM OBJECTS`,mem.exportCallback)
+  sql(`SELECT * FROM DIRS`,mem.exportDirsCallback)
+}
+
+mem.exportCallback = (res) => {
+  mem.exportedData.push(res)
+}
+
+mem.exportDirsCallback = (res) => {
+  mem.exportedData.push(res)
+  mem.exportedData = JSON.stringify(mem.exportedData)
+  exportData()
+}
 
 mem.collect(); //collect items to repeat
 setInterval(mem.collect, 5000);

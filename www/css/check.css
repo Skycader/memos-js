@@ -154,6 +154,11 @@
   b: #00ff00;
   background: #06a906 !important;
 }
+.skip {
+  transition: 400ms background ease-out, 500ms margin-top;
+  b: #00ff00;
+  background: rgb(226, 251, 0) !important;
+}
 .loose {
   transition: 400ms background ease-out, 500ms margin-top;
   b: #00ff00;
