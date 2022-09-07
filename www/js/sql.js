@@ -231,7 +231,11 @@ mem.percentage = 0;
 mem.progress = 0;
 mem.userAnswer = ""
 mem.check = (answer) => {
-  answer = answer.replaceAll("&nbsp;", " ");
+  // answer = answer.replaceAll("&nbsp;", " ");
+  answer = answer.replaceAll("&gt;",">")
+  answer = answer.replaceAll("&lt;","<")
+  answer = answer.replaceAll("&amp;","&")
+  
   answer = answer.replaceAll("<br>", "");
    
   mem.userAnswer = answer
@@ -568,6 +572,7 @@ mem.addExample = () => {
   // mem.add("1.1:3",["Le ciel",["Лю сьель","123"],"The sky"])
 };
 let ITEM_G_COUNT = 0;
+let INFORM_ERROR = 0
 mem.setItem = function (PID, DATA, SPEC) {
   ID = makeid(6);
   console.log(arguments);
@@ -578,7 +583,7 @@ mem.setItem = function (PID, DATA, SPEC) {
     sql(
       `INSERT INTO OBJECTS (ID,PID, DATA, RDATE, LREPEAT, SPEC) VALUES ("${ID}","${PID}",'${DATA}',"${RDATE}", "${LREPEAT}", "${SPEC}")`,
       undefined,
-      mem.setItem,
+      mem.setItemError,
       PID,
       DATA,
       SPEC
@@ -588,6 +593,10 @@ mem.setItem = function (PID, DATA, SPEC) {
   }
   //sql(`SELECT ID FROM OBJECTS WHERE ID = '${ID}'`);
 };
+
+mem.setItemError = (e) => {
+  alert("Error: ", e)
+}
 
 let G_PID = 0;
 let G_DATA = "";
@@ -664,6 +673,7 @@ mem.itemExample2 = [[["a cat"]], [["кот"]]];
 //ID: @String,
 //ArRAY: @Array
 mem.addItem = (ID, ARRAY) => {
+  try {
   let DATA = {};
   let SPEC = [];
   DATA = ARRAY;
@@ -677,7 +687,10 @@ mem.addItem = (ID, ARRAY) => {
 
   if (ARRAY.length > 1) {
     mem.setItem(ID, DATA, SPEC);
+  } else {
+    throw new Error("Too small")
   }
+  } catch(e) {alert("Error: ", e)}
 };
 
 mem.rem = (ID) => {
@@ -873,12 +886,22 @@ mem.setCache = (data) => {
     mem.cacheCalled++;
     for (let i = 0; i < browserCache[0].length; i++) {
       counter++;
+      let diriconName
+      try {
+          // diriconName = JSON.parse(browserCache[0][i].DATA)[0]
+          diriconName = browserCache[0][i].DATA
+      } catch(e) {console.log(e)
+        diriconName = "Unable to parse dir"}
+        let fields
+    //     try {
+    //  fields = JSON.parse(browserCache[0][i].DATA)[1]
+    //   } catch(e) {
+    //     fields = "Unable to parse fields"
+    //   }
       browserString +=
         counter +
         ": " +
-        JSON.parse(browserCache[0][i].DATA)[0] + //diricon and name
-        "/" +
-        JSON.parse(browserCache[0][i].DATA)[1] + //fields
+        diriconName + //diricon and name
         "\n";
     }
 
@@ -971,11 +994,13 @@ mem.terminalCommand = (choice) => {
     case "ls":
       // mem.browser(path[path.length - 1]);
       break;
-    //restore previous command
-    case "/clear":
+      case "ls -b":
+        // mem.browser(path[path.length - 1]);
+        break;
+    case "/clear": //clear SPEC
       sql("UPDATE OBJECTS SET SPEC = '[[],[]]' WHERE ID LIKE '%'", console.log);
       break;
-    case "/new":
+    case "/new": //make all objects new (DANGER!)
       let currentDate = Date.now();
       sql(
         `UPDATE OBJECTS SET LREPEAT = '${currentDate}' WHERE ID LIKE '%'`,
@@ -985,9 +1010,8 @@ mem.terminalCommand = (choice) => {
         `UPDATE OBJECTS SET RDATE = '${currentDate}' WHERE ID LIKE '%'`,
         console.log
       );
-
       break;
-    case "--":
+    case "--": // //restore previous command
       document.querySelector("#terminalCommands").value = mem.terminalChoice;
       break;
     case "help":
@@ -1024,6 +1048,7 @@ mem.terminalCommand = (choice) => {
       try {
         let DATA;
         [, ...DATA] = choice.split(" ");
+        let check = JSON.parse(DATA)
         DATA = DATA.join(" ");
 
         if (path.length == 0) {
@@ -1033,6 +1058,7 @@ mem.terminalCommand = (choice) => {
         mem.addDir(path[path.length - 1], JSON.parse(DATA));
         // mem.browser(path[path.length - 1]);
       } catch (e) {
+        alert("Error during mkdir")
         console.log(e);
       }
       break;
@@ -1050,12 +1076,14 @@ mem.terminalCommand = (choice) => {
         DATA = DATA.replaceAll("'","''")
         mem.addItem(path[path.length - 1], JSON.parse(DATA));
       } catch (e) {
+        alert("Error during touch")
         console.warn(e);
       }
       mem.collect();
       break;
 
     case "edit":
+      try {
       // choice = choice.replace("'", '"');
       if (choice.split(" ")[1] == "file") {
         let [, , , ...DATA] = choice.split(" ");
@@ -1065,14 +1093,19 @@ mem.terminalCommand = (choice) => {
         FILID = 1 * choice.split(" ")[2] - 1 - browserCache[0].length;
         UNIQUID = browserCache[1][FILID].ID;
         mem.editItem(UNIQUID, DATA);
+        
       }
       if (choice.split(" ")[1] == "dir") {
         let [, , , ...DATA] = choice.split(" ");
+        let check = JSON.parse(DATA)
         DATA = DATA.join(" ");
         DATA = DATA + "";
         DIRID = browserCache[0][1 * choice.split(" ")[2] - 1].ID;
         mem.editDir(DIRID, DATA);
       }
+    } catch(e) {
+      alert("Erro while editing")
+    }
       break;
 
     case "cut":
@@ -1128,6 +1161,9 @@ mem.exportDirsCallback = (res) => {
   exportData()
 }
 
+mem.browserSamplePlus = `<div style="height: 5px"></div><div class="stick"></div>`
+mem.browserDirSample = `<div class="memobject"><div class="memid">$icon</div><div class="memdata">$dirName</div></div>`
+mem.currentDir = ``
 mem.collect(); //collect items to repeat
 setInterval(mem.collect, 5000);
 mem.when();
