@@ -1,4 +1,4 @@
-method = null; //methods like need, set, get ... etc.
+// method = null; //methods like need, set, get ... etc.
 var db = openDatabase("MEMODB", "1.0", "OBJECTS DATABASE", null);
 db.transaction(function (tx) {
   //rDATA - repeatition DATA; lrepeat - last repeat unix time; dur - duration;
@@ -10,7 +10,6 @@ db.transaction(function (tx) {
   tx.executeSql("CREATE TABLE IF NOT EXISTS HISTORY (ID unique, DATA)");
   // tx.executeSql("ALTER TABLE DIRS RENAME COLUMN DIRDATA TO DATA;")
   // tx.executeSql("ALTER TABLE OBJECTS RENAME TO ITEMS ")
-
 });
 
 //The executeSql method is the following: executeSql(sqlStatement, arguments, callback, errorCallback)
@@ -58,7 +57,7 @@ sql = (query, callback, error, arg1, arg2, arg3) => {
   });
 };
 
-let mem = {};
+var mem = {};
 
 mem.list = [];
 mem.dirList = [];
@@ -86,10 +85,10 @@ mem.collectCallback = (res) => {
       //console.log(mem.list.indexOf(res[i]))
       //console.log("pushing")
       //console.log(res[i])
-      
+
       mem.list.push(res[i]);
       mem.idList.push(res[i].ID);
-      
+
       // mem.getDirInfo(res[i].PID);
     } else {
       // console.log("Already in");
@@ -105,6 +104,9 @@ mem.collectCallback = (res) => {
   */
 };
 
+mem.getDirById = (dirid,callback) => {
+  sql(`SELECT * FROM DIRS WHERE ID = '${dirid}'`, callback);
+}
 mem.getDirInfo = (dirid) => {
   try {
     sql(`SELECT DATA FROM DIRS WHERE ID = '${dirid}'`, mem.getDirInfoCallback);
@@ -132,7 +134,7 @@ mem.define = (increment) => {
   mem.res.obj = mem.list[mem.answered];
   if (mem.res.obj) {
     // mem.res.dir = mem.dirList[mem.answered];
-    mem.res.dir=mem.list[mem.answered].DIRDATA
+    mem.res.dir = mem.list[mem.answered].DIRDATA;
     DATA = JSON.parse(mem.res.obj.DATA);
     SPEC = JSON.parse(mem.res.obj.SPEC);
 
@@ -229,20 +231,19 @@ mem.focus = (focus) => {
 mem.maxRightSymbols = 0;
 mem.percentage = 0;
 mem.progress = 0;
-mem.userAnswer = ""
+mem.userAnswer = "";
 mem.check = (answer) => {
   // answer = answer.replaceAll("&nbsp;", " ");
-  answer = answer.replaceAll("&gt;",">")
-  answer = answer.replaceAll("&lt;","<")
-  answer = answer.replaceAll("&amp;","&")
-  
+  answer = answer.replaceAll("&gt;", ">");
+  answer = answer.replaceAll("&lt;", "<");
+  answer = answer.replaceAll("&amp;", "&");
+
   answer = answer.replaceAll("<br>", "");
-   
-  mem.userAnswer = answer
+
+  mem.userAnswer = answer;
 
   answer = answer.replaceAll("</div>", "").split("<div>");
   answer = answer.map((item) => item.replaceAll("&nbsp;", " "));
- 
 
   if (answer == "/right") {
     check.next(1);
@@ -254,9 +255,8 @@ mem.check = (answer) => {
     check.next(0);
   }
   if (answer == "/skip") {
-    mem.answered++
-    check.next(0.5)
-
+    mem.answered++;
+    check.next(0.5);
   }
 
   let rightSymbols = 0;
@@ -278,10 +278,10 @@ mem.check = (answer) => {
         j + 1 == answer[i].length
       ) {
         if (!cards.animation) {
-        mem.answer(1);
+          mem.answer(1);
         } else {
           document.querySelector(".pos1").classList.add("win");
-          setTimeout(()=>mem.answer(1),1000)
+          setTimeout(() => mem.answer(1), 1000);
         }
       }
     }
@@ -304,8 +304,6 @@ mem.check = (answer) => {
     }
   }
 };
-
-
 
 mem.query = null;
 mem.test = () => {
@@ -453,15 +451,14 @@ mem.memoPower = () => {
 };
 
 mem.memoPower2 = (data) => {
-  let res = data[0]['SUM(RDATE-LREPEAT)'];
-   
-  res = 1*res
+  let res = data[0]["SUM(RDATE-LREPEAT)"];
 
-  
-  let result = Math.floor(res / 1000 / 60 / 60)
-  result = zeroPad(result,9)
-  result = numberWithCommas(result," · ")
-  mem.memoPowerResult = result
+  res = 1 * res;
+
+  let result = Math.floor(res / 1000 / 60 / 60);
+  result = zeroPad(result, 9);
+  result = numberWithCommas(result, " · ");
+  mem.memoPowerResult = result;
   mem.circleData();
 };
 
@@ -572,7 +569,7 @@ mem.addExample = () => {
   // mem.add("1.1:3",["Le ciel",["Лю сьель","123"],"The sky"])
 };
 let ITEM_G_COUNT = 0;
-let INFORM_ERROR = 0
+let INFORM_ERROR = 0;
 mem.setItem = function (PID, DATA, SPEC) {
   ID = makeid(6);
   console.log(arguments);
@@ -595,8 +592,8 @@ mem.setItem = function (PID, DATA, SPEC) {
 };
 
 mem.setItemError = (e) => {
-  alert("Error: ", e)
-}
+  alert("Error: ", e);
+};
 
 let G_PID = 0;
 let G_DATA = "";
@@ -628,9 +625,12 @@ mem.addDir = (PID, ARRAY) => {
   mem.setDir(PID, JSON.stringify(ARRAY));
 };
 
-mem.get = (ID) => {
-  method = "get";
-  sql(`SELECT * FROM OBJECTS WHERE ID = '${ID}'`);
+mem.get = (ID,callback) => {
+  //get
+  sql(
+    `SELECT OBJECTS.ID, OBJECTS.DATA, RDATE, LREPEAT, SPEC, DIRS.DATA AS DIRDATA FROM OBJECTS JOIN DIRS ON OBJECTS.PID=DIRS.ID AND OBJECTS.ID='${ID}'`,
+    callback
+  );
 };
 
 mem.find = (DATA) => {
@@ -674,23 +674,25 @@ mem.itemExample2 = [[["a cat"]], [["кот"]]];
 //ArRAY: @Array
 mem.addItem = (ID, ARRAY) => {
   try {
-  let DATA = {};
-  let SPEC = [];
-  DATA = ARRAY;
-  for (var i = 0; i < ARRAY.length; i++) {
-    SPEC.push([]);
-  }
+    let DATA = {};
+    let SPEC = [];
+    DATA = ARRAY;
+    for (var i = 0; i < ARRAY.length; i++) {
+      SPEC.push([]);
+    }
 
-  DATA = JSON.stringify(DATA);
-  console.log(DATA);
-  SPEC = JSON.stringify(SPEC);
+    DATA = JSON.stringify(DATA);
+    console.log(DATA);
+    SPEC = JSON.stringify(SPEC);
 
-  if (ARRAY.length > 1) {
-    mem.setItem(ID, DATA, SPEC);
-  } else {
-    throw new Error("Too small")
+    if (ARRAY.length > 1) {
+      mem.setItem(ID, DATA, SPEC);
+    } else {
+      throw new Error("Too small");
+    }
+  } catch (e) {
+    alert("Error: ", e);
   }
-  } catch(e) {alert("Error: ", e)}
 };
 
 mem.rem = (ID) => {
@@ -825,15 +827,15 @@ mem.show = (DIRID, callback) => {
 };
 
 mem.editItem = (ID, DATA, callback) => {
-  sql(`UPDATE OBJECTS SET DATA = '${DATA}' WHERE ID = '${ID}'`, callback);
-  ARRAY = JSON.parse(DATA)
-  let SPEC = []
-  for (let i = 0; i<ARRAY.length; i++) {
-    SPEC.push([])
-  }
-  SPEC = JSON.stringify(SPEC)
-  sql(`UPDATE OBJECTS SET SPEC = '${SPEC}' WHERE ID = '${ID}'`, callback);
 
+  sql(`UPDATE OBJECTS SET DATA = '${DATA}' WHERE ID = '${ID}'`, callback);
+  ARRAY = JSON.parse(DATA);
+  let SPEC = [];
+  for (let i = 0; i < ARRAY.length; i++) {
+    SPEC.push([]);
+  }
+  SPEC = JSON.stringify(SPEC);
+  sql(`UPDATE OBJECTS SET SPEC = '${SPEC}' WHERE ID = '${ID}'`, callback);
 };
 mem.editDir = (ID, DATA, callback) => {
   sql(`UPDATE DIRS SET DATA = '${DATA}' WHERE ID = '${ID}'`, callback);
@@ -886,18 +888,20 @@ mem.setCache = (data) => {
     mem.cacheCalled++;
     for (let i = 0; i < browserCache[0].length; i++) {
       counter++;
-      let diriconName
+      let diriconName;
       try {
-          // diriconName = JSON.parse(browserCache[0][i].DATA)[0]
-          diriconName = browserCache[0][i].DATA
-      } catch(e) {console.log(e)
-        diriconName = "Unable to parse dir"}
-        let fields
-    //     try {
-    //  fields = JSON.parse(browserCache[0][i].DATA)[1]
-    //   } catch(e) {
-    //     fields = "Unable to parse fields"
-    //   }
+        // diriconName = JSON.parse(browserCache[0][i].DATA)[0]
+        diriconName = browserCache[0][i].DATA;
+      } catch (e) {
+        console.log(e);
+        diriconName = "Unable to parse dir";
+      }
+      let fields;
+      //     try {
+      //  fields = JSON.parse(browserCache[0][i].DATA)[1]
+      //   } catch(e) {
+      //     fields = "Unable to parse fields"
+      //   }
       browserString +=
         counter +
         ": " +
@@ -959,6 +963,7 @@ mem.setCache = (data) => {
     // command = terminal.lastLine.split(" ")[0]
     // choice = terminal.lastLine
   }
+  browser.render();
 };
 
 mem.terminalHelp = () => {
@@ -994,9 +999,9 @@ mem.terminalCommand = (choice) => {
     case "ls":
       // mem.browser(path[path.length - 1]);
       break;
-      case "ls -b":
-        // mem.browser(path[path.length - 1]);
-        break;
+    case "ls -b":
+      // mem.browser(path[path.length - 1]);
+      break;
     case "/clear": //clear SPEC
       sql("UPDATE OBJECTS SET SPEC = '[[],[]]' WHERE ID LIKE '%'", console.log);
       break;
@@ -1028,7 +1033,7 @@ mem.terminalCommand = (choice) => {
         mem.browser(path[path.length - 1]);
       } else if (choice.split(" ")[1] == "/") {
         path = ["/"];
-        pathNames = ["/"]
+        pathNames = ["/"];
         mem.browser(path[path.length - 1]);
       } else {
         newChoice = 1 * choice.split(" ")[1] - 1;
@@ -1048,7 +1053,7 @@ mem.terminalCommand = (choice) => {
       try {
         let DATA;
         [, ...DATA] = choice.split(" ");
-        let check = JSON.parse(DATA)
+        let check = JSON.parse(DATA);
         DATA = DATA.join(" ");
 
         if (path.length == 0) {
@@ -1058,25 +1063,25 @@ mem.terminalCommand = (choice) => {
         mem.addDir(path[path.length - 1], JSON.parse(DATA));
         // mem.browser(path[path.length - 1]);
       } catch (e) {
-        alert("Error during mkdir")
+        alert("Error during mkdir");
         console.log(e);
       }
       break;
-	case "export":
-		  mem.export()
-		  break
-	case "import":
-		  importData()
-		  break
+    case "export":
+      mem.export();
+      break;
+    case "import":
+      importData();
+      break;
     case "touch":
       // choice = choice.replace("'", '"');
       try {
         let [, ...DATA] = choice.split(" ");
         DATA = DATA.join(" ");
-        DATA = DATA.replaceAll("'","''")
+        DATA = DATA.replaceAll("'", "''");
         mem.addItem(path[path.length - 1], JSON.parse(DATA));
       } catch (e) {
-        alert("Error during touch")
+        alert("Error during touch");
         console.warn(e);
       }
       mem.collect();
@@ -1084,28 +1089,27 @@ mem.terminalCommand = (choice) => {
 
     case "edit":
       try {
-      // choice = choice.replace("'", '"');
-      if (choice.split(" ")[1] == "file") {
-        let [, , , ...DATA] = choice.split(" ");
-        DATA = DATA.join(" ");
-        DATA = DATA.replaceAll("'","''")
-        DATA = DATA + "";
-        FILID = 1 * choice.split(" ")[2] - 1 - browserCache[0].length;
-        UNIQUID = browserCache[1][FILID].ID;
-        mem.editItem(UNIQUID, DATA);
-        
+        // choice = choice.replace("'", '"');
+        if (choice.split(" ")[1] == "file") {
+          let [, , , ...DATA] = choice.split(" ");
+          DATA = DATA.join(" ");
+          DATA = DATA.replaceAll("'", "''");
+          DATA = DATA + "";
+          FILID = 1 * choice.split(" ")[2] - 1 - browserCache[0].length;
+          UNIQUID = browserCache[1][FILID].ID;
+          mem.editItem(UNIQUID, DATA);
+        }
+        if (choice.split(" ")[1] == "dir") {
+          let [, , , ...DATA] = choice.split(" ");
+          let check = JSON.parse(DATA);
+          DATA = DATA.join(" ");
+          DATA = DATA + "";
+          DIRID = browserCache[0][1 * choice.split(" ")[2] - 1].ID;
+          mem.editDir(DIRID, DATA);
+        }
+      } catch (e) {
+        alert("Erro while editing");
       }
-      if (choice.split(" ")[1] == "dir") {
-        let [, , , ...DATA] = choice.split(" ");
-        let check = JSON.parse(DATA)
-        DATA = DATA.join(" ");
-        DATA = DATA + "";
-        DIRID = browserCache[0][1 * choice.split(" ")[2] - 1].ID;
-        mem.editDir(DIRID, DATA);
-      }
-    } catch(e) {
-      alert("Erro while editing")
-    }
       break;
 
     case "cut":
@@ -1135,35 +1139,201 @@ mem.terminalCommand = (choice) => {
   }
   mem.browser(path[path.length - 1]);
   mem.terminalChoice = choice;
+  browser.render();
 };
 
 function htmlEntities(str) {
-var str = str.replace(/[\u00A0-\u9999<>\&]/g, function(i) {
-  return '&#'+i.charCodeAt(0)+';';
-});
-return str;
+  var str = str.replace(/[\u00A0-\u9999<>\&]/g, function (i) {
+    return "&#" + i.charCodeAt(0) + ";";
+  });
+  return str;
 }
 
-mem.exportedData = []
+mem.exportedData = [];
 mem.export = () => {
-  mem.exportedData = []
-  sql(`SELECT * FROM OBJECTS`,mem.exportCallback)
-  sql(`SELECT * FROM DIRS`,mem.exportDirsCallback)
-}
+  mem.exportedData = [];
+  sql(`SELECT * FROM OBJECTS`, mem.exportCallback);
+  sql(`SELECT * FROM DIRS`, mem.exportDirsCallback);
+};
 
 mem.exportCallback = (res) => {
-  mem.exportedData.push(res)
-}
+  mem.exportedData.push(res);
+};
 
 mem.exportDirsCallback = (res) => {
-  mem.exportedData.push(res)
-  mem.exportedData = JSON.stringify(mem.exportedData)
-  exportData()
+  mem.exportedData.push(res);
+  mem.exportedData = JSON.stringify(mem.exportedData);
+  exportData();
+};
+
+mem.browserSamplePlus = `<div style="height: 5px"></div><div class="stick"></div>`;
+mem.browserDirSample = `<div class="memobject" onclick="mem.terminalCommand('cd $goTo')"><div class="memid">$icon</div><div class="memdata">$dirName</div></div>`;
+mem.browserObjSample = `<div class="memobject" onclick="browser.render(1,'$ID')"><div class="memdata-obj">$objData</div></div>`;
+mem.currentDir = ``;
+let arba = 0;
+let browser = {};
+browser.focus = (el) => {
+let p = el
+let s = window.getSelection()
+let r = document.createRange()
+r.setStart(p, p.childElementCount)
+r.setEnd(p, p.childElementCount)
+s.removeAllRanges()
+s.addRange(r)
+}
+function auto_grow(element) {
+  element.style.height = "71px"
+    element.style.height = (element.scrollHeight)+"px";
 }
 
-mem.browserSamplePlus = `<div style="height: 5px"></div><div class="stick"></div>`
-mem.browserDirSample = `<div class="memobject"><div class="memid">$icon</div><div class="memdata">$dirName</div></div>`
-mem.currentDir = ``
+browser.collectInput = () => {
+  let arr = []
+  for (let item of document.querySelectorAll(".memos-object-input")) {
+      if (item.value.length) arr.push([[item.value]])
+  }
+  return arr
+}
+
+browser.editFile = (id) => {
+  let rows = JSON.stringify(browser.collectInput())
+  rows = rows.replaceAll("'","''")
+  mem.editItem(id,rows)
+  mem.terminalCommand('ls')
+}
+
+browser.addFile = () => {
+  let currentDirID = path[path.length-1]
+  let DATA = JSON.stringify(browser.collectInput())
+  DATA = DATA.replaceAll("'","''")
+  mem.addItem(currentDirID, JSON.parse(DATA));
+  mem.terminalCommand('ls')
+
+}
+browser.newFileInit = () => {
+  mem.getDirById(path[path.length-1],browser.newFile)
+}
+browser.newFile = (obj) => {
+
+  document.querySelector(
+    ".objects"
+  ).innerHTML = `<div class="memobject" onclick="browser.addFile()"><div class="memdata">←</div></div>`;
+
+  // let fields = JSON.parse(obj[0].DATA) //array of strings
+  let fieldNames = JSON.parse(obj[0].DATA)[1] //array of strings
+  let index = 0
+
+  for (let field of fieldNames) {
+  document.querySelector(
+    ".objects"
+  ).innerHTML += `<div class="memobject"  style="border-bottom: 5px dotted #151515"><div class="memdata">${field}</div></div>`;
+  document.querySelector(
+    ".objects"
+  ).innerHTML+=`<textarea oninput="auto_grow(this)" class='memos-object-input'></textarea>`
+    index++
+}
+
+  let items = document.querySelectorAll(".memos-object-input")
+  for (let item of items) {
+    auto_grow(item)
+  }
+}
+
+browser.renderFile = (obj) => {
+
+  console.log(obj)
+  document.querySelector(
+    ".objects"
+  ).innerHTML = `<div class="memobject" onclick="browser.editFile('${obj[0].ID}')"><div class="memdata">←</div></div>`;
+
+  let fields = JSON.parse(obj[0].DATA) //array of strings
+  let fieldNames = JSON.parse(obj[0].DIRDATA)[1] //array of strings
+  let index = 0
+
+  for (let field of fieldNames) {
+   if (fields[index] == undefined) fields[index]=""
+  document.querySelector(
+    ".objects"
+  ).innerHTML += `<div class="memobject"  style="border-bottom: 5px dotted #151515"><div class="memdata">${field}</div></div>`;
+  document.querySelector(
+    ".objects"
+  ).innerHTML+=`<textarea oninput="auto_grow(this)" class='memos-object-input'>${fields[index]}</textarea>`
+    index++
+}
+
+  let items = document.querySelectorAll(".memos-object-input")
+  for (let item of items) {
+    auto_grow(item)
+  }
+
+  document.querySelector(
+    ".objects"
+  ).innerHTML += `<div class="memobject" onclick="browser.removeFile('${obj[0].ID}')"><div class="memdata">Delete file</div></div>`;
+}
+const readFields = (data) => {
+  let obj = JSON.parse(data);
+  arba = obj;
+  let str = "";
+  let item;
+  let arr = []
+  let index = 0
+  if (obj.constructor != Array) {
+    item = obj[0]
+    while (item) {
+      arr.push([[obj[index]]])
+      index++
+      item = obj[index]
+    }
+   
+    obj = arr
+  }
+  
+  for (let item of obj) {
+    str += item[0][0] + "<br>";
+  }
+  return str;
+};
+browser.removeFile = (id) => {
+  let confirm = prompt("Type `yes` to confirm delete")
+  if (confirm == "yes") {
+    mem.rem(id)
+  }
+  mem.terminalCommand("ls")
+}
+browser.render = (showFile,id,data) => {
+
+  if (showFile) {
+    mem.get(id,browser.renderFile)
+  } else {
+    document.querySelector(
+      ".objects"
+    ).innerHTML = `<div class="memobject" onclick="mem.terminalCommand('cd ..')"><div class="memdata">←</div></div>`;
+    document.querySelector(
+      ".objects"
+    ).innerHTML+= `<div class="memobject" onclick="mem.terminalCommand('cd ..')"><div class="memdata">Add directory</div></div>`;
+    document.querySelector(
+      ".objects"
+    ).innerHTML+= `<div class="memobject" onclick="browser.newFileInit()"><div class="memdata">Add file</div></div>`;
+    let icons = [];
+    let data = [];
+    let index = 1;
+    for (let item of browserCache[0]) {
+      document.querySelector(".objects").innerHTML += mem.browserDirSample
+        .replace("$icon", JSON.parse(item.DATA)[0][0])
+        .replace("$dirName", JSON.parse(item.DATA)[0][1])
+        .replace("$goTo", index);
+      index++;
+    }
+
+    for (let item of browserCache[1]) {
+      document.querySelector(".objects").innerHTML += mem.browserObjSample
+        .replace("$objData", readFields(item.DATA))
+        .replace("$ID", item.ID)
+        // .replace("$DATA", item.DATA)
+    }
+    document.querySelector(".page2-node4").scrollBy(0, 50);
+  }
+};
+
 mem.collect(); //collect items to repeat
 setInterval(mem.collect, 5000);
 mem.when();
@@ -1173,6 +1343,8 @@ mem.countDaily();
 mem.count();
 mem.countTotal();
 mem.memoPower();
+// const clickHandler = (event) => event.target.focus()
+// document.addEventListener('click',clickHandler)
 setInterval(mem.when, 5000);
 setInterval(() => {
   mem.circleData(1);

@@ -100,7 +100,6 @@
     padding: 10px;
     width: calc(100% - 10px);
     border-bottom: 2px solid #151515;
-    height: 80px;
     display: flex;
     align-items: center;
     font-size: 15px;
@@ -128,7 +127,7 @@
    .memdata {
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
     width: calc(100% - 60px);
     overflow-x: hidden;
     overflow-y: hidden;
@@ -136,8 +135,40 @@
     border-radius: 5px;
     padding: 10px 60px 10px 10px;
     height: 100%;
-    font-size: 33px;
+    font-size: 25px;
     font-family: memoff;
     color: white
    }
    
+   .memdata-obj {
+    display: flex;
+    justify-content: flex-start;
+    width: 100%;
+    overflow-x: hidden;
+    overflow-y: hidden;
+    border-radius: 5px;
+    height: 100%;
+    font-size: 25px;
+    font-family: memoff;
+    color: white
+   }
+
+.memos-object-input {
+    display: flex;
+    padding: 20px !important;
+    height: 71px;
+    resize: none;
+    justify-content: flex-start;
+    word-break: break-all;
+    word-wrap: break-word;
+    background: #1f1f1f;
+    outline: none;
+    border: 0px;
+    border-bottom: 2px solid #151515;
+    width: 100%;
+    overflow-x: hidden;
+    overflow-y: hidden;
+    font-size: 25px;
+    font-family: memoff;
+    color: white
+}

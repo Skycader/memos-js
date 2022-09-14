@@ -94,17 +94,17 @@ function touchStartDetected() {
     
     touchEnd = false
 }
-window.addEventListener('touchstart', touchStartDetected); 
-window.addEventListener('touchend', touchEndDetected); 
+// window.addEventListener('touchstart', touchStartDetected); 
+// window.addEventListener('touchend', touchEndDetected); 
 // window.addEventListener('touchend', r); 
 // setInterval(r,600)
 var timer = null;
-document.querySelector(".page2-node4").addEventListener('scroll', function() {
-    if(timer !== null) {
-        clearTimeout(timer);        
-    }
-    timer = setTimeout(function() {
-          r()
-        //   console.log("R")
-    }, 150);
-}, false);
+// document.querySelector(".page2-node4").addEventListener('scroll', function() {
+//     if(timer !== null) {
+//         clearTimeout(timer);        
+//     }
+//     timer = setTimeout(function() {
+//           r()
+//         //   console.log("R")
+//     }, 150);
+// }, false);
