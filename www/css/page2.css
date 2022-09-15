@@ -47,7 +47,7 @@
 
 .page2-node4 { 
     position: absolute;
-    scroll-behavior: smooth;
+    /* scroll-behavior: smooth; */
     scroll-snap-type: y mandatory;
     border-radius: 15px 15px; 
     border: 0px solid red; 
@@ -159,7 +159,7 @@
     height: 71px;
     resize: none;
     justify-content: flex-start;
-    word-break: break-all;
+    word-break: break-word;
     word-wrap: break-word;
     background: #1f1f1f;
     outline: none;
@@ -171,4 +171,8 @@
     font-size: 25px;
     font-family: memoff;
     color: white
+}
+
+.memotable-upside-down {
+    height: 100vh !important;
 }

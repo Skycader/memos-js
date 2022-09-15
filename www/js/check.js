@@ -176,7 +176,14 @@ document.getElementById("memosInput").addEventListener(
   },
   false
 );
+check.skipped=0
 check.focus = () => {
+  check.skipped+=1
+  if (check.skipped>1) {
+    mem.answered++;
+    check.next(0.5);
+    check.skipped=0
+  }
   document.getElementById("memosInput").focus();
 };
 check.exit = () => {

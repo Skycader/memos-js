@@ -240,11 +240,13 @@ mem.check = (answer) => {
 
   answer = answer.replaceAll("<br>", "");
 
+  answer = answer.replaceAll("<div>","\n")
+  answer = answer.replaceAll("</div>","")
   mem.userAnswer = answer;
 
   answer = answer.replaceAll("</div>", "").split("<div>");
   answer = answer.map((item) => item.replaceAll("&nbsp;", " "));
-
+  console.log(answer)
   if (answer == "/right") {
     check.next(1);
   }
@@ -1183,7 +1185,7 @@ s.addRange(r)
 }
 function auto_grow(element) {
   element.style.height = "71px"
-    element.style.height = (element.scrollHeight)+"px";
+  element.style.height = (element.scrollHeight)+"px";
 }
 
 browser.collectInput = () => {
@@ -1197,7 +1199,8 @@ browser.collectInput = () => {
 browser.editFile = (id) => {
   let rows = JSON.stringify(browser.collectInput())
   rows = rows.replaceAll("'","''")
-  mem.editItem(id,rows)
+  if (browser.changeDetected) mem.editItem(id,rows)
+  browser.changeDetected = false
   mem.terminalCommand('ls')
 }
 
@@ -1205,6 +1208,7 @@ browser.addFile = () => {
   let currentDirID = path[path.length-1]
   let DATA = JSON.stringify(browser.collectInput())
   DATA = DATA.replaceAll("'","''")
+  if (browser.collectInput().length>1)
   mem.addItem(currentDirID, JSON.parse(DATA));
   mem.terminalCommand('ls')
 
@@ -1237,7 +1241,8 @@ browser.newFile = (obj) => {
     auto_grow(item)
   }
 }
-
+browser.changeDetected = false
+browser.triggerChange = () => {browser.changeDetected=true}
 browser.renderFile = (obj) => {
 
   console.log(obj)
@@ -1256,8 +1261,9 @@ browser.renderFile = (obj) => {
   ).innerHTML += `<div class="memobject"  style="border-bottom: 5px dotted #151515"><div class="memdata">${field}</div></div>`;
   document.querySelector(
     ".objects"
-  ).innerHTML+=`<textarea oninput="auto_grow(this)" class='memos-object-input'>${fields[index]}</textarea>`
-    index++
+  ).innerHTML+=`<textarea onclick="setTimeout(()=>{this.scrollIntoView(false)},500)" onchange="browser.triggerChange()" oninput="auto_grow(this)" class='memos-object-input'>${fields[index]}</textarea>`
+  
+  index++
 }
 
   let items = document.querySelectorAll(".memos-object-input")
@@ -1265,9 +1271,36 @@ browser.renderFile = (obj) => {
     auto_grow(item)
   }
 
+  // document.querySelector(
+  //   ".objects"
+  // ).innerHTML += `<div class="memobject" onclick="browser.editFile('${obj[0].ID}')"><div class="memdata">Save file</div></div>`;
+  document.querySelector(
+    ".objects"
+  ).innerHTML += `<div class="memobject" style="border-bottom: 5px dotted #151515"><div class="memdata">Repeat in</div></div>`;
+  
+  document.querySelector(
+    ".objects"
+  ).innerHTML+=`<textarea onchange="browser.triggerChange()" oninput="auto_grow(this)" class='memos-object-input'>${mem.calcRepeat(obj[0].RDATE)}</textarea>`
+  
+  document.querySelector(
+    ".objects"
+  ).innerHTML += `<div class="memobject" style="border-bottom: 5px dotted #151515"><div class="memdata">Total interval</div></div>`;
+  
+  memPower = mem.convertHMS(
+    (obj[0].RDATE * 1 - obj[0].LREPEAT * 1) / 1000
+  );
+
+  document.querySelector(
+    ".objects"
+  ).innerHTML+=`<textarea onchange="browser.triggerChange()" oninput="auto_grow(this)" class='memos-object-input'>${memPower}</textarea>`
+  
+
   document.querySelector(
     ".objects"
   ).innerHTML += `<div class="memobject" onclick="browser.removeFile('${obj[0].ID}')"><div class="memdata">Delete file</div></div>`;
+
+
+
 }
 const readFields = (data) => {
   let obj = JSON.parse(data);
@@ -1293,11 +1326,14 @@ const readFields = (data) => {
   return str;
 };
 browser.removeFile = (id) => {
-  let confirm = prompt("Type `yes` to confirm delete")
-  if (confirm == "yes") {
+  let confirm = prompt("Type `delete` to confirm delete")
+  if (confirm == "delete") {
     mem.rem(id)
   }
   mem.terminalCommand("ls")
+}
+browser.movePanel = () => {
+  document.querySelector(".memotable-upside").classList.toggle("memotable-upside-down")
 }
 browser.render = (showFile,id,data) => {
 
