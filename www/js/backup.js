@@ -44,6 +44,8 @@ function read() {
   }
 }
 
+const importData = read
+
 function fail(e) {
   console.log("FileSystem Error");
   document.querySelector("#terminalCommands").value = "Filesystem error";
@@ -55,9 +57,9 @@ function gotFile(fileEntry) {
     var reader = new FileReader();
 
     reader.onloadend = function (e) {
-      console.log("Text is: " + this.result);
-      alert(this.result);
-      document.querySelector("#terminalCommands").value = this.result;
+      // console.log("Text is: " + this.result);
+      // alert(this.result);
+      document.querySelector("#terminalCommands").value = this.result; //<-- this is import
     };
 
     reader.readAsText(file);

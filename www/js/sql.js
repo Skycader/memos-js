@@ -1200,10 +1200,23 @@ s.removeAllRanges()
 s.addRange(r)
 }
 function auto_grow(element) {
+
   element.style.height = "71px"
   element.style.height = (element.scrollHeight)+"px";
+  element.scrollIntoView(false)
 }
-
+const focusElement = (e) => {
+  e.scrollIntoView(false)
+}
+let focusInterval = 0
+const clickHandler = (e) => {
+  console.log(e.target.classList)
+  if (e.target.classList.contains("memos-userInput")) {
+    focusInterval = setInterval(focusElement,100,e.target)
+    setTimeout(()=>{clearInterval(focusInterval)},1000)
+  }
+}
+document.addEventListener("click",clickHandler)
 browser.collectInput = () => {
   let arr = []
   //const sentence = '    My string with a    lot   of Whitespace.  '.replace(/\s+/g, ' ').trim()
