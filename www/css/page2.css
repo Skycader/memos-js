@@ -176,3 +176,20 @@
 .memotable-upside-down {
     height: 100vh !important;
 }
+
+select {
+    color: white;
+    font-size: 25px;
+    background: #1d1d1d
+}
+
+#label {
+    color: white;
+    font-size: 25px;
+}
+
+#import::-webkit-file-upload-button {
+   color: white;
+   background: #1d1d1d;
+   font-size: 25px;
+  }

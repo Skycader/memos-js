@@ -105,7 +105,7 @@ mem.collectCallback = (res) => {
 };
 
 mem.getDirById = (dirid,callback) => {
-  sql(`SELECT * FROM DIRS WHERE ID = '${dirid}'`, callback);
+  sql(`SELECT *,(SELECT COUNT(ID) FROM OBJECTS WHERE PID='${dirid}') AS TOTAL FROM DIRS WHERE ID = '${dirid}'`, callback)
 }
 mem.getDirInfo = (dirid) => {
   try {
@@ -825,6 +825,7 @@ function makeid(length) {
 
 mem.show = (DIRID, callback,order) => {
   sql(`SELECT * FROM DIRS WHERE PID = "${DIRID}" ORDER BY DATA`, callback);
+  // mem.getDirById(DIRID,callback)
   switch(order) {
     case "interval":
       sql(`SELECT * FROM OBJECTS WHERE PID = "${DIRID}" GROUP BY ID ORDER BY SUM(RDATE-LREPEAT)`, callback);
@@ -1484,6 +1485,24 @@ browser.selectOrder = () => {
         break
   }
 }
+
+var openFile = function(event) {
+   try {
+  var input = event.target;
+
+  var reader = new FileReader();
+  reader.onload = function(){
+    var text = reader.result;
+    // var node = document.getElementById('output');
+    // node.innerText = text;
+    alert(text)
+    console.log(reader.result.substring(0, 200));
+    // alert(reader.result.substring(0, 200));
+  };
+  reader.readAsText(input.files[0]);
+} catch(e) {console.log(e)}
+};
+
 browser.render = (showFile,id,data) => {
 
   if (showFile) {
@@ -1506,24 +1525,34 @@ browser.render = (showFile,id,data) => {
       ".objects"
     ).innerHTML+= `<div class="memobject" onclick="browser.newFileInit()"><div class="memdata">Add file</div></div>`;
 
+    document.querySelector(
+      ".objects"
+    ).innerHTML+= `<div class="memobject"><div class="memdata" id="total-objects"></div></div>`;
+
+      sql(`select COUNT(ID) AS TOTAL FROM OBJECTS WHERE PID = '${path[path.length-1]}'`,(res)=>
+      {document.querySelector("#total-objects").innerHTML = `TOTAL:  ${res[0].TOTAL}`})
       document.querySelector(
       ".objects"
     ).innerHTML+=
-    `<label>Select order</label>
+    `<label id="label">Select order</label>
     <select onchange="browser.selectOrder()" name="cars" id="order">
     <option value="repeatin">Select order</option>
     <option value="repeatin">By repeat in</option>
     <option value="interval">By interval ASC</option>
     <option value="intervalb">By interval DESC</option>
-  </select>`
+  </select>
+  <input id="import" type="file" accept='text/plain' onchange='openFile(event)'/>
+  `
     let icons = [];
     let data = [];
     let index = 1;
     for (let item of browserCache[0]) {
+      console.log(item)
       document.querySelector(".objects").innerHTML += mem.browserDirSample
         .replace("$icon", JSON.parse(item.DATA)[0][0])
         .replace("$dirName", JSON.parse(item.DATA)[0][1])
-        .replace("$goTo", index);
+        .replace("$goTo", index)
+       
       index++;
     }
 
