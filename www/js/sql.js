@@ -104,9 +104,12 @@ mem.collectCallback = (res) => {
   */
 };
 
-mem.getDirById = (dirid,callback) => {
-  sql(`SELECT *,(SELECT COUNT(ID) FROM OBJECTS WHERE PID='${dirid}') AS TOTAL FROM DIRS WHERE ID = '${dirid}'`, callback)
-}
+mem.getDirById = (dirid, callback) => {
+  sql(
+    `SELECT *,(SELECT COUNT(ID) FROM OBJECTS WHERE PID='${dirid}') AS TOTAL FROM DIRS WHERE ID = '${dirid}'`,
+    callback
+  );
+};
 mem.getDirInfo = (dirid) => {
   try {
     sql(`SELECT DATA FROM DIRS WHERE ID = '${dirid}'`, mem.getDirInfoCallback);
@@ -240,13 +243,13 @@ mem.check = (answer) => {
 
   answer = answer.replaceAll("<br>", "");
 
-  answer = answer.replaceAll("<div>","\n")
-  answer = answer.replaceAll("</div>","")
+  answer = answer.replaceAll("<div>", "\n");
+  answer = answer.replaceAll("</div>", "");
   mem.userAnswer = answer;
 
   answer = answer.replaceAll("</div>", "").split("<div>");
   answer = answer.map((item) => item.replaceAll("&nbsp;", " "));
-  console.log(answer)
+  console.log(answer);
   if (answer == "/right") {
     check.next(1);
   }
@@ -627,7 +630,7 @@ mem.addDir = (PID, ARRAY) => {
   mem.setDir(PID, JSON.stringify(ARRAY));
 };
 
-mem.get = (ID,callback) => {
+mem.get = (ID, callback) => {
   //get
   sql(
     `SELECT OBJECTS.ID, OBJECTS.DATA, RDATE, LREPEAT, SPEC, DIRS.DATA AS DIRDATA FROM OBJECTS JOIN DIRS ON OBJECTS.PID=DIRS.ID AND OBJECTS.ID='${ID}'`,
@@ -823,25 +826,33 @@ function makeid(length) {
   return result;
 }
 
-mem.show = (DIRID, callback,order) => {
-  sql(`SELECT * FROM DIRS WHERE PID = "${DIRID}" ORDER BY DATA`, callback);
+mem.offset = 0
+mem.show = (DIRID, callback, order) => {
+  sql(`SELECT * FROM DIRS WHERE PID = "${DIRID}" ORDER BY DATA LIMIT ${mem.offset},10` , callback);
   // mem.getDirById(DIRID,callback)
-  switch(order) {
+  switch (order) {
     case "interval":
-      sql(`SELECT * FROM OBJECTS WHERE PID = "${DIRID}" GROUP BY ID ORDER BY SUM(RDATE-LREPEAT)`, callback);
-      break
+      sql(
+        `SELECT * FROM OBJECTS WHERE PID = "${DIRID}" GROUP BY ID ORDER BY SUM(RDATE-LREPEAT) LIMIT ${mem.offset},10`,
+        callback
+      );
+      break;
     case "interval backwards":
-        sql(`SELECT * FROM OBJECTS WHERE PID = "${DIRID}" GROUP BY ID ORDER BY SUM(RDATE-LREPEAT) DESC`, callback);
-        break
-    default: 
-      sql(`SELECT * FROM OBJECTS WHERE PID = "${DIRID}" ORDER BY RDATE`, callback);
-      break
+      sql(
+        `SELECT * FROM OBJECTS WHERE PID = "${DIRID}" GROUP BY ID ORDER BY SUM(RDATE-LREPEAT) DESC LIMIT ${mem.offset},10`,
+        callback
+      );
+      break;
+    default:
+      sql(
+        `SELECT * FROM OBJECTS WHERE PID = "${DIRID}" ORDER BY RDATE LIMIT ${mem.offset},10`,
+        callback
+      );
+      break;
   }
- 
 };
 
 mem.editItem = (ID, DATA, callback) => {
-
   sql(`UPDATE OBJECTS SET DATA = '${DATA}' WHERE ID = '${ID}'`, callback);
   ARRAY = JSON.parse(DATA);
   let SPEC = [];
@@ -875,7 +886,7 @@ let choice = 0;
 let counter = 0;
 let path = ["/"];
 let pathNames = [];
-mem.browser = (goTo,order) => {
+mem.browser = (goTo, order) => {
   mem.when();
   counter = 0;
   cached = 0;
@@ -885,7 +896,7 @@ mem.browser = (goTo,order) => {
     goTo = "/";
   }
 
-  mem.show(goTo, mem.setCache,order);
+  mem.show(goTo, mem.setCache, order);
   mem.collect();
 };
 let cached = 0;
@@ -1014,11 +1025,14 @@ mem.terminalCommand = (choice) => {
       mem.browser(path[path.length - 1]);
       break;
     case "lsi":
-      mem.browser(path[path.length - 1],"interval");
+      mem.browser(path[path.length - 1], "interval");
       break;
-   case "lsib":
-        mem.browser(path[path.length - 1],"interval backwards");
-        break;
+    case "lsib":
+      mem.browser(path[path.length - 1], "interval backwards");
+      break;
+    case "lslim":
+      mem.browser(path[path.length - 1], `limit ${ choice.split(" ")[1].toLowerCase()}`);
+      break;
     case "/clear": //clear SPEC
       sql("UPDATE OBJECTS SET SPEC = '[[],[]]' WHERE ID LIKE '%'", console.log);
       break;
@@ -1047,6 +1061,7 @@ mem.terminalCommand = (choice) => {
           path.push("/");
         }
         pathNames.pop();
+        if (pathNames.length == 0) pathNames.push("/");
         mem.browser(path[path.length - 1]);
       } else if (choice.split(" ")[1] == "/") {
         path = ["/"];
@@ -1058,7 +1073,9 @@ mem.terminalCommand = (choice) => {
 
         path.push(DIRID);
 
-        pathNames.push(JSON.parse(browserCache[0][newChoice].DATA)[0][1]);
+        pathNames.push(JSON.parse(browserCache[0][newChoice].DATA)[0][0]);
+        pathNames[pathNames.length - 1] +=
+          " " + JSON.parse(browserCache[0][newChoice].DATA)[0][1];
         // mem.browser(DIRID);
         mem.browser(path[path.length - 1]);
         break;
@@ -1183,386 +1200,476 @@ mem.exportDirsCallback = (res) => {
   exportData();
 };
 
-
 mem.browserSamplePlus = `<div style="height: 5px"></div><div class="stick"></div>`;
-mem.browserDirSample = `<div class="memobject" onclick="mem.terminalCommand('cd $goTo')"><div class="memid">$icon</div><div class="memdata">$dirName</div></div>`;
-mem.browserObjSample = `<div class="memobject" onclick="browser.render(1,'$ID')"><div class="memdata-obj">$objData</div></div>`;
+mem.browserDirSample = `<div class="memobject md-ripples md-ripples" onclick="mem.terminalCommand('cd $goTo')"><div class="memid">$icon</div><div class="memdata">$dirName</div></div>`;
+mem.browserObjSample = `<div class="memobject md-ripples" onclick="browser.render(1,'$ID')"><div class="memdata-obj">$objData</div></div>`;
 mem.currentDir = ``;
 let arba = 0;
 let browser = {};
 
 browser.focus = (el) => {
-let p = el
-let s = window.getSelection()
-let r = document.createRange()
-r.setStart(p, p.childElementCount)
-r.setEnd(p, p.childElementCount)
-s.removeAllRanges()
-s.addRange(r)
-}
+  let p = el;
+  let s = window.getSelection();
+  let r = document.createRange();
+  r.setStart(p, p.childElementCount);
+  r.setEnd(p, p.childElementCount);
+  s.removeAllRanges();
+  s.addRange(r);
+};
 function auto_grow(element) {
-
-  element.style.height = "71px"
-  element.style.height = (element.scrollHeight)+"px";
-  element.scrollIntoView(false)
+  element.style.height = "71px";
+  element.style.height = element.scrollHeight + "px";
+  element.scrollIntoView(false);
 }
 const focusElement = (e) => {
-  e.scrollIntoView(false)
-}
-let focusInterval = 0
+  e.scrollIntoView(false);
+};
+let focusInterval = 0;
 const clickHandler = (e) => {
-  console.log(e.target.classList)
+  console.log(e.target.classList);
   if (e.target.classList.contains("memos-userInput")) {
-    focusInterval = setInterval(focusElement,100,e.target)
-    setTimeout(()=>{clearInterval(focusInterval)},1000)
+    focusInterval = setInterval(focusElement, 100, e.target);
+    setTimeout(() => {
+      clearInterval(focusInterval);
+    }, 1000);
   }
-}
-document.addEventListener("click",clickHandler)
+};
+document.addEventListener("click", clickHandler);
 browser.collectInput = () => {
-  let arr = []
+  let arr = [];
   //const sentence = '    My string with a    lot   of Whitespace.  '.replace(/\s+/g, ' ').trim()
   for (let item of document.querySelectorAll(".memos-userInput")) {
-      if (item.value.length) arr.push([[item.value.replace(/\s+/g, ' ').trim()]])
+    if (item.value.length) arr.push([[item.value.replace(/\s+/g, " ").trim()]]);
   }
-  return arr
-}
+  return arr;
+};
 
 browser.editFile = (id) => {
-  let rows = JSON.stringify(browser.collectInput())
-  rows = rows.replaceAll("'","''")
-  if (browser.changeDetected) mem.editItem(id,rows)
-  browser.changeDetected = false
-  mem.terminalCommand('ls')
-}
+  let rows = JSON.stringify(browser.collectInput());
+  rows = rows.replaceAll("'", "''");
+  if (browser.changeDetected) mem.editItem(id, rows);
+  browser.changeDetected = false;
+  mem.terminalCommand("ls");
+};
 
 browser.newDir = () => {
   document.querySelector(
     ".objects"
-  ).innerHTML = `<div class="memobject" onclick="browser.addDir()"><div class="memdata">←</div></div>`;
+  ).innerHTML = `<div class="memobject md-ripples" onclick="browser.addDir()"><div class="memdata">←</div></div>`;
 
   document.querySelector(
     ".objects"
-  ).innerHTML += `<div class="memobject"  style="border-bottom: 5px dotted #151515"><div class="memdata">Icon</div></div>`;
+  ).innerHTML += `<div class="memobject md-ripples"  style="border-bottom: 5px dotted #151515"><div class="memdata">Icon</div></div>`;
   document.querySelector(
     ".objects"
-  ).innerHTML+=`<textarea id='dirIcon'  onchange="browser.triggerChange()" oninput="auto_grow(this)" class='memos-object-input'></textarea>`
-  
-  document.querySelector(
-    ".objects"
-  ).innerHTML += `<div class="memobject"   style="border-bottom: 5px dotted #151515"><div class="memdata">Name</div></div>`;
-  document.querySelector(
-    ".objects"
-  ).innerHTML+=`<textarea id='dirName'onchange="browser.triggerChange()" oninput="auto_grow(this)" class='memos-object-input'></textarea>`
+  ).innerHTML += `<textarea id='dirIcon'  onchange="browser.triggerChange()" oninput="auto_grow(this)" class='memos-object-input'></textarea>`;
 
   document.querySelector(
     ".objects"
-  ).innerHTML += `<div class="memobject" style="border-bottom: 5px dotted #151515"><div class="memdata">Fields</div></div>`;
+  ).innerHTML += `<div class="memobject md-ripples"   style="border-bottom: 5px dotted #151515"><div class="memdata">Name</div></div>`;
   document.querySelector(
     ".objects"
-  ).innerHTML+=`<textarea placeholder="Field1,Field2, ..." id='dirFields' onchange="browser.triggerChange()" oninput="auto_grow(this)" class='memos-object-input'></textarea>`
+  ).innerHTML += `<textarea id='dirName'onchange="browser.triggerChange()" oninput="auto_grow(this)" class='memos-object-input'></textarea>`;
 
-}
+  document.querySelector(
+    ".objects"
+  ).innerHTML += `<div class="memobject md-ripples" style="border-bottom: 5px dotted #151515"><div class="memdata">Fields</div></div>`;
+  document.querySelector(
+    ".objects"
+  ).innerHTML += `<textarea placeholder="Field1,Field2, ..." id='dirFields' onchange="browser.triggerChange()" oninput="auto_grow(this)" class='memos-object-input'></textarea>`;
+};
 
 browser.addDir = () => {
-  let icon = document.querySelector('#dirIcon').value
-  let name = document.querySelector('#dirName').value
-  let fields = document.querySelector('#dirFields').value.split(",")
-  let arr = [[icon,name],fields]
-  if (arr.length*name.length*arr.length > 0)
-  mem.addDir(path[path.length-1],arr)
-  mem.terminalCommand('ls')
-}
+  let icon = document.querySelector("#dirIcon").value;
+  let name = document.querySelector("#dirName").value;
+  let fields = document.querySelector("#dirFields").value.split(",");
+  let arr = [[icon, name], fields];
+  if (arr.length * name.length * arr.length > 0)
+    mem.addDir(path[path.length - 1], arr);
+  mem.terminalCommand("ls");
+};
 
 browser.addFile = () => {
-  let currentDirID = path[path.length-1]
-  let DATA = JSON.stringify(browser.collectInput())
-  DATA = DATA.replaceAll("'","''")
-  if (browser.collectInput().length>1)
-  mem.addItem(currentDirID, JSON.parse(DATA));
-  mem.terminalCommand('ls')
-
-}
+  let currentDirID = path[path.length - 1];
+  let DATA = JSON.stringify(browser.collectInput());
+  DATA = DATA.replaceAll("'", "''");
+  if (browser.collectInput().length > 1)
+    mem.addItem(currentDirID, JSON.parse(DATA));
+  mem.terminalCommand("ls");
+};
 browser.newFileInit = () => {
-  mem.getDirById(path[path.length-1],browser.newFile)
-}
+  mem.getDirById(path[path.length - 1], browser.newFile);
+};
 browser.editDirInit = () => {
-  mem.getDirById(path[path.length-1],browser.editDir)
-}
+  mem.getDirById(path[path.length - 1], browser.editDir);
+};
 browser.editDir = (obj) => {
   try {
-  console.log(obj)
-  let DATA = JSON.parse(obj[0].DATA)
-  console.log(DATA)
-  let dirIcon = DATA[0][0]
-  let dirName = DATA[0][1]
-  let dirFields = DATA[1].join()
-  document.querySelector(
-    ".objects"
-  ).innerHTML = `<div class="memobject" onclick="browser.editDirAPI()"><div class="memdata">←</div></div>`;
+    console.log(obj);
+    let DATA = JSON.parse(obj[0].DATA);
+    console.log(DATA);
+    let dirIcon = DATA[0][0];
+    let dirName = DATA[0][1];
+    let dirFields = DATA[1].join();
+    document.querySelector(
+      ".objects"
+    ).innerHTML = `<div class="memobject md-ripples" onclick="browser.editDirAPI()"><div class="memdata">←</div></div>`;
 
-  document.querySelector(
-    ".objects"
-  ).innerHTML += `<div class="memobject"  style="border-bottom: 5px dotted #151515"><div class="memdata">Icon</div></div>`;
-  document.querySelector(
-    ".objects"
-  ).innerHTML+=`<textarea id='dirIcon' onchange="browser.triggerChange()" oninput="auto_grow(this)" class='memos-object-input'>${dirIcon}</textarea>`
-  
-  document.querySelector(
-    ".objects"
-  ).innerHTML += `<div class="memobject"   style="border-bottom: 5px dotted #151515"><div class="memdata">Name</div></div>`;
-  document.querySelector(
-    ".objects"
-  ).innerHTML+=`<textarea id='dirName' onchange="browser.triggerChange()" oninput="auto_grow(this)" class='memos-object-input'>${dirName}</textarea>`
+    document.querySelector(
+      ".objects"
+    ).innerHTML += `<div class="memobject md-ripples"  style="border-bottom: 5px dotted #151515"><div class="memdata">Icon</div></div>`;
+    document.querySelector(
+      ".objects"
+    ).innerHTML += `<textarea id='dirIcon' onchange="browser.triggerChange()" oninput="auto_grow(this)" class='memos-object-input'>${dirIcon}</textarea>`;
 
-  document.querySelector(
-    ".objects"
-  ).innerHTML += `<div class="memobject" style="border-bottom: 5px dotted #151515"><div class="memdata">Fields</div></div>`;
-  document.querySelector(
-    ".objects"
-  ).innerHTML+=`<textarea placeholder="Field1,Field2, ..." id='dirFields' onchange="browser.triggerChange()" oninput="auto_grow(this)" class='memos-object-input'>${dirFields}</textarea>`
+    document.querySelector(
+      ".objects"
+    ).innerHTML += `<div class="memobject md-ripples"   style="border-bottom: 5px dotted #151515"><div class="memdata">Name</div></div>`;
+    document.querySelector(
+      ".objects"
+    ).innerHTML += `<textarea id='dirName' onchange="browser.triggerChange()" oninput="auto_grow(this)" class='memos-object-input'>${dirName}</textarea>`;
 
-  document.querySelector(
-    ".objects"
-  ).innerHTML += `<div class="memobject" onclick="browser.removeDir()"><div class="memdata">Delete direcotry</div></div>`;
-  } catch(e) {console.log(e)}
-}
+    document.querySelector(
+      ".objects"
+    ).innerHTML += `<div class="memobject md-ripples" style="border-bottom: 5px dotted #151515"><div class="memdata">Fields</div></div>`;
+    document.querySelector(
+      ".objects"
+    ).innerHTML += `<textarea placeholder="Field1,Field2, ..." id='dirFields' onchange="browser.triggerChange()" oninput="auto_grow(this)" class='memos-object-input'>${dirFields}</textarea>`;
+
+    document.querySelector(
+      ".objects"
+    ).innerHTML += `<div class="memobject md-ripples" onclick="browser.removeDir()"><div class="memdata">Delete direcotry</div></div>`;
+
+    let items = document.querySelectorAll(".memos-object-input");
+    for (let item of items) {
+      auto_grow(item);
+    }
+  } catch (e) {
+    console.log(e);
+  }
+};
 
 browser.editDirAPI = () => {
-  let icon = document.querySelector('#dirIcon').value
-  let name = document.querySelector('#dirName').value
-  let fields = document.querySelector('#dirFields').value.split(",")
-  let arr = [[icon,name],fields]
-  if (arr.length*name.length*arr.length > 0)
-  mem.editDir(path[path.length-1],JSON.stringify(arr))
-  console.log(JSON.stringify(arr))
-  mem.terminalCommand('ls')
-}
+  let icon = document.querySelector("#dirIcon").value;
+  let name = document.querySelector("#dirName").value;
+  let fields = document.querySelector("#dirFields").value.split(",");
+  let arr = [[icon, name], fields];
+  if (arr.length * name.length * arr.length > 0)
+    mem.editDir(path[path.length - 1], JSON.stringify(arr));
+  console.log(JSON.stringify(arr));
+  mem.terminalCommand("ls");
+};
 
 browser.newFile = (obj) => {
-
   document.querySelector(
     ".objects"
-  ).innerHTML = `<div class="memobject" onclick="browser.addFile()"><div class="memdata">←</div></div>`;
+  ).innerHTML = `<div class="memobject md-ripples" onclick="browser.addFile()"><div class="memdata">←</div></div>`;
 
   // let fields = JSON.parse(obj[0].DATA) //array of strings
-  let fieldNames = JSON.parse(obj[0].DATA)[1] //array of strings
-  let index = 0
+  let fieldNames = JSON.parse(obj[0].DATA)[1]; //array of strings
+  let index = 0;
 
   for (let field of fieldNames) {
-  document.querySelector(
-    ".objects"
-  ).innerHTML += `<div class="memobject"  style="border-bottom: 5px dotted #151515"><div class="memdata">${field}</div></div>`;
-  document.querySelector(
-    ".objects"
-  ).innerHTML+=`<textarea oninput="auto_grow(this)" class='memos-object-input memos-userInput'></textarea>`
-    index++
-}
-
-  let items = document.querySelectorAll(".memos-object-input")
-  for (let item of items) {
-    auto_grow(item)
+    document.querySelector(
+      ".objects"
+    ).innerHTML += `<div class="memobject md-ripples"  style="border-bottom: 5px dotted #151515"><div class="memdata">${field}</div></div>`;
+    document.querySelector(
+      ".objects"
+    ).innerHTML += `<textarea oninput="auto_grow(this)" class='memos-object-input memos-userInput'></textarea>`;
+    index++;
   }
-}
-browser.changeDetected = false
-browser.triggerChange = () => {browser.changeDetected=true}
-browser.renderFile = (obj) => {
 
-  console.log(obj)
+  let items = document.querySelectorAll(".memos-object-input");
+  for (let item of items) {
+    auto_grow(item);
+  }
+};
+browser.changeDetected = false;
+browser.triggerChange = () => {
+  browser.changeDetected = true;
+};
+browser.renderFile = (obj) => {
+  console.log(obj);
   document.querySelector(
     ".objects"
-  ).innerHTML = `<div class="memobject" onclick="browser.editFile('${obj[0].ID}')"><div class="memdata">←</div></div>`;
+  ).innerHTML = `<div class="memobject md-ripples" onclick="browser.editFile('${obj[0].ID}')"><div class="memdata">←</div></div>`;
 
-  let fields = JSON.parse(obj[0].DATA) //array of strings
-  let fieldNames = JSON.parse(obj[0].DIRDATA)[1] //array of strings
-  let index = 0
+  let fields = JSON.parse(obj[0].DATA); //array of strings
+  let fieldNames = JSON.parse(obj[0].DIRDATA)[1]; //array of strings
+  let index = 0;
 
   for (let field of fieldNames) {
-   if (fields[index] == undefined) fields[index]=""
-  document.querySelector(
-    ".objects"
-  ).innerHTML += `<div class="memobject"  style="border-bottom: 5px dotted #151515"><div class="memdata">${field}</div></div>`;
-  document.querySelector(
-    ".objects"
-  ).innerHTML+=`<textarea onchange="browser.triggerChange()" oninput="auto_grow(this)" class='memos-object-input memos-userInput'>${fields[index]}</textarea>`
-  
-  index++
-}
+    if (fields[index] == undefined) fields[index] = "";
+    document.querySelector(
+      ".objects"
+    ).innerHTML += `<div class="memobject md-ripples"  style="border-bottom: 5px dotted #151515"><div class="memdata">${field}</div></div>`;
+    document.querySelector(
+      ".objects"
+    ).innerHTML += `<textarea onchange="browser.triggerChange()" oninput="auto_grow(this)" class='memos-object-input memos-userInput'>${fields[index]}</textarea>`;
 
-  let items = document.querySelectorAll(".memos-object-input")
+    index++;
+  }
+
+  let items = document.querySelectorAll(".memos-object-input");
   for (let item of items) {
-    auto_grow(item)
+    auto_grow(item);
   }
 
   // document.querySelector(
   //   ".objects"
-  // ).innerHTML += `<div class="memobject" onclick="browser.editFile('${obj[0].ID}')"><div class="memdata">Save file</div></div>`;
+  // ).innerHTML += `<div class="memobject md-ripples" onclick="browser.editFile('${obj[0].ID}')"><div class="memdata">Save file</div></div>`;
   document.querySelector(
     ".objects"
-  ).innerHTML += `<div class="memobject" style="border-bottom: 5px dotted #151515"><div class="memdata">Repeat in</div></div>`;
-  
-  document.querySelector(
-    ".objects"
-  ).innerHTML+=`<textarea onchange="browser.triggerChange()" oninput="auto_grow(this)" class='memos-object-input'>${mem.calcRepeat(obj[0].RDATE)}</textarea>`
-  
-  document.querySelector(
-    ".objects"
-  ).innerHTML += `<div class="memobject" style="border-bottom: 5px dotted #151515"><div class="memdata">Total interval</div></div>`;
-  
-  memPower = mem.convertHMS(
-    (obj[0].RDATE * 1 - obj[0].LREPEAT * 1) / 1000
-  );
+  ).innerHTML += `<div class="memobject md-ripples" style="border-bottom: 5px dotted #151515"><div class="memdata">Repeat in</div></div>`;
 
   document.querySelector(
     ".objects"
-  ).innerHTML+=`<textarea onchange="browser.triggerChange()" oninput="auto_grow(this)" class='memos-object-input'>${memPower}</textarea>`
-  
+  ).innerHTML += `<textarea onchange="browser.triggerChange()" oninput="auto_grow(this)" class='memos-object-input'>${mem.calcRepeat(
+    obj[0].RDATE
+  )}</textarea>`;
 
   document.querySelector(
     ".objects"
-  ).innerHTML += `<div class="memobject" onclick="browser.removeFile('${obj[0].ID}')"><div class="memdata">Delete file</div></div>`;
+  ).innerHTML += `<div class="memobject md-ripples" style="border-bottom: 5px dotted #151515"><div class="memdata">Total interval</div></div>`;
 
+  memPower = mem.convertHMS((obj[0].RDATE * 1 - obj[0].LREPEAT * 1) / 1000);
 
+  document.querySelector(
+    ".objects"
+  ).innerHTML += `<textarea onchange="browser.triggerChange()" oninput="auto_grow(this)" class='memos-object-input'>${memPower}</textarea>`;
 
-}
+  document.querySelector(
+    ".objects"
+  ).innerHTML += `<div class="memobject md-ripples" onclick="browser.removeFile('${obj[0].ID}')"><div class="memdata">Delete file</div></div>`;
+};
 const readFields = (data) => {
   let obj = JSON.parse(data.DATA);
   arba = obj;
   let str = "";
   let item;
-  let arr = []
-  let index = 0
+  let arr = [];
+  let index = 0;
   if (obj.constructor != Array) {
-    item = obj[0]
+    item = obj[0];
     while (item) {
-      arr.push([[obj[index]]])
-      index++
-      item = obj[index]
+      arr.push([[obj[index]]]);
+      index++;
+      item = obj[index];
     }
-   
-    obj = arr
+
+    obj = arr;
   }
-  
+
   for (let item of obj) {
     str += item[0][0] + "<br>";
   }
 
-  str+="⏱ " + mem.calcRepeat(data.RDATE) + "<br>"
+  str += "⌛ " + mem.calcRepeat(data.RDATE) + "<br>"; //<-- repeat in
 
-  str+= "💪 " + mem.convertHMS(
-    (data.RDATE * 1 - data.LREPEAT * 1) / 1000
-  );
+  str +=
+    "💪 " +
+    mem.convertHMS(
+      (data.RDATE * 1 - data.LREPEAT * 1) / 2 / 1000 //<-- strength
+    );
+
+  str +=
+    "<br>🚗 " +
+    mem.convertHMS(
+      (data.RDATE * 1 - data.LREPEAT * 1) / 1000 //<-- now going
+    );
 
   return str;
 };
 browser.removeFile = (id) => {
-  let confirm = prompt("Type `delete` to confirm delete")
+  let confirm = prompt("Type `delete` to confirm delete");
   if (confirm == "delete") {
-    mem.rem(id)
+    mem.rem(id);
   }
-  mem.terminalCommand("ls")
-}
+  mem.terminalCommand("ls");
+};
 browser.removeDir = () => {
-  let confirm = prompt("Type `delete` to confirm delete")
+  let confirm = prompt("Type `delete` to confirm delete");
   if (confirm == "delete") {
-    mem.rmdir(path[path.length-1])
+    mem.rmdir(path[path.length - 1]);
   }
-  mem.terminalCommand("cd ..")
-}
+  mem.terminalCommand("cd ..");
+};
 browser.movePanel = () => {
-  document.querySelector(".memotable-upside").classList.toggle("memotable-upside-down")
-}
+  document
+    .querySelector(".memotable-upside")
+    .classList.toggle("memotable-upside-down");
+};
 browser.selectOrder = () => {
-  let order = document.querySelector("select").value
-  switch(order) {
+  let order = document.querySelector("select").value;
+  switch (order) {
     case "repeatin":
-      mem.terminalCommand("ls")
-      break
+      mem.terminalCommand("ls");
+      break;
     case "interval":
-      mem.terminalCommand("lsi")
-      break
-      case "intervalb":
-        mem.terminalCommand("lsib")
-        break
+      mem.terminalCommand("lsi");
+      break;
+    case "intervalb":
+      mem.terminalCommand("lsib");
+      break;
   }
-}
-
-var openFile = function(event) {
-   try {
-  var input = event.target;
-
-  var reader = new FileReader();
-  reader.onload = function(){
-    var text = reader.result;
-    // var node = document.getElementById('output');
-    // node.innerText = text;
-    alert(text)
-    console.log(reader.result.substring(0, 200));
-    // alert(reader.result.substring(0, 200));
-  };
-  reader.readAsText(input.files[0]);
-} catch(e) {console.log(e)}
 };
 
-browser.render = (showFile,id,data) => {
+var openFile = function (event) {
+  try {
+    var input = event.target;
 
-  if (showFile) {
-    mem.get(id,browser.renderFile)
+    var reader = new FileReader();
+    reader.onload = function () {
+      var text = reader.result;
+      // var node = document.getElementById('output');
+      // node.innerText = text;
+      alert(text);
+      console.log(reader.result.substring(0, 200));
+      // alert(reader.result.substring(0, 200));
+    };
+    reader.readAsText(input.files[0]);
+  } catch (e) {
+    console.log(e);
+  }
+};
+browser.toggle = () => {
+  browser.showControlPanel = !browser.showControlPanel;
+  browser.render();
+};
+browser.switchPage = (next) => {
+  if (next) {
+  mem.offset+=10
   } else {
-    document.querySelector(
-      ".objects"
-    ).innerHTML = `<div class="memobject" onclick="mem.terminalCommand('cd ..')"><div class="memdata">←</div></div>`;
-    document.querySelector(
-      ".objects"
-    ).innerHTML+= `<div class="memobject" onclick="browser.newDir()"><div class="memdata">Add directory</div></div>`;
+    mem.offset-=10
+  }
+  mem.terminalCommand('ls')
+}
+browser.goUp = () => {
+  mem.offset = 0
+  mem.terminalCommand('cd ..')
+}
+browser.showControlPanel = false;
+browser.thisDirTotal = 0
+browser.render = (showFile, id, data) => {
+  if (showFile) {
+    mem.get(id, browser.renderFile);
+  } else {
+    document.querySelector(".objects").innerHTML = "";
 
-    if (path[path.length-1] != '/')
-    document.querySelector(
-      ".objects"
-    ).innerHTML+= `<div class="memobject" onclick="browser.editDirInit()"><div class="memdata">Edit this directory</div></div>`;
-
-    if (path[path.length-1] != '/')
-    document.querySelector(
-      ".objects"
-    ).innerHTML+= `<div class="memobject" onclick="browser.newFileInit()"><div class="memdata">Add file</div></div>`;
-
-    document.querySelector(
-      ".objects"
-    ).innerHTML+= `<div class="memobject"><div class="memdata" id="total-objects"></div></div>`;
-
-      sql(`select COUNT(ID) AS TOTAL FROM OBJECTS WHERE PID = '${path[path.length-1]}'`,(res)=>
-      {document.querySelector("#total-objects").innerHTML = `TOTAL:  ${res[0].TOTAL}`})
+    if (path.length > 1)
       document.querySelector(
+        ".objects"
+      ).innerHTML = `<div class="memobject md-ripples" onclick="browser.goUp()"><div class="memdata">←</div></div>`;
+
+      
+    document.querySelector(
       ".objects"
-    ).innerHTML+=
-    `<label id="label">Select order</label>
-    <select onchange="browser.selectOrder()" name="cars" id="order">
-    <option value="repeatin">Select order</option>
-    <option value="repeatin">By repeat in</option>
-    <option value="interval">By interval ASC</option>
-    <option value="intervalb">By interval DESC</option>
-  </select>
-  <input id="import" type="file" accept='text/plain' onchange='openFile(event)'/>
-  `
+    ).innerHTML += `<div class="memobject md-ripples"><div class="memdata">${pathNames
+      .join("/")
+      .replace("//", "/")}</div></div>`;
+
+      
+    if (browser.showControlPanel) {
+      document.querySelector(
+        ".objects"
+      ).innerHTML += `<div onclick="browser.toggle()"class="memobject md-ripples"><div class="memdata">Hide controls</div></div>`;
+    } else {
+      document.querySelector(
+        ".objects"
+      ).innerHTML += `<div onclick="browser.toggle()"class="memobject md-ripples"><div class="memdata">Show controls</div></div>`;
+    }
+
+    if (browser.showControlPanel) {
+      document.querySelector(
+        ".objects"
+      ).innerHTML += `<div class="memobject md-ripples" onclick="browser.newDir()"><div class="memdata">Add directory</div></div>`;
+
+      if (path[path.length - 1] != "/")
+        document.querySelector(
+          ".objects"
+        ).innerHTML += `<div class="memobject md-ripples" onclick="browser.editDirInit()"><div class="memdata">Edit this directory</div></div>`;
+
+      if (path[path.length - 1] != "/")
+        document.querySelector(
+          ".objects"
+        ).innerHTML += `<div class="memobject md-ripples" onclick="browser.newFileInit()"><div class="memdata">Add file</div></div>`;
+      
+        if (path[path.length - 1] == "/")
+        document.querySelector(
+          ".objects"
+        ).innerHTML += `<input id="import" type="file" accept='text/plain' onchange='openFile(event)'/>`;
+      }
+      document.querySelector(
+        ".objects"
+      ).innerHTML += `<div class="memobject md-ripples"><div class="memdata" id="total-objects"></div></div>`;
+
+      document.querySelector(
+        ".objects"
+      ).innerHTML += `<label id="label">Select order</label>
+      <select onchange="browser.selectOrder()" name="cars" id="order">
+      <option value="repeatin">Select order</option>
+      <option value="repeatin">By repeat in</option>
+      <option value="interval">By interval ASC</option>
+      <option value="intervalb">By interval DESC</option>
+    </select>
+    
+    `;
+
+        if (mem.offset != 0)
+    document.querySelector(
+      ".objects"
+    ).innerHTML += `
+    <div class="memobject md-ripples" onclick="browser.switchPage(0)"><div class="memdata">Previous page</div></div>
+    `
+
+      
+
+    
+    
+   
     let icons = [];
     let data = [];
     let index = 1;
     for (let item of browserCache[0]) {
-      console.log(item)
+      console.log(item);
       document.querySelector(".objects").innerHTML += mem.browserDirSample
         .replace("$icon", JSON.parse(item.DATA)[0][0])
         .replace("$dirName", JSON.parse(item.DATA)[0][1])
-        .replace("$goTo", index)
-       
+        .replace("$goTo", index);
+
       index++;
     }
 
     for (let item of browserCache[1]) {
       document.querySelector(".objects").innerHTML += mem.browserObjSample
         .replace("$objData", readFields(item))
-        .replace("$ID", item.ID)
+        .replace("$ID", item.ID);
 
-        // .replace("$DATA", item.DATA)
+      // .replace("$DATA", item.DATA)
     }
+
+
+    
+
+    sql(
+      `select COUNT(ID) AS TOTAL FROM OBJECTS WHERE PID = '${
+        path[path.length - 1]
+      }'`,
+      (res) => {
+        browser.thisDirTotal = res[0].TOTAL
+        if (browser.thisDirTotal > mem.offset*10) {
+          document.querySelector(
+            ".objects"
+          ).innerHTML += `
+          <div class="memobject md-ripples" onclick="browser.switchPage(1)"><div class="memdata">Next page</div></div>
+          `
+          }
+
+        document.querySelector(
+          "#total-objects"
+        ).innerHTML = `TOTAL:  ${res[0].TOTAL}`;
+      }
+    );
     document.querySelector(".page2-node4").scrollBy(0, 50);
   }
 };
