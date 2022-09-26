@@ -35,12 +35,19 @@
    <link rel="stylesheet" href="css/style4.css">
    <link rel="stylesheet" href="css/owl.carousel.min.css">
    <link rel="stylesheet" href="css/owl.theme.default.min.css">
+   <link rel="stylesheet" href="css/notifier.css">
    <title>Memos</title>
 </head>
 
 <body>
 	<!--<div style='position: fixed; left: 0; right: 0; top: 0; bottom: 0; background: black; z-index: 99999'></div>-->
    <!--opacity 0 stands for curtain thing...-->
+
+   <div class="notifier notifier-up">
+      <div class="notifier-content">
+      </div>
+   </div>
+
    <div class='menu' style="opacity-0">
       <div id='papers' onclick='check.focus()' class='donotdisplay'>
       </div>
@@ -287,7 +294,8 @@
       </div>
    </div>
 </body>
-
+<script src="js/shorthands.js"></script>
+<script src="js/notifier.js"></script>
 <script src="js/viewport.js"></script>
 <script src="css/jquery.min.js"></script> <!--required for owl.carousel-->
 <script src="css/owl.carousel.min.js"></script>

@@ -12,6 +12,20 @@ db.transaction(function (tx) {
   // tx.executeSql("ALTER TABLE OBJECTS RENAME TO ITEMS ")
 });
 
+const openConnection = () => {
+  db.transaction(function (tx) {
+    //rDATA - repeatition DATA; lrepeat - last repeat unix time; dur - duration;
+    tx.executeSql(
+      "CREATE TABLE IF NOT EXISTS OBJECTS (ID unique, PID, DATA, RDATE, LREPEAT, SPEC)"
+    ); //PID - PARENT ID
+    tx.executeSql("CREATE TABLE IF NOT EXISTS DIRS (ID unique, PID, DATA)");
+    tx.executeSql("CREATE TABLE IF NOT EXISTS MEMOROUTES (ID unique, DATA)");
+    tx.executeSql("CREATE TABLE IF NOT EXISTS HISTORY (ID unique, DATA)");
+    // tx.executeSql("ALTER TABLE DIRS RENAME COLUMN DIRDATA TO DATA;")
+    // tx.executeSql("ALTER TABLE OBJECTS RENAME TO ITEMS ")
+  });
+};
+
 //The executeSql method is the following: executeSql(sqlStatement, arguments, callback, errorCallback)
 
 /*
@@ -56,6 +70,29 @@ sql = (query, callback, error, arg1, arg2, arg3) => {
     );
   });
 };
+const prom = new Promise((res, rej) => {});
+sql2 = (query) =>
+  new Promise((resolve, reject) => {
+    db.transaction(function (tx) {
+      tx.executeSql(
+        query,
+        [],
+        function (tx, results) {
+          resolve(results.rows);
+        },
+        function (tx, results) {
+          console.log(query, tx, results, "ERROR");
+          error(arg1, arg2, arg3);
+        }
+      );
+    });
+  });
+
+async function sql3(query) {
+  let res = await sql2(query);
+  console.log(res);
+  return res;
+}
 
 var mem = {};
 
@@ -75,6 +112,23 @@ mem.collect = () => {
     mem.collectCallback
   );
 };
+mem.fixLinker = () => {
+  sql("select id,spec from objects", (res) => {
+    res = Array.from(res);
+    res.map((item) => {
+      if (JSON.parse(item.SPEC) instanceof Array)
+        sql(
+          `update OBJECTS set SPEC='{"links": ${item.SPEC},"qfields": []}' WHERE ID='${item.ID}'`
+        );
+    });
+  });
+};
+
+//q: write array destructurization for [1,2,3] and take first
+//a: const [n1,n2,n3] = [1,2,3]
+//---
+//q: What is it? const [n1,n2,n3] = [1,2,3]
+//a: array destructurization
 
 mem.collectCallback = (res) => {
   // mem.list = []
@@ -139,12 +193,13 @@ mem.define = (increment) => {
     // mem.res.dir = mem.dirList[mem.answered];
     mem.res.dir = mem.list[mem.answered].DIRDATA;
     DATA = JSON.parse(mem.res.obj.DATA);
+
     SPEC = JSON.parse(mem.res.obj.SPEC);
 
     let result = mem.linker(SPEC); //calculate links, meaning what field is asked and which field is considered as answer
     let index = result[0];
     mem.res.obj.result = result;
-    // mem.res.obj.SPEC = JSON.stringify(result[1]);
+    mem.res.obj.SPEC = JSON.stringify(result[1]);
 
     let question = DATA[index[0]];
 
@@ -577,13 +632,15 @@ let ITEM_G_COUNT = 0;
 let INFORM_ERROR = 0;
 mem.setItem = function (PID, DATA, SPEC) {
   ID = makeid(6);
-  console.log(arguments);
+  // console.log(arguments);
   var RDATE = Date.now() + 0 * 60 * 1000;
   var LREPEAT = Date.now();
+  // console.log(`INSERT INTO OBJECTS (ID,PID, DATA, RDATE, LREPEAT, SPEC) VALUES ("${ID}","${PID}",'${DATA}',"${RDATE}", "${LREPEAT}", "${SPEC}")`)
+
   if (ITEM_G_COUNT < 1000) {
     ITEM_G_COUNT++;
     sql(
-      `INSERT INTO OBJECTS (ID,PID, DATA, RDATE, LREPEAT, SPEC) VALUES ("${ID}","${PID}",'${DATA}',"${RDATE}", "${LREPEAT}", "${SPEC}")`,
+      `INSERT INTO OBJECTS (ID,PID, DATA, RDATE, LREPEAT, SPEC) VALUES ("${ID}","${PID}",'${DATA}',"${RDATE}", "${LREPEAT}", '${SPEC}')`,
       undefined,
       mem.setItemError,
       PID,
@@ -680,23 +737,26 @@ mem.itemExample2 = [[["a cat"]], [["кот"]]];
 mem.addItem = (ID, ARRAY) => {
   try {
     let DATA = {};
-    let SPEC = [];
+    let SPEC = { links: [], qfields: [] };
     DATA = ARRAY;
     for (var i = 0; i < ARRAY.length; i++) {
-      SPEC.push([]);
+      SPEC.links.push([]);
     }
 
     DATA = JSON.stringify(DATA);
     console.log(DATA);
     SPEC = JSON.stringify(SPEC);
-
+    console.log(ARRAY.length);
     if (ARRAY.length > 1) {
       mem.setItem(ID, DATA, SPEC);
     } else {
+      notifier.show(`⚠️ Too little data`, true);
       throw new Error("Too small");
     }
   } catch (e) {
     alert("Error: ", e);
+    notifier.show(`⚠️ Error during adding ${e}`, true);
+    console.log(e);
   }
 };
 
@@ -778,14 +838,12 @@ mem.rmdir2 = (res) => {
 
 mem.linker = (SPEC) => {
   let result = mem.sublinker(SPEC);
-  console.log(`mem.sublinker(${SPEC})`);
-  console.log("RESULT: ", result);
   //console.log(result)
   if (result) {
     return result;
   } else {
-    for (var i = 0; i < SPEC.length; i++) {
-      SPEC[i] = [];
+    for (var i = 0; i < SPEC.links.length; i++) {
+      SPEC.links[i] = [];
     }
     console.log("SPEC: ", SPEC);
 
@@ -794,13 +852,16 @@ mem.linker = (SPEC) => {
   }
 };
 mem.sublinker = (SPEC) => {
+  let LINKS = SPEC.links;
   //@SPEC array of arrays [[],[]]
   //i symbols the 1st field and the numbers inside (j) are field it was asked with
-  for (var i = 0; i < SPEC.length; i++) {
-    for (var j = 0; j < SPEC.length; j++) {
+  //i is quiestion and j is answer
+  for (var i = 0; i < LINKS.length; i++) {
+    for (var j = 0; j < LINKS.length; j++) {
       if (i != j) {
-        if (SPEC[i].indexOf(j) == -1) {
-          SPEC[i].push(j);
+        if (LINKS[i].indexOf(j) == -1 && SPEC.qfields.indexOf(j) == -1) {
+          LINKS[i].push(j);
+          SPEC.links = LINKS;
 
           return [[i, j], SPEC];
         }
@@ -826,9 +887,12 @@ function makeid(length) {
   return result;
 }
 
-mem.offset = 0
+mem.offset = 0;
 mem.show = (DIRID, callback, order) => {
-  sql(`SELECT * FROM DIRS WHERE PID = "${DIRID}" ORDER BY DATA LIMIT ${mem.offset},10` , callback);
+  sql(
+    `SELECT * FROM DIRS WHERE PID = "${DIRID}" ORDER BY DATA LIMIT ${mem.offset},10`,
+    callback
+  );
   // mem.getDirById(DIRID,callback)
   switch (order) {
     case "interval":
@@ -852,16 +916,38 @@ mem.show = (DIRID, callback, order) => {
   }
 };
 
-mem.editItem = (ID, DATA, callback) => {
-  sql(`UPDATE OBJECTS SET DATA = '${DATA}' WHERE ID = '${ID}'`, callback);
-  ARRAY = JSON.parse(DATA);
-  let SPEC = [];
-  for (let i = 0; i < ARRAY.length; i++) {
-    SPEC.push([]);
+mem.editItem = async function (ID, DATA) {
+  try {
+    let SPEC = await sql2(`SELECT SPEC FROM OBJECTS WHERE ID = '${ID}'`);
+    SPEC = SPEC[0].SPEC;
+    SPEC = JSON.parse(SPEC);
+    await sql2(`UPDATE OBJECTS SET DATA = '${DATA}' WHERE ID = '${ID}'`);
+    ARRAY = JSON.parse(DATA);
+    if (ARRAY.length != SPEC.links.length) {
+      for (let i = 0; i < ARRAY.length; i++) {
+        SPEC.links.push([]);
+      }
+      SPEC = JSON.stringify(SPEC);
+      await sql2(`UPDATE OBJECTS SET SPEC = '${SPEC}' WHERE ID = '${ID}'`);
+    }
+  } catch (e) {
+    log(e);
+    notifier.show(e,true)
   }
-  SPEC = JSON.stringify(SPEC);
-  sql(`UPDATE OBJECTS SET SPEC = '${SPEC}' WHERE ID = '${ID}'`, callback);
 };
+
+mem.editItemQFields = async function (ID, ARRAY) {
+  let SPEC = await sql2(`SELECT SPEC FROM OBJECTS WHERE ID = '${ID}'`);
+  SPEC = SPEC[0].SPEC;
+  SPEC = JSON.parse(SPEC);
+  SPEC.qfields = ARRAY;
+  SPEC = JSON.stringify(SPEC);
+  return await sql2(`UPDATE OBJECTS SET SPEC = '${SPEC}' WHERE ID = '${ID}'`);
+};
+mem.getQFields = async function (ID) {
+  return await sql2(`SELECT SPEC FROM OBJECTS WHERE ID = '${ID}'`);
+};
+
 mem.editDir = (ID, DATA, callback) => {
   sql(`UPDATE DIRS SET DATA = '${DATA}' WHERE ID = '${ID}'`, callback);
 };
@@ -1031,7 +1117,10 @@ mem.terminalCommand = (choice) => {
       mem.browser(path[path.length - 1], "interval backwards");
       break;
     case "lslim":
-      mem.browser(path[path.length - 1], `limit ${ choice.split(" ")[1].toLowerCase()}`);
+      mem.browser(
+        path[path.length - 1],
+        `limit ${choice.split(" ")[1].toLowerCase()}`
+      );
       break;
     case "/clear": //clear SPEC
       sql("UPDATE OBJECTS SET SPEC = '[[],[]]' WHERE ID LIKE '%'", console.log);
@@ -1226,8 +1315,9 @@ const focusElement = (e) => {
 };
 let focusInterval = 0;
 const clickHandler = (e) => {
-  console.log(e.target.classList);
+  // console.log(e.target.classList);
   if (e.target.classList.contains("memos-userInput")) {
+    clearInterval(focusInterval);
     focusInterval = setInterval(focusElement, 100, e.target);
     setTimeout(() => {
       clearInterval(focusInterval);
@@ -1244,11 +1334,17 @@ browser.collectInput = () => {
   return arr;
 };
 
-browser.editFile = (id) => {
-  let rows = JSON.stringify(browser.collectInput());
-  rows = rows.replaceAll("'", "''");
-  if (browser.changeDetected) mem.editItem(id, rows);
-  browser.changeDetected = false;
+browser.editFile = async function (id) {
+  let rows = browser.collectInput();
+  if (rows.length > 1) {
+    rows = JSON.stringify(rows);
+    rows = rows.replaceAll("'", "''");
+    if (browser.changeDetected) await mem.editItem(id, rows);
+    browser.changeDetected = false;
+    notifier.show(`📝 Edit successful`);
+  } else {
+    notifier.show(`⚠️ Too little data`, true);
+  }
   mem.terminalCommand("ls");
 };
 
@@ -1293,8 +1389,12 @@ browser.addFile = () => {
   let currentDirID = path[path.length - 1];
   let DATA = JSON.stringify(browser.collectInput());
   DATA = DATA.replaceAll("'", "''");
-  if (browser.collectInput().length > 1)
+  if (browser.collectInput().length > 1) {
+    notifier.show(`📝 Card added`);
     mem.addItem(currentDirID, JSON.parse(DATA));
+  } else {
+    notifier.show(`⚠️ Too little data`, true);
+  }
   mem.terminalCommand("ls");
 };
 browser.newFileInit = () => {
@@ -1402,7 +1502,7 @@ browser.renderFile = (obj) => {
     if (fields[index] == undefined) fields[index] = "";
     document.querySelector(
       ".objects"
-    ).innerHTML += `<div class="memobject md-ripples"  style="border-bottom: 5px dotted #151515"><div class="memdata">${field}</div></div>`;
+    ).innerHTML += `<div class="memobject md-ripples field-name" style="border-bottom: 5px dotted #151515"><div class="memdata">🔒 ${field}</div></div>`;
     document.querySelector(
       ".objects"
     ).innerHTML += `<textarea onchange="browser.triggerChange()" oninput="auto_grow(this)" class='memos-object-input memos-userInput'>${fields[index]}</textarea>`;
@@ -1514,6 +1614,54 @@ browser.selectOrder = () => {
   }
 };
 
+mem.parsedBackup = 0;
+
+async function importBackup(data) {
+  await sql2("DROP TABLE OBJECTS");
+  await sql2("DROP TABLE DIRS");
+  await sql2("DROP TABLE MEMOROUTES");
+  await sql2("DROP TABLE HISTORY");
+
+  await sql2(
+    `CREATE TABLE IF NOT EXISTS OBJECTS (ID unique, PID, DATA, RDATE, LREPEAT, SPEC)`
+  );
+  await sql2(`CREATE TABLE IF NOT EXISTS DIRS (ID unique, PID, DATA)`);
+  await sql2(`CREATE TABLE IF NOT EXISTS MEMOROUTES (ID unique, DATA)`);
+  await sql2(`CREATE TABLE IF NOT EXISTS HISTORY (ID unique, DATA)`);
+
+  let parsed = JSON.parse(data);
+  mem.parsedBackup = parsed;
+
+  let object = parsed[0][0];
+  let i = 0;
+  while (object) {
+    object.DATA = object.DATA.replaceAll(`'`, `''`);
+    sql2(
+      `INSERT INTO OBJECTS (ID,PID, DATA, RDATE, LREPEAT, SPEC) VALUES ("${object.ID}","${object.PID}",'${object.DATA}',"${object.RDATE}", "${object.LREPEAT}", "${object.SPEC}")`
+    );
+    i++;
+    object = parsed[0][i];
+  }
+
+  i = 0;
+  let dir = parsed[1][0];
+  while (dir) {
+    sql2(
+      `INSERT INTO DIRS (ID, PID, DATA) VALUES ("${dir.ID}", "${dir.PID}", '${dir.DATA}')`
+    );
+    i++;
+    dir = parsed[1][i];
+  }
+
+  mem.terminalCommand("ls");
+
+  // for (let object of parsed[0]) {
+  //   sql2(`INSERT INTO OBJECTS (ID,PID, DATA, RDATE, LREPEAT, SPEC) VALUES ("${object.ID}","${object.PID}",'${object.DATA}',"${object.RDATE}", "${object.LREPEAT}", "${object.SPEC}")`)
+  // }
+  // for (let dir of parsed[1]) {
+  //   sql2(`INSERT INTO DIRS (ID, PID, DATA) VALUES ("${dir.ID}", "${dir.PID}", '${dir.DATA}')`)
+  // }
+}
 var openFile = function (event) {
   try {
     var input = event.target;
@@ -1521,10 +1669,11 @@ var openFile = function (event) {
     var reader = new FileReader();
     reader.onload = function () {
       var text = reader.result;
+      importBackup(text);
       // var node = document.getElementById('output');
       // node.innerText = text;
-      alert(text);
-      console.log(reader.result.substring(0, 200));
+      // alert(text);
+      // console.log(reader.result.substring(0, 200));
       // alert(reader.result.substring(0, 200));
     };
     reader.readAsText(input.files[0]);
@@ -1538,18 +1687,18 @@ browser.toggle = () => {
 };
 browser.switchPage = (next) => {
   if (next) {
-  mem.offset+=10
+    mem.offset += 10;
   } else {
-    mem.offset-=10
+    mem.offset -= 10;
   }
-  mem.terminalCommand('ls')
-}
+  mem.terminalCommand("ls");
+};
 browser.goUp = () => {
-  mem.offset = 0
-  mem.terminalCommand('cd ..')
-}
+  mem.offset = 0;
+  mem.terminalCommand("cd ..");
+};
 browser.showControlPanel = false;
-browser.thisDirTotal = 0
+browser.thisDirTotal = 0;
 browser.render = (showFile, id, data) => {
   if (showFile) {
     mem.get(id, browser.renderFile);
@@ -1561,51 +1710,49 @@ browser.render = (showFile, id, data) => {
         ".objects"
       ).innerHTML = `<div class="memobject md-ripples" onclick="browser.goUp()"><div class="memdata">←</div></div>`;
 
-      
     document.querySelector(
       ".objects"
     ).innerHTML += `<div class="memobject md-ripples"><div class="memdata">${pathNames
       .join("/")
       .replace("//", "/")}</div></div>`;
 
-      
     if (browser.showControlPanel) {
       document.querySelector(
         ".objects"
-      ).innerHTML += `<div onclick="browser.toggle()"class="memobject md-ripples"><div class="memdata">Hide controls</div></div>`;
+      ).innerHTML += `<div onclick="browser.toggle()"class="memobject md-ripples"><div class="memdata">⚙️ Hide controls</div></div>`;
     } else {
       document.querySelector(
         ".objects"
-      ).innerHTML += `<div onclick="browser.toggle()"class="memobject md-ripples"><div class="memdata">Show controls</div></div>`;
+      ).innerHTML += `<div onclick="browser.toggle()"class="memobject md-ripples"><div class="memdata">⚙️ Show controls</div></div>`;
     }
 
     if (browser.showControlPanel) {
       document.querySelector(
         ".objects"
-      ).innerHTML += `<div class="memobject md-ripples" onclick="browser.newDir()"><div class="memdata">Add directory</div></div>`;
+      ).innerHTML += `<div class="memobject md-ripples" onclick="browser.newDir()"><div class="memdata">📁 Add catalog</div></div>`;
 
       if (path[path.length - 1] != "/")
         document.querySelector(
           ".objects"
-        ).innerHTML += `<div class="memobject md-ripples" onclick="browser.editDirInit()"><div class="memdata">Edit this directory</div></div>`;
+        ).innerHTML += `<div class="memobject md-ripples" onclick="browser.editDirInit()"><div class="memdata">🔧 Edit this catalog</div></div>`;
 
       if (path[path.length - 1] != "/")
         document.querySelector(
           ".objects"
-        ).innerHTML += `<div class="memobject md-ripples" onclick="browser.newFileInit()"><div class="memdata">Add file</div></div>`;
-      
-        if (path[path.length - 1] == "/")
+        ).innerHTML += `<div class="memobject md-ripples" onclick="browser.newFileInit()"><div class="memdata">📝 Add card</div></div>`;
+
+      if (path[path.length - 1] == "/")
         document.querySelector(
           ".objects"
         ).innerHTML += `<input id="import" type="file" accept='text/plain' onchange='openFile(event)'/>`;
-      }
-      document.querySelector(
-        ".objects"
-      ).innerHTML += `<div class="memobject md-ripples"><div class="memdata" id="total-objects"></div></div>`;
+    }
+    document.querySelector(
+      ".objects"
+    ).innerHTML += `<div class="memobject md-ripples"><div class="memdata" id="total-objects"></div></div>`;
 
-      document.querySelector(
-        ".objects"
-      ).innerHTML += `<label id="label">Select order</label>
+    document.querySelector(
+      ".objects"
+    ).innerHTML += `<label id="label">Select order</label>
       <select onchange="browser.selectOrder()" name="cars" id="order">
       <option value="repeatin">Select order</option>
       <option value="repeatin">By repeat in</option>
@@ -1615,23 +1762,16 @@ browser.render = (showFile, id, data) => {
     
     `;
 
-        if (mem.offset != 0)
-    document.querySelector(
-      ".objects"
-    ).innerHTML += `
-    <div class="memobject md-ripples" onclick="browser.switchPage(0)"><div class="memdata">Previous page</div></div>
-    `
+    if (mem.offset != 0)
+      document.querySelector(".objects").innerHTML += `
+    <div class="memobject md-ripples" onclick="browser.switchPage(0)"><div class="memdata">⬅️ Previous page</div></div>
+    `;
 
-      
-
-    
-    
-   
     let icons = [];
     let data = [];
     let index = 1;
     for (let item of browserCache[0]) {
-      console.log(item);
+      // console.log(item);
       document.querySelector(".objects").innerHTML += mem.browserDirSample
         .replace("$icon", JSON.parse(item.DATA)[0][0])
         .replace("$dirName", JSON.parse(item.DATA)[0][1])
@@ -1648,26 +1788,23 @@ browser.render = (showFile, id, data) => {
       // .replace("$DATA", item.DATA)
     }
 
-
-    
-
     sql(
       `select COUNT(ID) AS TOTAL FROM OBJECTS WHERE PID = '${
         path[path.length - 1]
       }'`,
       (res) => {
-        browser.thisDirTotal = res[0].TOTAL
-        if (browser.thisDirTotal > mem.offset*10) {
-          document.querySelector(
-            ".objects"
-          ).innerHTML += `
-          <div class="memobject md-ripples" onclick="browser.switchPage(1)"><div class="memdata">Next page</div></div>
-          `
-          }
+        browser.thisDirTotal = res[0].TOTAL;
+        let compare = mem.offset * 10;
+        if (compare == 0) compare = 10;
+        if (browser.thisDirTotal > compare) {
+          document.querySelector(".objects").innerHTML += `
+          <div class="memobject md-ripples" onclick="browser.switchPage(1)"><div class="memdata">➡️ Next page</div></div>
+          `;
+        }
 
         document.querySelector(
           "#total-objects"
-        ).innerHTML = `TOTAL:  ${res[0].TOTAL}`;
+        ).innerHTML = `📚 TOTAL:  ${res[0].TOTAL}`;
       }
     );
     document.querySelector(".page2-node4").scrollBy(0, 50);
