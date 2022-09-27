@@ -1347,9 +1347,12 @@ browser.editFile = async function (id) {
     rows = rows.replaceAll("'", "''");
     if (browser.changeDetected) await mem.editItem(id, rows);
     console.log("Q", id, qfields);
-    mem.editItemQFields(id, qfields);
+    if (browser.lockFieldEngaged) await mem.editItemQFields(id, qfields);
+    if (browser.lockFieldEngaged || browser.changeDetected) notifier.show(`📝 Edit successful`);
+    browser.lockFieldEngaged=0
     browser.changeDetected = false;
-    notifier.show(`📝 Edit successful`);
+
+    
   } else {
     notifier.show(`⚠️ Too little data`, true);
   }
@@ -1497,7 +1500,9 @@ browser.triggerChange = () => {
   browser.changeDetected = true;
 };
 browser.lockedElement = 0;
+browser.lockFieldEngaged = 0
 browser.lockField = (elm) => {
+  browser.lockFieldEngaged = 1
   browser.lockedElement = elm;
   if (elm.children[0].innerHTML.includes("🔒")) {
     browser.lockedElement.children[0].innerHTML =
