@@ -1,5 +1,20 @@
+function download(filename, text) {
+  var element = document.createElement('a');
+  element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+  element.setAttribute('download', filename);
+
+  element.style.display = 'none';
+  document.body.appendChild(element);
+
+  element.click();
+
+  document.body.removeChild(element);
+}
+
 function exportData() {
   a = mem.exportedData;
+  download("memos.backup.txt",a)
+  console.log(a)
   var way;
   try {
     var dl = new Download2();
@@ -19,7 +34,7 @@ function exportData() {
     });
     dl.Get(a);
   } catch (e) {
-    alert(e);
+    //alert(e)
   }
 }
 
