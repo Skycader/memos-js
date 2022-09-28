@@ -2,7 +2,8 @@
     transition-duration: 0.5s;
     position: fixed; 
     width: 100%; 
-    z-index: 999999
+    z-index: 999999;
+    transform: translateY(-10px)
 }
 
 .notifier-warning {

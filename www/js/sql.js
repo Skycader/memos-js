@@ -188,6 +188,7 @@ mem.define = (increment) => {
   }
   let DATA;
   let SPEC;
+  console.log("!",mem.list[mem.answered])
   mem.res.obj = mem.list[mem.answered];
   if (mem.res.obj) {
     // mem.res.dir = mem.dirList[mem.answered];
@@ -199,7 +200,7 @@ mem.define = (increment) => {
     let result = mem.linker(SPEC); //calculate links, meaning what field is asked and which field is considered as answer
     let index = result[0];
     mem.res.obj.result = result;
-    mem.res.obj.SPEC = JSON.stringify(result[1]);
+    // mem.res.obj.SPEC = JSON.stringify(result[1]);
 
     let question = DATA[index[0]];
 
@@ -215,7 +216,7 @@ mem.define = (increment) => {
     let rightAnswer;
 
     rightAnswer = DATA[index[1]];
-    mem.rightAnswer = rightAnswer;
+    mem.res.rightAnswer = rightAnswer;
   } else {
     console.log("No more objects to repeat");
     mem.nothing = 1;
@@ -249,13 +250,16 @@ mem.answer = (answerIsCorrect) => {
       } else {
         diff = diff + Date.now() + 10 * 1000;
       }
+      
       let repeatIn = diff - Date.now();
+      console.log('!!!',repeatIn)
+      notifier.show(`⌛ +${mem.convertHMS(repeatIn/1000)}`)
       repeatIn = repeatIn / 1000 / 60 / 60;
       console.log("New RDATE: " + new Date(diff));
       console.log(`Repeat in ${repeatIn} hours`);
       mem.update("RDATE", diff, "ID", mem.res.obj.ID);
       mem.update("LREPEAT", Date.now(), "ID", mem.res.obj.ID);
-      mem.res.obj.SPEC = JSON.stringify(mem.res.obj.result[1]);
+      mem.res.obj.SPEC = JSON.stringify(mem.res.obj.result[1])
       mem.update("SPEC", mem.res.obj.SPEC, "ID", mem.res.obj.ID);
     } else {
       mem.update("RDATE", Date.now(), "ID", mem.res.obj.ID);
@@ -324,7 +328,7 @@ mem.check = (answer) => {
   for (var i = 0; i < answer.length; i++) {
     for (var j = 0; j < answer[i].length; j++) {
       if (
-        answer[i][j].toLowerCase() != mem.rightAnswer[0][i][j].toLowerCase()
+        answer[i][j].toLowerCase() != mem.res.rightAnswer[0][i][j].toLowerCase()
       ) {
         block = 1;
         mem.mistake = 1;
@@ -333,7 +337,7 @@ mem.check = (answer) => {
       }
       if (
         !block &&
-        answer.join("").length == mem.rightAnswer[0].join("").length &&
+        answer.join("").length == mem.res.rightAnswer[0].join("").length &&
         i + 1 == answer.length &&
         j + 1 == answer[i].length
       ) {
@@ -354,13 +358,17 @@ mem.check = (answer) => {
 
       mem.maxRightSymbols = rightSymbols;
     }
-    mem.percentage = rightSymbols / mem.rightAnswer[0].join("").length;
+    mem.percentage = rightSymbols / mem.res.rightAnswer[0].join("").length;
     document.querySelector(".progressBar").style.width =
       mem.percentage * 100 + "%";
     if (block) {
       document.querySelector(".progressBar").style.background = "red";
+      document.querySelector(".pos1").classList.add("loose");
+      document.querySelector("#memosInput").classList.add("loose");
     } else {
       document.querySelector(".progressBar").style.background = "";
+      document.querySelector(".pos1").classList.remove("loose");
+      document.querySelector("#memosInput").classList.remove("loose");
     }
   }
 };
@@ -427,16 +435,15 @@ mem.when2 = (res) => {
 mem.convertHMS = (seconds) => {
   timeLeft = seconds;
   if (timeLeft < 0) timeLeft = 0;
-  daysLeft = Math.floor(timeLeft / 60 / 60 / 24); //ok
-  hoursLeft = Math.floor((timeLeft - daysLeft * 60 * 60 * 24) / 60 / 60);
-  minutesLeft = Math.floor(
-    (timeLeft - daysLeft * 60 * 60 * 24 - hoursLeft * 60 * 60) / 60
+  let yearsLeft = Math.floor(timeLeft / 60 / 60 / 24 / 365); 
+  let daysLeft = Math.floor((timeLeft - yearsLeft * 60 * 60 * 24 * 365)/60/60/24);
+  let hoursLeft = Math.floor((timeLeft - yearsLeft*60*60*24*365 - daysLeft * 60 * 60 * 24) / 60 / 60);
+  let minutesLeft = Math.floor(
+    (timeLeft - yearsLeft*60*60*24*365 - daysLeft * 60 * 60 * 24 - hoursLeft * 60 * 60) / 60
   );
-
-  return `${zeroPad(daysLeft, 2)}:${zeroPad(hoursLeft, 2)}:${zeroPad(
-    minutesLeft,
-    2
-  )}`;
+  if (yearsLeft>0)
+  return `${zeroPad(yearsLeft,2)}:${zeroPad(daysLeft, 2)}:${zeroPad(hoursLeft, 2)}:${zeroPad(minutesLeft,2)}`;
+  return `${zeroPad(daysLeft, 2)}:${zeroPad(hoursLeft, 2)}:${zeroPad(minutesLeft,2)}`;
 };
 
 mem.calcRepeat = (date) => {
@@ -601,16 +608,6 @@ mem.getDir = (string) => {
     string.split(":")[0].split(".")[1]
   );
 };
-/*
-mem.check2 = (res, callback) => {
-  console.log("DIR RES");
-  console.log(res);
-  let DIRID = mem.getDir(res.ID);
-  console.log("DIRID" + DIRID);
-  sql(`SELECT DATA FROM DIRS WHERE ID = '${DIRID}'`, callback);
-  method = "ask2";
-};
-*/
 
 mem.drop = () => {
   sql("DROP TABLE OBJECTS");
@@ -1124,7 +1121,7 @@ mem.terminalCommand = (choice) => {
       );
       break;
     case "/clear": //clear SPEC
-      sql("UPDATE OBJECTS SET SPEC = '[[],[]]' WHERE ID LIKE '%'", console.log);
+      // sql("UPDATE OBJECTS SET SPEC = '[[],[]]' WHERE ID LIKE '%'", console.log);
       break;
     case "/new": //make all objects new (DANGER!)
       let currentDate = Date.now();
@@ -1816,7 +1813,7 @@ browser.render = (showFile, id, data) => {
           if (path[path.length - 1] == "/")
           document.querySelector(
             ".objects"
-          ).innerHTML += `<div class="memobject md-ripples" onclick="exportData()"><div class="memdata">📨 Export data</div></div>`;
+          ).innerHTML += `<div class="memobject md-ripples" onclick="mem.export()"><div class="memdata">📨 Export data</div></div>`;
 
           if (path[path.length - 1] == "/")
           document.querySelector(
@@ -1829,6 +1826,7 @@ browser.render = (showFile, id, data) => {
             ".objects"
           ).innerHTML += `<input id="import" type="file" style='display: none' accept='text/plain' onchange='openFile(event)'/>`;
       }
+      if (path[path.length - 1] !== "/")
       document.querySelector(
         ".objects"
       ).innerHTML += `<div class="memobject md-ripples"><div class="memdata" id="total-objects"></div></div>`;
@@ -1885,6 +1883,7 @@ browser.render = (showFile, id, data) => {
           `;
           }
 
+          
           document.querySelector(
             "#total-objects"
           ).innerHTML = `📚 TOTAL:  ${res[0].TOTAL}`;

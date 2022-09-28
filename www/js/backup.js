@@ -14,7 +14,7 @@ function download(filename, text) {
 function exportData() {
   a = mem.exportedData;
   download("memos.backup.txt",a)
-  console.log(a)
+  console.log("EXPORT: ", a)
   var way;
   try {
     var dl = new Download2();

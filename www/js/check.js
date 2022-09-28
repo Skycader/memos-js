@@ -506,7 +506,7 @@ cards.set = (pos) => {
       renderedCard = cardWin;
       check.win = 1;
     }
-    console.log("!" + renderedCard);
+    // console.log("!" + renderedCard);
     document.querySelector(".pos" + pos).innerHTML = renderedCard;
     if (pos == 4) {
       cards.call();
