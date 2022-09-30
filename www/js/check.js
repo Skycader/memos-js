@@ -344,7 +344,7 @@ function toggleFullscreen() {
 cards.color = null;
 cards.animation = 0;
 check.next = (success) => {
-  mem.when();
+ 
   cards.animation = 1;
   //Just moves the cards
   if (success == undefined) {
@@ -486,6 +486,7 @@ cards.rem0 = () => {
 //document.querySelector(".table").offsetHeight > 100 то пизда (нужно раздеить на 2 карточки)
 check.justStarted = 0;
 cards.set = (pos) => {
+  
   try {
     if (!pos) {
       pos = 4;
@@ -511,7 +512,7 @@ cards.set = (pos) => {
         mem.res.reqFieldName
       );
     } else {
-      renderedCard = cardWin.replace("$time",mem.nextRepeatIn);
+      renderedCard = cardWin
       if (mem.nextRepeatIn == 0) {
         renderedCard = cardNull
       }
@@ -564,9 +565,7 @@ cardWin = `
   <div class="cardTimer"></div>
 	<div class='datapanel'>
 		<div class='innerdata'>
-		<div>Pay us a visit in</div>
-    <br>
-    <div>$time</div> 
+		<div>Pay us a visit later</div>
 		</div>
 	</div>
 `;

@@ -72,6 +72,7 @@ sql = (query, callback, error, arg1, arg2, arg3) => {
 };
 const prom = new Promise((res, rej) => {});
 sql2 = (query) =>
+console.log("QUERY: ",query)
   new Promise((resolve, reject) => {
     db.transaction(function (tx) {
       tx.executeSql(
@@ -275,8 +276,10 @@ mem.answer = (answerIsCorrect) => {
     } else {
       mem.update("RDATE", Date.now(), "ID", mem.res.obj.ID);
       mem.update("LREPEAT", Date.now(), "ID", mem.res.obj.ID);
+      if (!(mem.showAnswer%2))
       notifier.show(`⌛ - ${mem.convertHMS((Date.now() - mem.res.obj.LREPEAT * 1)/1000)}`,true)
       console.log("ZEROING FILE");
+      mem.res.obj.LREPEAT = Date.now()
       mem.code = 0;
       
     }
@@ -444,8 +447,15 @@ mem.when = (id) => {
   }
 };
 
+mem.nextRepeatInValue = 0
+mem.nextRepeatIn = async function() {
+  let res = await sql2(`SELECT ID, DATA, MIN(RDATE) AS RDATE, LREPEAT, SPEC FROM OBJECTS WHERE 1*RDATE>${Date.now()} LIMIT 1`);
+  mem.nextRepeatInValue = mem.calcRepeat(res[0].RDATE*1)
+}
+
+
 const zeroPad = (num, places) => String(num).padStart(places, "0");
-mem.nextRepeatIn = 0
+
 mem.when2 = (res) => {
   if (res[0].RDATE == null) {
    return 0
@@ -470,8 +480,8 @@ mem.when2 = (res) => {
       2
     )}`;
     // console.log(result);
-    mem.nextRepeatIn = result
     document.querySelector("#info1").innerHTML = result;
+    return result
   }
 };
 
@@ -748,12 +758,9 @@ mem.need = (LIMIT) => {
   );
 };
 
-mem.update = (FIELD, DATA, CON1, CON2, callback) => {
+mem.update = (FIELD, DATA, CON1, CON2) => {
   method = "update";
-  sql(
-    `UPDATE OBJECTS SET ${FIELD} = '${DATA}' WHERE ${CON1} = '${CON2}'`,
-    callback
-  );
+  sql2(`UPDATE OBJECTS SET ${FIELD} = '${DATA}' WHERE ${CON1} = '${CON2}'`);
 };
 
 //Memos item is a lexical unit
@@ -1949,7 +1956,6 @@ browser.render = (showFile, id, data) => {
 mem.collect(); //collect items to repeat
 setInterval(mem.collect, 5000);
 mem.when();
-
 mem.todayAnswered();
 mem.countDaily();
 mem.count();
