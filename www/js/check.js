@@ -344,6 +344,7 @@ function toggleFullscreen() {
 cards.color = null;
 cards.animation = 0;
 check.next = (success) => {
+  mem.when();
   cards.animation = 1;
   //Just moves the cards
   if (success == undefined) {
