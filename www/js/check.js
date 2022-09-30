@@ -156,7 +156,7 @@ check.clear = () => {
   document.querySelector("#memosInput").style.height =
     $("#memosInput").get(0).scrollHeight + "px";
   document.querySelector(".memokeyboard").scrollBy(0, 1000000);
-  mem.maxRightSymbols = 0
+  mem.maxRightSymbols = 0;
 };
 
 check.answer = "";
@@ -166,27 +166,29 @@ document.getElementById("memosInput").addEventListener(
   function () {
     console.log("input event fired");
     check.answer = document.querySelector("#memosInput").innerHTML;
+    // check.answer = document.querySelector("#memosInput").value;
     if (!cards.animation) {
       if (!mem.nothing) mem.check(check.answer);
     } else {
-    //  check.clear();
+      //  check.clear();
       // setTimeout(()=>mem.check(check.answer),500)
       if (!mem.nothing) mem.check(check.answer);
     }
   },
   false
 );
-check.skipped=0
+check.skipped = 0;
 check.focus = () => {
-  check.skipped+=1
-  if (check.skipped>1) {
+  check.skipped += 1;
+  if (check.skipped > 1) {
     mem.answered++;
-    check.next(0.5);
-    check.skipped=0
+    // check.next(0.5);
+    check.skipped = 0;
   }
   document.getElementById("memosInput").focus();
 };
 check.exit = () => {
+  document.querySelector("#memosInput")?.classList.remove("redColor");
   check.clear();
   document.querySelector("#thatcircle").classList.remove("omniscale2");
 
@@ -198,9 +200,9 @@ check.exit = () => {
 
   document.getElementById("memosInput").innerHTML = "";
   document.getElementById("memosInput").blur();
-   
-  mem.circleData(1)
-  mem.circleData(1)
+
+  mem.circleData(1);
+  mem.circleData(1);
   cards.close();
 
   inititated = false;
@@ -210,11 +212,10 @@ check.exit = () => {
   setTimeout(check.toggle, 0);
 };
 
-
 cards = {};
-cards.timerInterval = 0
+cards.timerInterval = 0;
 cards.init = () => {
-  cards.animation=1
+  cards.animation = 1;
   mem.collect();
   mem.answered = 0;
   mem.nothing = 0;
@@ -228,10 +229,9 @@ cards.init = () => {
 
   mem.ask(4);
   if (!mem.nothing) {
-  setTimeout(cards.initTimer, 1000);
-  cards.timerInterval = setInterval(cards.checkTimer,100)
+    setTimeout(cards.initTimer, 1000);
+    cards.timerInterval = setInterval(cards.checkTimer, 100);
   }
-
 
   // cards.set(4);
 };
@@ -242,7 +242,7 @@ cards.p1 = () => {
     document.querySelector(".work").classList.remove("pos4");
     document.querySelector(".work").classList.add("pos3");
     document.querySelector(".pos3").classList.remove("work");
-    cards.animation=0
+    cards.animation = 0;
   } catch (e) {}
 };
 cards.p2 = () => {
@@ -342,17 +342,23 @@ function toggleFullscreen() {
 }
 
 cards.color = null;
-cards.animation = 0
+cards.animation = 0;
 check.next = (success) => {
-  cards.animation=1
+  cards.animation = 1;
   //Just moves the cards
   if (success == undefined) {
     success = 1;
   }
   switch (success) {
-    case 1: cards.color = "win"; break;
-    case 0.5: cards.color = "skip"; break;
-    case 0: cards.color = "loose"; break;
+    case 1:
+      cards.color = "win";
+      break;
+    case 0.5:
+      cards.color = "skip";
+      break;
+    case 0:
+      cards.color = "loose";
+      break;
   }
   // if (success == 1) {
   //   cards.color = "win"; //mode
@@ -411,11 +417,9 @@ check.p4 = () => {
 };
 
 check.p5 = () => {
-  
   document
     .querySelector("#papers")
     .insertAdjacentHTML("afterbegin", " <div class='pos4 card'></div>");
-    
 };
 
 cards.timeout = 0;
@@ -423,32 +427,31 @@ cards.initTimer = () => {
   if (!mem.nothing) {
     document.querySelector(".cardTimer").classList.add("timerStarted");
   }
-  console.log(document.querySelector(".cardTimer"))
+  console.log(document.querySelector(".cardTimer"));
 };
 
 // theTime = 0
 
 cards.checkTimer = () => {
   // theTime = new Date()
-  let width = $(".cardTimer").width()
-  if (width != undefined) 
-  {
-  if (width == 0) {
-    cards.allowNull=0
-    mem.answer(0)
-    clearInterval(cards.timerInterval)
+  let width = $(".cardTimer").width();
+  if (width != undefined) {
+    if (width == 0) {
+      cards.allowNull = 0;
+      mem.answer(0);
+      clearInterval(cards.timerInterval);
+    }
+    if (mem.nothing || !check.toggled) {
+      clearInterval(cards.timerInterval);
+    }
   }
-  if ((mem.nothing)||(!check.toggled)) {
-    clearInterval(cards.timerInterval)
-  }
-  }
-}
+};
 
 check.subNext = () => {
   console.log("SUBNEXT INFO");
   console.log(mem.res);
   // cards.set(2);
-  mem.ask(2)
+  mem.ask(2);
   //cards.unfreeze();
   setTimeout(check.setColor, 0);
   setTimeout(check.p1, 500);
@@ -459,12 +462,12 @@ check.subNext = () => {
   setTimeout(check.p5, 950);
   //setTimeout(cards.fixSize, 1000);
   setTimeout(cards.rem0, 2000);
-  setTimeout(cards.initTimer,2100)
-  
-  setTimeout(()=> {
-    cards.timerInterval = setInterval(cards.checkTimer,100)
-    cards.animation=0
-  },2100)
+  setTimeout(cards.initTimer, 2100);
+
+  setTimeout(() => {
+    cards.timerInterval = setInterval(cards.checkTimer, 100);
+    cards.animation = 0;
+  }, 2100);
   // setTimeout(check.checkNext,3000)
 };
 
@@ -490,20 +493,27 @@ cards.set = (pos) => {
     console.log(mem);
     if (!mem.nothing) {
       renderedCard = cardSample.replace("$icon", JSON.parse(mem.res.dir)[0][0]);
+
+      
       renderedCard = renderedCard.replace(
         "$dirName",
         JSON.parse(mem.res.dir)[0][1]
       );
+
       renderedCard = renderedCard.replace(
         "$question",
         mem.res.question[0].join("<br>")
       );
+
       renderedCard = renderedCard.replace(
         "$reqFieldName",
         mem.res.reqFieldName
       );
     } else {
-      renderedCard = cardWin;
+      renderedCard = cardWin.replace("$time",mem.nextRepeatIn);
+      if (mem.nextRepeatIn == 0) {
+        renderedCard = cardNull
+      }
       check.win = 1;
     }
     // console.log("!" + renderedCard);
@@ -514,7 +524,6 @@ cards.set = (pos) => {
   } catch (e) {
     console.error(e);
   }
-  
 };
 
 cardSample = `
@@ -554,7 +563,33 @@ cardWin = `
   <div class="cardTimer"></div>
 	<div class='datapanel'>
 		<div class='innerdata'>
-		Pay us a visit in 3 hours
+		<div>Pay us a visit in</div>
+    <br>
+    <div>$time</div> 
+		</div>
+	</div>
+`;
+cardNull = `
+	<div class='infopanel'>
+	<div class='diricon'>
+		<div class="forpicture">🕸️</div>
+		<div class="prepare2"> 
+			<div class="prepare3">
+				<p class="tip">No cards</p>
+			</div>
+	</div>
+	</div>
+	<div class='dirname'>No cards</div>
+	</div>
+  <div class="cardTimer"></div>
+	<div class='datapanel'>
+		<div class='innerdata'>
+		<div>🕸️No cards found</div>
+    <br>
+    <div>Swipe to ✎Edit menu</div> 
+    <div>⚙️ Open controls</div>
+    <div>📁 Add a catalog</div> 
+    <div>📝 Add a card</div> 
 		</div>
 	</div>
 `;
@@ -592,7 +627,6 @@ cardid2 =
   "<div class='pos4 card'><div class='table'> <div class='table2'> <div class='cell pad'> <div> $id </div> </div></div></div></div>";
 
 cards.close = () => {
-  
   mem.maxRightSymbols = 0;
   cards.timeLeft = 20;
   mem.answered = 0;
@@ -687,6 +721,8 @@ check.toggled = 0;
 var height = 0;
 var prevHeight = 0;
 check.check = (ans) => {
+  // ans = ans.replaceAll("<span>","")
+  // ans = ans.replaceAll("</span>","")
   height = document.querySelector("#memosInput2").style.height.slice(0, -2) * 1;
   document.querySelector("#memosInput2").innerHTML =
     document.querySelector("#memosInput").innerHTML;

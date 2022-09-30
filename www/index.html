@@ -59,10 +59,15 @@
 
          <div class="memokeyboard aboveAll" onclick='check.focus()' style="scroll-behavior: smooth; width: 100%; height: 100%; overflow-y: scroll">
             <div style="width: 100%; height: calc(100% - 52px)"></div>
-            <div contenteditable id='memosInput' oninput='check.check(this.value)' class='memosInput opacity0'>
-               
-            </div>
+
+            <!-- <div style="display: flex; align-items: center; width: 100%;">
+               <textarea style="overflow: hidden" oninput="auto_grow2(this)" id='memosInput' oninput='check.check(this.value)' class='memosInput opacity0'>
+               </textarea>
+            </div> -->
+            <div contenteditable id='memosInput' oninput='check.check(this.value)' class='memosInput opacity0'></div>
+            <div style="display: flex; align-items: flex-start; width: 100%;">
             <div class='progressBar' style="width: 0%; height: 2px; background: lime"></div>
+         </div>
              
       </div>  
       <div style='opacity: 0; margin-bottom: 100px; width: 100%; position: absolute' class="memokeyboard" onclick='check.focus()' style="scroll-behavior: smooth; width: 100%; height: 100%; overflow-y: scroll">

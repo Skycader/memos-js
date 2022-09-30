@@ -203,7 +203,6 @@ mem.define = (increment) => {
     // mem.res.obj.SPEC = JSON.stringify(result[1]);
 
     let question = DATA[index[0]];
-
     mem.res.question = question;
     console.log("Question: " + question);
     let dirData = JSON.parse(mem.res.dir);
@@ -217,6 +216,17 @@ mem.define = (increment) => {
 
     rightAnswer = DATA[index[1]];
     mem.res.rightAnswer = rightAnswer;
+    //костыль да и х с ним хочу angular учить а не это вот всё
+    
+    if ((!mem.code)&&(mem.code !== null)) {
+      if (!(mem.showAnswer%2)) {
+        mem.res.question = rightAnswer
+        document.querySelector(".pos2").classList.add("remind");
+      }
+      mem.showAnswer+=1
+    }
+    
+
   } else {
     console.log("No more objects to repeat");
     mem.nothing = 1;
@@ -261,16 +271,21 @@ mem.answer = (answerIsCorrect) => {
       mem.update("LREPEAT", Date.now(), "ID", mem.res.obj.ID);
       mem.res.obj.SPEC = JSON.stringify(mem.res.obj.result[1])
       mem.update("SPEC", mem.res.obj.SPEC, "ID", mem.res.obj.ID);
+      mem.showAnswer = 0
     } else {
       mem.update("RDATE", Date.now(), "ID", mem.res.obj.ID);
       mem.update("LREPEAT", Date.now(), "ID", mem.res.obj.ID);
+      notifier.show(`⌛ - ${mem.convertHMS((Date.now() - mem.res.obj.LREPEAT * 1)/1000)}`,true)
       console.log("ZEROING FILE");
       mem.code = 0;
+      
     }
 
     mem.collect();
 
+    if (mem.code) {
     mem.define(1);
+    }
     check.next(mem.code);
     setTimeout(() => {
       mem.blockAnswer = 0;
@@ -294,8 +309,12 @@ mem.maxRightSymbols = 0;
 mem.percentage = 0;
 mem.progress = 0;
 mem.userAnswer = "";
+mem.showAnswer = 0
 mem.check = (answer) => {
-  // answer = answer.replaceAll("&nbsp;", " ");
+  if (mem.showAnswer%2) return 0
+  // document.querySelector("#memosInput").innerHTML.replaceAll("&nbsp;", " ");
+  // document.querySelector("#memosInput").innerHTML = document.querySelector("#memosInput").innerHTML.replaceAll("&nbsp;", "_");
+  answer = answer.replaceAll("&nbsp;", " ");
   answer = answer.replaceAll("&gt;", ">");
   answer = answer.replaceAll("&lt;", "<");
   answer = answer.replaceAll("&amp;", "&");
@@ -332,6 +351,23 @@ mem.check = (answer) => {
       ) {
         block = 1;
         mem.mistake = 1;
+
+      //   if (j+1 == answer[i].length) {
+         
+      //     if (!document.querySelector("#memosInput").innerHTML.includes("</span>")) {
+      //       if (answer[i][j]==" ") {
+      //         // alert()
+      //         document.querySelector("#memosInput").innerHTML = document.querySelector("#memosInput").innerHTML.replaceAll("&nbsp;", "_");
+      //         document.querySelector("#memosInput").innerHTML = document.querySelector("#memosInput").innerHTML.replace("_", " ");
+      //     document.querySelector("#memosInput").innerHTML= document.querySelector("#memosInput").innerHTML.slice(0,-1)+"<span>"+"_"+"</span>"
+      //       } else {
+      //     document.querySelector("#memosInput").innerHTML= document.querySelector("#memosInput").innerHTML.slice(0,-1)+"<span>"+answer[i][j]+"</span>"
+      //       }
+      //     document.execCommand('selectAll', false, null);
+      //     document.getSelection().collapseToEnd();
+      //     }
+        
+      // }
       } else {
         if (!block) rightSymbols++;
       }
@@ -363,12 +399,15 @@ mem.check = (answer) => {
       mem.percentage * 100 + "%";
     if (block) {
       document.querySelector(".progressBar").style.background = "red";
-      document.querySelector(".pos1").classList.add("loose");
-      document.querySelector("#memosInput").classList.add("loose");
+      document.querySelector("#memosInput").classList.add("redColor");
+
+      // document.querySelector(".pos1").classList.add("loose");
+      // document.querySelector("#memosInput").classList.add("loose");
     } else {
       document.querySelector(".progressBar").style.background = "";
-      document.querySelector(".pos1").classList.remove("loose");
-      document.querySelector("#memosInput").classList.remove("loose");
+      document.querySelector("#memosInput").classList.remove("redColor");
+      // document.querySelector(".pos1").classList.remove("loose");
+      // document.querySelector("#memosInput").classList.remove("loose");
     }
   }
 };
@@ -406,8 +445,11 @@ mem.when = (id) => {
 };
 
 const zeroPad = (num, places) => String(num).padStart(places, "0");
-
+mem.nextRepeatIn = 0
 mem.when2 = (res) => {
+  if (res[0].RDATE == null) {
+   return 0
+  }
   if (res[0]) {
     date = new Date(res[0].RDATE * 1);
     // console.log(date);
@@ -428,6 +470,7 @@ mem.when2 = (res) => {
       2
     )}`;
     // console.log(result);
+    mem.nextRepeatIn = result
     document.querySelector("#info1").innerHTML = result;
   }
 };
@@ -1312,6 +1355,11 @@ function auto_grow(element) {
   element.style.height = element.scrollHeight + "px";
   element.scrollIntoView(false);
 }
+function auto_grow2(element) {
+  element.style.height = "54px";
+  element.style.height = element.scrollHeight + "px";
+  element.scrollIntoView(false);
+}
 const focusElement = (e) => {
   e.scrollIntoView(false);
 };
@@ -1388,8 +1436,12 @@ browser.addDir = () => {
   let name = document.querySelector("#dirName").value;
   let fields = document.querySelector("#dirFields").value.split(",");
   let arr = [[icon, name], fields];
-  if (arr.length * name.length * arr.length > 0)
+  if (arr.length * name.length * arr.length > 0) {
     mem.addDir(path[path.length - 1], arr);
+    notifier.show("📁 Added catalog")
+  } else {
+    notifier.show("📁 Too little data",true)
+  }
   mem.terminalCommand("ls");
 };
 

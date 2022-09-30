@@ -55,6 +55,30 @@
   padding: 10px; /*top right bottom left */
 }
 
+/* .redColor {
+  color: red !important;
+} */
+.redColor::after {
+  content: "﹏";
+  position: absolute;
+  bottom: 0;
+  transform: translateX(-75%);
+  color: red ;
+}
+
+
+/* .redColor::before { 
+  content: attr(data-end) ;
+  color: blue ;
+} */
+
+/* .redColor::after {
+  color: red;
+  content: attr(data-end);
+  position: absolute;
+  transform: translate(-100%, 0);
+} */
+
 .medal {
   padding-top: 30px;
 }
@@ -162,6 +186,9 @@
   transition: 400ms background ease-out, 500ms margin-top;
   b: #00ff00;
   background: red !important;
+}
+.remind {
+  background: #b00000 !important
 }
 .loosewas {
   transition: 400ms background ease-out, 500ms margin-top;
@@ -387,6 +414,11 @@
   opacity: 1 !important;
 }
 
+div>span {
+  color: red;
+  font-family: Round;
+  font-size: 25px;
+}
 .memosInput {
   max-width: 400px;
   margin: 0 auto;
@@ -401,7 +433,6 @@
   background: #171717;
   outline: none;
   resize: none;
-  height: 34px;
   height: 49px;
   text-align: center;
   width: 100%;
