@@ -965,14 +965,15 @@ mem.show = (DIRID, callback, order) => {
   }
 };
 
-mem.editItem = async function (ID, DATA) {
+mem.editItem = async function (ID, DATA) { //strings
   try {
-    let SPEC = await sql2(`SELECT SPEC FROM OBJECTS WHERE ID = '${ID}'`);
-    SPEC = SPEC[0].SPEC;
+    let RES = await sql2(`SELECT SPEC FROM OBJECTS WHERE ID = '${ID}'`);
+    SPEC = RES[0].SPEC;
     SPEC = JSON.parse(SPEC);
     await sql2(`UPDATE OBJECTS SET DATA = '${DATA}' WHERE ID = '${ID}'`);
     ARRAY = JSON.parse(DATA);
     if (ARRAY.length != SPEC.links.length) {
+      SPEC.links = []
       for (let i = 0; i < ARRAY.length; i++) {
         SPEC.links.push([]);
       }
@@ -986,8 +987,8 @@ mem.editItem = async function (ID, DATA) {
 };
 
 mem.editItemQFields = async function (ID, ARRAY) {
-  let SPEC = await sql2(`SELECT SPEC FROM OBJECTS WHERE ID = '${ID}'`);
-  SPEC = SPEC[0].SPEC;
+  let RES = await sql2(`SELECT SPEC FROM OBJECTS WHERE ID = '${ID}'`);
+  SPEC = RES[0].SPEC;
   SPEC = JSON.parse(SPEC);
   SPEC.qfields = ARRAY;
   SPEC = JSON.stringify(SPEC);
