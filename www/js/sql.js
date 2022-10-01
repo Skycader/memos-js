@@ -71,9 +71,7 @@ sql = (query, callback, error, arg1, arg2, arg3) => {
   });
 };
 const prom = new Promise((res, rej) => {});
-sql2 = (query) =>
-console.log("QUERY: ",query)
-  new Promise((resolve, reject) => {
+sql2 = (query) => new Promise((resolve, reject) => {
     db.transaction(function (tx) {
       tx.executeSql(
         query,
@@ -189,7 +187,7 @@ mem.define = (increment) => {
   }
   let DATA;
   let SPEC;
-  console.log("!",mem.list[mem.answered])
+  // console.log("!",mem.list[mem.answered])
   mem.res.obj = mem.list[mem.answered];
   if (mem.res.obj) {
     // mem.res.dir = mem.dirList[mem.answered];
@@ -263,11 +261,11 @@ mem.answer = (answerIsCorrect) => {
       }
       
       let repeatIn = diff - Date.now();
-      console.log('!!!',repeatIn)
+      // console.log('!!!',repeatIn)
       notifier.show(`⌛ +${mem.convertHMS(repeatIn/1000)}`)
       repeatIn = repeatIn / 1000 / 60 / 60;
-      console.log("New RDATE: " + new Date(diff));
-      console.log(`Repeat in ${repeatIn} hours`);
+      // console.log("New RDATE: " + new Date(diff));
+      // console.log(`Repeat in ${repeatIn} hours`);
       mem.update("RDATE", diff, "ID", mem.res.obj.ID);
       mem.update("LREPEAT", Date.now(), "ID", mem.res.obj.ID);
       mem.res.obj.SPEC = JSON.stringify(mem.res.obj.result[1])
@@ -759,9 +757,13 @@ mem.need = (LIMIT) => {
 };
 
 mem.update = (FIELD, DATA, CON1, CON2) => {
-  method = "update";
-  sql2(`UPDATE OBJECTS SET ${FIELD} = '${DATA}' WHERE ${CON1} = '${CON2}'`);
+  sql(`UPDATE OBJECTS SET ${FIELD} = '${DATA}' WHERE ${CON1} = '${CON2}'`);
 };
+
+mem.nullify = (ID) => {
+  sql(`UPDATE OBJECTS SET RDATE = '${Date.now()}' WHERE ID = '${ID}'`);
+  sql(`UPDATE OBJECTS SET LREPEAT = '${Date.now()}' WHERE ID = '${ID}'`);
+}
 
 //Memos item is a lexical unit
 //Memos advice: always write down sententes or phrases and never just words alone
@@ -892,7 +894,7 @@ mem.linker = (SPEC) => {
     for (var i = 0; i < SPEC.links.length; i++) {
       SPEC.links[i] = [];
     }
-    console.log("SPEC: ", SPEC);
+    // console.log("SPEC: ", SPEC);
 
     return mem.sublinker(SPEC);
     console.log(`mem.linker(${SPEC})`);
@@ -1653,7 +1655,12 @@ browser.renderFile = (obj) => {
 
   document.querySelector(
     ".objects"
-  ).innerHTML += `<div class="memobject md-ripples" onclick="browser.removeFile('${obj[0].ID}')"><div class="memdata">Delete file</div></div>`;
+  ).innerHTML += `<div class="memobject md-ripples" onclick="browser.nullify('${obj[0].ID}')"><div class="memdata">⏲️ Nullify file</div></div>`;
+
+
+  document.querySelector(
+    ".objects"
+  ).innerHTML += `<div class="memobject md-ripples" onclick="browser.removeFile('${obj[0].ID}')"><div class="memdata">🗑️ Delete file</div></div>`;
 };
 const readFields = (data) => {
   let obj = JSON.parse(data.DATA);
@@ -1693,6 +1700,15 @@ const readFields = (data) => {
 
   return str;
 };
+
+browser.nullify = (id) => {
+  let confirm = prompt("Type `nullify` to confirm delete");
+  if (confirm == "nullify") {
+    mem.nullify(id);
+    browser.render(1,id)
+  }
+};
+
 browser.removeFile = (id) => {
   let confirm = prompt("Type `delete` to confirm delete");
   if (confirm == "delete") {
