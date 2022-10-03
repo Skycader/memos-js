@@ -1996,7 +1996,7 @@ browser.render = (showFile, id, data) => {
         }'`,
         (res) => {
           browser.thisDirTotal = res[0].TOTAL;
-          let compare = mem.offset * 10;
+          let compare = mem.offset + 10;
           if (compare == 0) compare = 10;
           if (browser.thisDirTotal > compare) {
             document.querySelector(".objects").innerHTML += `
