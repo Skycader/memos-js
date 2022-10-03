@@ -13,7 +13,7 @@ function download(filename, text) {
 
 function exportData() {
   a = mem.exportedData;
-  try {cordova} catch(e) {download("memos.backup.txt",a)}
+  try {cordova} catch(e) {download("memos.backup.txt",a); notifier.show("📨 Export complete")}
   // console.log("EXPORT: ", a)
   var way;
   try {
@@ -39,11 +39,14 @@ function exportData() {
 }
 
 function DownloaderError(err) {
-  alert("download error: " + err);
+  // alert("download error: " + err);
+  notifier.show(`📨 Export error ${err}`,true)
+  
 }
 
 function DownloaderSuccess() {
-  alert("yay!");
+  // alert("yay!");
+  notifier.show("📨 Export complete")
 }
 
 

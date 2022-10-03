@@ -35,6 +35,10 @@
     height: 100%;  
 }
 
+.noSnap {
+    scroll-snap-align: none !important;
+}
+
 .page2-node3 {
     width: 100%; 
     height: calc( 100% - 352px);  

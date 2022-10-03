@@ -1760,12 +1760,25 @@ mem.dropDatabase = async function () {
   await sql2(`CREATE TABLE IF NOT EXISTS HISTORY (ID unique, DATA)`);
 };
 
+browser.importProgress = (str) => {
+  document.querySelector(".import").innerHTML = `${str}`
+  // console.log(str)
+}
+
 async function importBackup(data) {
+  document.querySelector(".memotable").classList.toggle("noSnap")
+  document.querySelector(".memotable-upside").classList.toggle("noSnap")
+
+  browser.importProgress('🎁 Initializing import sequence...')
+  notifier.show(`🎁 Inititslizing import...`)
+  browser.importProgress('🎁 Clearing database...')
+
   await sql2("DROP TABLE OBJECTS");
   await sql2("DROP TABLE DIRS");
   await sql2("DROP TABLE MEMOROUTES");
   await sql2("DROP TABLE HISTORY");
 
+  browser.importProgress('🎁 Creating database...')
   await sql2(
     `CREATE TABLE IF NOT EXISTS OBJECTS (ID unique, PID, DATA, RDATE, LREPEAT, SPEC)`
   );
@@ -1773,30 +1786,62 @@ async function importBackup(data) {
   await sql2(`CREATE TABLE IF NOT EXISTS MEMOROUTES (ID unique, DATA)`);
   await sql2(`CREATE TABLE IF NOT EXISTS HISTORY (ID unique, DATA)`);
 
+  browser.importProgress('Parsing data...')
   let parsed = JSON.parse(data);
   mem.parsedBackup = parsed;
 
   let object = parsed[0][0];
   let i = 0;
+  browser.importProgress('🎁 Inititslizing import...')
+  
+  browser.importProgress('🎁Counting cards...')
+  i = 0
+  while (object) {
+    object = parsed[0][i]
+    i++
+  }
+
+  let cardsAmount=i
+
+  i = 0
+  object = parsed[0][0];
+   
+  let time1 = Date.now()
   while (object) {
     object.DATA = object.DATA.replaceAll(`'`, `''`);
-    sql2(
+    await sql2(
       `INSERT INTO OBJECTS (ID,PID, DATA, RDATE, LREPEAT, SPEC) VALUES ("${object.ID}","${object.PID}",'${object.DATA}',"${object.RDATE}", "${object.LREPEAT}", '${object.SPEC}')`
     );
+    browser.importProgress(`🎁 Importing cards (${(i*100/cardsAmount).toFixed(0)}%) ${i} of ${cardsAmount}`)
     i++;
     object = parsed[0][i];
   }
 
-  i = 0;
+  console.log(Date.now()-time1)
   let dir = parsed[1][0];
+  i = 0
   while (dir) {
-    sql2(
+    dir = parsed[1][i]
+    i++
+  }
+
+  let foldersAmount=i
+
+  i = 0;
+  dir = parsed[1][0];
+  while (dir) {
+    await sql2(
       `INSERT INTO DIRS (ID, PID, DATA) VALUES ("${dir.ID}", "${dir.PID}", '${dir.DATA}')`
     );
+    browser.importProgress(`🎁 Importing dirs (${(i*100/foldersAmount).toFixed(0)}%) ${i} of ${foldersAmount}`)
     i++;
     dir = parsed[1][i];
   }
 
+  browser.importProgress(`🎁 Import data`)
+  notifier.show(`🎁 Import complete`)
+  document.querySelector(".memotable").classList.toggle("noSnap")
+  document.querySelector(".memotable-upside").classList.toggle("noSnap")
   mem.terminalCommand("ls");
 
   // for (let object of parsed[0]) {
@@ -1894,7 +1939,7 @@ browser.render = (showFile, id, data) => {
           if (path[path.length - 1] == "/")
           document.querySelector(
             ".objects"
-          ).innerHTML += `<div class="memobject md-ripples" onclick="document.querySelector('#import').click()"><div class="memdata">🎁 Import data</div></div>`;
+          ).innerHTML += `<div class="memobject md-ripples" onclick="document.querySelector('#import').click()"><div class="memdata import">🎁 Import data</div></div>`;
 
 
         if (path[path.length - 1] == "/")
