@@ -939,7 +939,31 @@ function makeid(length) {
 mem.offset = 0;
 mem.show = (DIRID, callback, order) => {
   sql(
-    `SELECT * FROM DIRS WHERE PID = "${DIRID}" ORDER BY DATA LIMIT ${mem.offset},10`,
+    `SELECT *,
+    CASE 
+    WHEN substr(DATA,2,1) = ',' THEN substr(DATA,3)
+    WHEN substr(DATA,3,1) = ',' THEN substr(DATA,4)
+    WHEN substr(DATA,4,1) = ',' THEN substr(DATA,5)
+    WHEN substr(DATA,5,1) = ',' THEN substr(DATA,6)
+    WHEN substr(DATA,6,1) = ',' THEN substr(DATA,7)
+    WHEN substr(DATA,7,1) = ',' THEN substr(DATA,8)
+    WHEN substr(DATA,8,1) = ',' THEN substr(DATA,9)
+    WHEN substr(DATA,9,1) = ',' THEN substr(DATA, 10)
+    WHEN substr(DATA,10,1) = ',' THEN substr(DATA,11)
+    WHEN substr(DATA,11,1) = ',' THEN substr(DATA,12)
+    WHEN substr(DATA,12,1) = ',' THEN substr(DATA,13)
+    WHEN substr(DATA,13,1) = ',' THEN substr(DATA,14)
+    WHEN substr(DATA,14,1) = ',' THEN substr(DATA,15)
+    WHEN substr(DATA,15,1) = ',' THEN substr(DATA,16)
+    WHEN substr(DATA,16,1) = ',' THEN substr(DATA,17)
+    WHEN substr(DATA,17,1) = ',' THEN substr(DATA,18)
+    WHEN substr(DATA,18,1) = ',' THEN substr(DATA,19)
+    --- More as required
+    ELSE ''
+END AS result
+     FROM DIRS WHERE PID = "${DIRID}" ORDER BY 
+     result
+     ASC LIMIT ${mem.offset},10`,
     callback
   );
   // mem.getDirById(DIRID,callback)
