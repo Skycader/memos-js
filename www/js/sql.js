@@ -1,5 +1,6 @@
 // method = null; //methods like need, set, get ... etc.
-var db = openDatabase("MEMODB", "1.0", "OBJECTS DATABASE", null);
+var db = 0
+try {db = openDatabase("MEMODB", "1.0", "OBJECTS DATABASE", null)} catch(e) {alert("Websql is not supported!)}
 db.transaction(function (tx) {
   //rDATA - repeatition DATA; lrepeat - last repeat unix time; dur - duration;
   tx.executeSql(
