@@ -267,18 +267,26 @@ mem.answer = (answerIsCorrect) => {
     document.querySelector(".cardTimer").classList.remove("no-trunsition");
 
     if (answerIsCorrect) {
+      console.log("GOT",answerIsCorrect)
       console.log("OK");
 
       mem.code = 1; //code OK
 
       let diff = Date.now() - mem.res.obj.LREPEAT * 1;
       console.log("Different in hours: " + diff / 1000 / 60 / 60);
-
-      if (answerIsCorrect != 0.5) {
-        diff = 2 * diff + Date.now() + 10 * 1000;
-      } else {
-        diff = diff + Date.now() + 10 * 1000;
+      switch(answerIsCorrect) {
+        case 0.5:
+          diff = diff + Date.now() + 10 * 1000;
+          break //same
+        case 100:
+          diff = Date.now()+1000*60*60 //+1 hour
+          console.log("+1 hour")
+          break
+        default:
+          diff = 2 * diff + Date.now() + 10 * 1000;
+          break
       }
+      
 
       let repeatIn = diff - Date.now();
       // console.log('!!!',repeatIn)
@@ -365,6 +373,11 @@ mem.check = (answer) => {
   if (answer == "/skip") {
     mem.answered++;
     check.next(0.5);
+  }
+  if (answer == "/postpone") {
+    mem.answered++;
+    mem.answer(100)
+    check.next(-1);
   }
 
   let rightSymbols = 0;
@@ -1348,7 +1361,7 @@ mem.terminalCommand = (choice) => {
       mem.export();
       break;
     case "import":
-      importData();
+      importDainta();
       break;
     case "touch":
       // choice = choice.replace("'", '"');
