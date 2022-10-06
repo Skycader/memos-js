@@ -174,6 +174,7 @@ mem.collectCallback = (res) => {
     console.log("123");
   }
   */
+
 };
 
 mem.getDirById = (dirid, callback) => {
@@ -247,6 +248,7 @@ mem.define = (increment) => {
     console.log("No more objects to repeat");
     mem.nothing = 1;
     mem.dropList()
+    mem.collect()
   }
 };
 
@@ -474,7 +476,7 @@ mem.when = (id) => {
   method = "when";
   if (!id) {
     sql(
-      `SELECT ID, DATA, MIN(RDATE) AS RDATE, LREPEAT, SPEC FROM OBJECTS WHERE (1*RDATE != 1*LREPEAT) LIMIT 1`,
+      `SELECT ID, DATA, MIN(RDATE) AS RDATE, LREPEAT, SPEC FROM OBJECTS WHERE (1*RDATE > 1*LREPEAT) LIMIT 1`,
       mem.when2
     );
   }
@@ -517,7 +519,7 @@ mem.when2 = (res) => {
     )}`;
     // console.log(result);
     if (back) result = "+"+result
-    document.querySelector("#info1").innerHTML = result;
+    document.querySelector("#info1").innerHTML = result
 
     return result;
   }
@@ -587,9 +589,11 @@ mem.circleData = (update) => {
   if (!isNaN(percentage) && Math.abs(percentage) != Infinity) {
     document.querySelector("#info3").innerHTML = percentage;
     document.querySelector("#info4").innerHTML = mem.memoPowerResult;
-    document.querySelector("#info5").innerHTML = mem.countTotalResult2;
+    // document.querySelector("#info5").innerHTML = mem.countTotalResult2;
     // document.querySelector("#info5").innerHTML = mem.weakestItem;
-    // document.querySelector("#info5").innerHTML = mem.inQuery;
+    document.querySelector("#info5").innerHTML = mem.inQuery;
+
+    document.querySelector(".memobase-info-1").innerHTML =`Total cards: ` + mem.countTotalResult2
     if (percentage > 0) {
       document.querySelector("#mycircle").classList.remove("hidden");
     } else {
@@ -656,9 +660,9 @@ mem.countQuery = async () => {
 mem.count = async function() {
   let repeats = await sql2(`SELECT COUNT(ID) FROM OBJECTS WHERE 1*RDATE < ${Date.now()} AND (1*RDATE-1*LREPEAT)>7200000`)
   repeats = repeats[0]['COUNT(ID)']
-  let kids = await sql2(`SELECT COUNT(ID), RDATE, (1*RDATE-1*LREPEAT) AS INTERVAL FROM OBJECTS WHERE (1*RDATE-1*LREPEAT)<7200000 ORDER BY INTERVAL DESC LIMIT 1`)
+  let kids = await sql2(`SELECT ID, RDATE, (1*RDATE-1*LREPEAT) AS INTERVAL FROM OBJECTS WHERE (1*RDATE-1*LREPEAT)<7200000 ORDER BY INTERVAL DESC LIMIT 1`)
   let res = [repeats,kids]
-  if (kids[0]['COUNT(ID)']&&(kids[0].RDATE*1<Date.now())) repeats++
+  if (kids[0]&&(kids[0].RDATE*1<Date.now())) repeats++
 
   let result = zeroPad(repeats, 3);
   mem.countResult = result;
@@ -2116,12 +2120,18 @@ browser.render = (showFile, id, data) => {
 
 mem.newAvailable = () => {
   if ((mem.nothing)&&(mem.list.length)) {
-    notifier.show("New cards available")
-    // mem.nothing=0
-    // mem.answered=0
-    // mem.define()
-    // check.next()
+    console.error("NEW AVAILABLE")
+    // notifier.show("New cards available")
+    mem.nothing=0
+    mem.answered=0
+    setTimeout(mem.setAvailable,1000)
   }
+}
+
+mem.setAvailable = () => {
+  // console.error("NEW AVAILABLE!")
+    mem.define()
+    check.next()
 }
 
 mem.collect(); //collect items to repeat
@@ -2137,7 +2147,7 @@ mem.memoPower();
 // const clickHandler = (event) => event.target.focus()
 // document.addEventListener('click',clickHandler)
 setInterval(mem.when, 5000);
-setInterval(mem.newAvailable,5000)
+setInterval(mem.newAvailable,1000)
 setInterval(() => {
   mem.circleData(1);
 }, 5000);
