@@ -627,6 +627,9 @@ cardid2 =
   "<div class='pos4 card'><div class='table'> <div class='table2'> <div class='cell pad'> <div> $id </div> </div></div></div></div>";
 
 cards.close = () => {
+  mem.showAnswer=0
+  mem.nothing=0
+  mem.code=null
   mem.maxRightSymbols = 0;
   cards.timeLeft = 20;
   mem.answered = 0;

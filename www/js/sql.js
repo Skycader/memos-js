@@ -1,6 +1,10 @@
 // method = null; //methods like need, set, get ... etc.
-var db = 0
-try {db = openDatabase("MEMODB", "1.0", "OBJECTS DATABASE", null)} catch(e) {alert("Websql is not supported!")}
+var db = 0;
+try {
+  db = openDatabase("MEMODB", "1.0", "OBJECTS DATABASE", null);
+} catch (e) {
+  alert("Websql is not supported!");
+}
 db.transaction(function (tx) {
   //rDATA - repeatition DATA; lrepeat - last repeat unix time; dur - duration;
   tx.executeSql(
@@ -72,7 +76,8 @@ sql = (query, callback, error, arg1, arg2, arg3) => {
   });
 };
 const prom = new Promise((res, rej) => {});
-sql2 = (query) => new Promise((resolve, reject) => {
+sql2 = (query) =>
+  new Promise((resolve, reject) => {
     db.transaction(function (tx) {
       tx.executeSql(
         query,
@@ -107,8 +112,13 @@ mem.dropList = () => {
 };
 mem.collect = () => {
   sql(
+    `SELECT OBJECTS.ID, OBJECTS.DATA, RDATE, LREPEAT, (1*RDATE - 1*LREPEAT) AS INTERVAL, SPEC, DIRS.DATA AS DIRDATA FROM OBJECTS JOIN DIRS ON OBJECTS.PID=DIRS.ID AND (1*RDATE - 1*LREPEAT)<7200000 ORDER BY INTERVAL DESC LIMIT 1`,
+    mem.collectCallback
+  );
+
+  sql(
     // `SELECT * FROM OBJECTS  LEFT JOIN DIRS ON OBJECTS.PID=DIRS.ID AND 1*RDATE < ${Date.now()} LIMIT 10`,
-    `SELECT OBJECTS.ID, OBJECTS.DATA, RDATE, LREPEAT, SPEC, DIRS.DATA AS DIRDATA FROM OBJECTS JOIN DIRS ON OBJECTS.PID=DIRS.ID AND 1*RDATE < ${Date.now()} LIMIT 10`,
+    `SELECT OBJECTS.ID, OBJECTS.DATA, RDATE, LREPEAT, SPEC, DIRS.DATA AS DIRDATA FROM OBJECTS JOIN DIRS ON OBJECTS.PID=DIRS.ID AND 1*RDATE < ${Date.now()} AND (1*RDATE - 1*LREPEAT)>=7200000 LIMIT 9`,
     mem.collectCallback
   );
 };
@@ -131,6 +141,7 @@ mem.fixLinker = () => {
 //a: array destructurization
 
 mem.collectCallback = (res) => {
+  
   // mem.list = []
   // mem.idList = []
   // mem.dirList = []
@@ -139,9 +150,16 @@ mem.collectCallback = (res) => {
       //console.log(mem.list.indexOf(res[i]))
       //console.log("pushing")
       //console.log(res[i])
-
+      if (res[i].hasOwnProperty('INTERVAL')) {
+        if (res[i].RDATE*1<Date.now()) {
+          res[i].KID = true
+          mem.list.push(res[i]);
+          mem.idList.push(res[i].ID);
+        }
+      } else {
       mem.list.push(res[i]);
       mem.idList.push(res[i].ID);
+      }
 
       // mem.getDirInfo(res[i].PID);
     } else {
@@ -217,19 +235,18 @@ mem.define = (increment) => {
     rightAnswer = DATA[index[1]];
     mem.res.rightAnswer = rightAnswer;
     //костыль да и х с ним хочу angular учить а не это вот всё
-    
-    if ((!mem.code)&&(mem.code !== null)) {
-      if (!(mem.showAnswer%2)) {
-        mem.res.question = rightAnswer
+
+    if (!mem.code && mem.code !== null) {
+      if (!(mem.showAnswer % 2)) {
+        mem.res.question = rightAnswer;
         document.querySelector(".pos2").classList.add("remind");
       }
-      mem.showAnswer+=1
+      mem.showAnswer += 1;
     }
-    
-
   } else {
     console.log("No more objects to repeat");
     mem.nothing = 1;
+    mem.dropList()
   }
 };
 
@@ -260,33 +277,37 @@ mem.answer = (answerIsCorrect) => {
       } else {
         diff = diff + Date.now() + 10 * 1000;
       }
-      
+
       let repeatIn = diff - Date.now();
       // console.log('!!!',repeatIn)
-      notifier.show(`⌛ +${mem.convertHMS(repeatIn/1000)}`)
+      notifier.show(`⌛ +${mem.convertHMS(repeatIn / 1000)}`);
       repeatIn = repeatIn / 1000 / 60 / 60;
       // console.log("New RDATE: " + new Date(diff));
       // console.log(`Repeat in ${repeatIn} hours`);
       mem.update("RDATE", diff, "ID", mem.res.obj.ID);
       mem.update("LREPEAT", Date.now(), "ID", mem.res.obj.ID);
-      mem.res.obj.SPEC = JSON.stringify(mem.res.obj.result[1])
+      mem.res.obj.SPEC = JSON.stringify(mem.res.obj.result[1]);
       mem.update("SPEC", mem.res.obj.SPEC, "ID", mem.res.obj.ID);
-      mem.showAnswer = 0
+      mem.showAnswer = 0;
     } else {
       mem.update("RDATE", Date.now(), "ID", mem.res.obj.ID);
       mem.update("LREPEAT", Date.now(), "ID", mem.res.obj.ID);
-      if (!(mem.showAnswer%2))
-      notifier.show(`⌛ - ${mem.convertHMS((Date.now() - mem.res.obj.LREPEAT * 1)/1000)}`,true)
+      if (!(mem.showAnswer % 2))
+        notifier.show(
+          `⌛ - ${mem.convertHMS(
+            (Date.now() - mem.res.obj.LREPEAT * 1) / 1000
+          )}`,
+          true
+        );
       console.log("ZEROING FILE");
-      mem.res.obj.LREPEAT = Date.now()
+      mem.res.obj.LREPEAT = Date.now();
       mem.code = 0;
-      
     }
 
     mem.collect();
 
     if (mem.code) {
-    mem.define(1);
+      mem.define(1);
     }
     check.next(mem.code);
     setTimeout(() => {
@@ -311,9 +332,9 @@ mem.maxRightSymbols = 0;
 mem.percentage = 0;
 mem.progress = 0;
 mem.userAnswer = "";
-mem.showAnswer = 0
+mem.showAnswer = 0;
 mem.check = (answer) => {
-  if (mem.showAnswer%2) return 0
+  if (mem.showAnswer % 2) return 0;
   // document.querySelector("#memosInput").innerHTML.replaceAll("&nbsp;", " ");
   // document.querySelector("#memosInput").innerHTML = document.querySelector("#memosInput").innerHTML.replaceAll("&nbsp;", "_");
   answer = answer.replaceAll("&nbsp;", " ");
@@ -354,22 +375,22 @@ mem.check = (answer) => {
         block = 1;
         mem.mistake = 1;
 
-      //   if (j+1 == answer[i].length) {
-         
-      //     if (!document.querySelector("#memosInput").innerHTML.includes("</span>")) {
-      //       if (answer[i][j]==" ") {
-      //         // alert()
-      //         document.querySelector("#memosInput").innerHTML = document.querySelector("#memosInput").innerHTML.replaceAll("&nbsp;", "_");
-      //         document.querySelector("#memosInput").innerHTML = document.querySelector("#memosInput").innerHTML.replace("_", " ");
-      //     document.querySelector("#memosInput").innerHTML= document.querySelector("#memosInput").innerHTML.slice(0,-1)+"<span>"+"_"+"</span>"
-      //       } else {
-      //     document.querySelector("#memosInput").innerHTML= document.querySelector("#memosInput").innerHTML.slice(0,-1)+"<span>"+answer[i][j]+"</span>"
-      //       }
-      //     document.execCommand('selectAll', false, null);
-      //     document.getSelection().collapseToEnd();
-      //     }
-        
-      // }
+        //   if (j+1 == answer[i].length) {
+
+        //     if (!document.querySelector("#memosInput").innerHTML.includes("</span>")) {
+        //       if (answer[i][j]==" ") {
+        //         // alert()
+        //         document.querySelector("#memosInput").innerHTML = document.querySelector("#memosInput").innerHTML.replaceAll("&nbsp;", "_");
+        //         document.querySelector("#memosInput").innerHTML = document.querySelector("#memosInput").innerHTML.replace("_", " ");
+        //     document.querySelector("#memosInput").innerHTML= document.querySelector("#memosInput").innerHTML.slice(0,-1)+"<span>"+"_"+"</span>"
+        //       } else {
+        //     document.querySelector("#memosInput").innerHTML= document.querySelector("#memosInput").innerHTML.slice(0,-1)+"<span>"+answer[i][j]+"</span>"
+        //       }
+        //     document.execCommand('selectAll', false, null);
+        //     document.getSelection().collapseToEnd();
+        //     }
+
+        // }
       } else {
         if (!block) rightSymbols++;
       }
@@ -436,28 +457,43 @@ mem.res.reqFieldName = null;
 mem.code = null;
 mem.nothing = null;
 
+// mem.when = async function(id) {
+
+//   if (!id) {
+//     repeatIn = await sql2(`SELECT ID, DATA, MIN(RDATE) AS RDATE, LREPEAT, SPEC FROM OBJECTS WHERE (1*RDATE != 1*LREPEAT) LIMIT 1`);
+//   }
+// }
+
+mem.getWeakestItemInRepeat = async function() {
+  let interval = await sql2(`SELECT *, (RDATE-LREPEAT) AS INTERVAL FROM OBJECTS ORDER BY (RDATE-LREPEAT) ASC LIMIT 1`)
+  interval = interval[0].INTERVAL
+  mem.weakestItem = mem.convertHMS((interval)/1000)
+  return mem.convertHMS((interval)/1000)
+}
 mem.when = (id) => {
   method = "when";
   if (!id) {
     sql(
-      `SELECT ID, DATA, MIN(RDATE) AS RDATE, LREPEAT, SPEC FROM OBJECTS LIMIT 1`,
+      `SELECT ID, DATA, MIN(RDATE) AS RDATE, LREPEAT, SPEC FROM OBJECTS WHERE (1*RDATE != 1*LREPEAT) LIMIT 1`,
       mem.when2
     );
   }
 };
 
-mem.nextRepeatInValue = 0
-mem.nextRepeatIn = async function() {
-  let res = await sql2(`SELECT ID, DATA, MIN(RDATE) AS RDATE, LREPEAT, SPEC FROM OBJECTS WHERE 1*RDATE>${Date.now()} LIMIT 1`);
-  mem.nextRepeatInValue = mem.calcRepeat(res[0].RDATE*1)
-}
-
+mem.nextRepeatInValue = 0;
+mem.nextRepeatIn = async function () {
+  let res = await sql2(
+    `SELECT ID, DATA, MIN(RDATE) AS RDATE, LREPEAT, SPEC FROM OBJECTS WHERE 1*RDATE>${Date.now()} LIMIT 1`
+  );
+  mem.nextRepeatInValue = mem.calcRepeat(res[0].RDATE * 1);
+};
 
 const zeroPad = (num, places) => String(num).padStart(places, "0");
 
 mem.when2 = (res) => {
+  let back = 0
   if (res[0].RDATE == null) {
-   return 0
+    return 0;
   }
   if (res[0]) {
     date = new Date(res[0].RDATE * 1);
@@ -465,6 +501,7 @@ mem.when2 = (res) => {
     timeLeft = (res[0].RDATE * 1 - Date.now()) / 1000;
     if (timeLeft < 0) {
       timeLeft = Math.abs(timeLeft);
+      back=1
     }
     daysLeft = Math.floor(timeLeft / 60 / 60 / 24); //ok
     hoursLeft = Math.floor((timeLeft - daysLeft * 60 * 60 * 24) / 60 / 60);
@@ -479,23 +516,41 @@ mem.when2 = (res) => {
       2
     )}`;
     // console.log(result);
+    if (back) result = "+"+result
     document.querySelector("#info1").innerHTML = result;
-    return result
+
+    return result;
   }
 };
 
 mem.convertHMS = (seconds) => {
   timeLeft = seconds;
   if (timeLeft < 0) timeLeft = 0;
-  let yearsLeft = Math.floor(timeLeft / 60 / 60 / 24 / 365); 
-  let daysLeft = Math.floor((timeLeft - yearsLeft * 60 * 60 * 24 * 365)/60/60/24);
-  let hoursLeft = Math.floor((timeLeft - yearsLeft*60*60*24*365 - daysLeft * 60 * 60 * 24) / 60 / 60);
-  let minutesLeft = Math.floor(
-    (timeLeft - yearsLeft*60*60*24*365 - daysLeft * 60 * 60 * 24 - hoursLeft * 60 * 60) / 60
+  let yearsLeft = Math.floor(timeLeft / 60 / 60 / 24 / 365);
+  let daysLeft = Math.floor(
+    (timeLeft - yearsLeft * 60 * 60 * 24 * 365) / 60 / 60 / 24
   );
-  if (yearsLeft>0)
-  return `${zeroPad(yearsLeft,2)}:${zeroPad(daysLeft, 2)}:${zeroPad(hoursLeft, 2)}:${zeroPad(minutesLeft,2)}`;
-  return `${zeroPad(daysLeft, 2)}:${zeroPad(hoursLeft, 2)}:${zeroPad(minutesLeft,2)}`;
+  let hoursLeft = Math.floor(
+    (timeLeft - yearsLeft * 60 * 60 * 24 * 365 - daysLeft * 60 * 60 * 24) /
+      60 /
+      60
+  );
+  let minutesLeft = Math.floor(
+    (timeLeft -
+      yearsLeft * 60 * 60 * 24 * 365 -
+      daysLeft * 60 * 60 * 24 -
+      hoursLeft * 60 * 60) /
+      60
+  );
+  if (yearsLeft > 0)
+    return `${zeroPad(yearsLeft, 2)}:${zeroPad(daysLeft, 2)}:${zeroPad(
+      hoursLeft,
+      2
+    )}:${zeroPad(minutesLeft, 2)}`;
+  return `${zeroPad(daysLeft, 2)}:${zeroPad(hoursLeft, 2)}:${zeroPad(
+    minutesLeft,
+    2
+  )}`;
 };
 
 mem.calcRepeat = (date) => {
@@ -533,6 +588,8 @@ mem.circleData = (update) => {
     document.querySelector("#info3").innerHTML = percentage;
     document.querySelector("#info4").innerHTML = mem.memoPowerResult;
     document.querySelector("#info5").innerHTML = mem.countTotalResult2;
+    // document.querySelector("#info5").innerHTML = mem.weakestItem;
+    // document.querySelector("#info5").innerHTML = mem.inQuery;
     if (percentage > 0) {
       document.querySelector("#mycircle").classList.remove("hidden");
     } else {
@@ -542,6 +599,8 @@ mem.circleData = (update) => {
   document.querySelector("#mycircle").style["stroke-dasharray"] =
     percentage + ", 100";
   if (update) {
+    mem.getWeakestItemInRepeat()
+    mem.countQuery()
     mem.todayAnswered();
     mem.countDaily();
     mem.countTotal();
@@ -585,20 +644,27 @@ function numberWithCommas(num, sep) {
   return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, sep);
 }
 
-mem.count = () => {
-  sql(
-    `SELECT COUNT(ID) FROM OBJECTS WHERE 1*RDATE < ${Date.now()}`,
-    mem.count2
-  );
-};
+mem.inQuery = 0
+mem.countQuery = async () => {
+  let res = await sql2(`SELECT COUNT(ID), RDATE, (1*RDATE-1*LREPEAT) AS INTERVAL FROM OBJECTS WHERE (1*RDATE-1*LREPEAT)<7200000`)
+  res = res[0]['COUNT(ID)']
+  res = numberWithCommas(zeroPad(res, 9), ".");
+  mem.inQuery = res
+  return res
+}
 
-mem.count2 = (data) => {
-  let toRepeat = data[0]["COUNT(ID)"];
-  // console.log(toRepeat);
-  let result = zeroPad(toRepeat, 3);
+mem.count = async function() {
+  let repeats = await sql2(`SELECT COUNT(ID) FROM OBJECTS WHERE 1*RDATE < ${Date.now()} AND (1*RDATE-1*LREPEAT)>7200000`)
+  repeats = repeats[0]['COUNT(ID)']
+  let kids = await sql2(`SELECT COUNT(ID), RDATE, (1*RDATE-1*LREPEAT) AS INTERVAL FROM OBJECTS WHERE (1*RDATE-1*LREPEAT)<7200000 ORDER BY INTERVAL DESC LIMIT 1`)
+  let res = [repeats,kids]
+  if (kids[0]['COUNT(ID)']&&(kids[0].RDATE*1<Date.now())) repeats++
+
+  let result = zeroPad(repeats, 3);
   mem.countResult = result;
   mem.circleData();
-};
+  return res
+}
 
 function getNewDay(arg = 0) {
   let h = new Date();
@@ -688,14 +754,16 @@ mem.setItem = function (PID, DATA, SPEC) {
 
   if (ITEM_G_COUNT < 1000) {
     ITEM_G_COUNT++;
-    sql(
-      `INSERT INTO OBJECTS (ID,PID, DATA, RDATE, LREPEAT, SPEC) VALUES ("${ID}","${PID}",'${DATA}',"${RDATE}", "${LREPEAT}", '${SPEC}')`,
-      undefined,
-      mem.setItemError,
-      PID,
-      DATA,
-      SPEC
-    );
+    sql2(`INSERT INTO OBJECTS (ID,PID, DATA, RDATE, LREPEAT, SPEC) VALUES ("${ID}","${PID}",'${DATA}',"${RDATE}", "${LREPEAT}", '${SPEC}')`)
+    .then((res)=>{mem.collect()})
+    // sql(
+    //   `INSERT INTO OBJECTS (ID,PID, DATA, RDATE, LREPEAT, SPEC) VALUES ("${ID}","${PID}",'${DATA}',"${RDATE}", "${LREPEAT}", '${SPEC}')`,
+    //   undefined,
+    //   mem.setItemError,
+    //   PID,
+    //   DATA,
+    //   SPEC
+    // );
   } else {
     alert("CANNOT GENERATE UNIQUE ID");
   }
@@ -764,7 +832,7 @@ mem.update = (FIELD, DATA, CON1, CON2) => {
 mem.nullify = (ID) => {
   sql(`UPDATE OBJECTS SET RDATE = '${Date.now()}' WHERE ID = '${ID}'`);
   sql(`UPDATE OBJECTS SET LREPEAT = '${Date.now()}' WHERE ID = '${ID}'`);
-}
+};
 
 //Memos item is a lexical unit
 //Memos advice: always write down sententes or phrases and never just words alone
@@ -990,7 +1058,9 @@ END AS result
   }
 };
 
-mem.editItem = async function (ID, DATA) { //strings
+mem.editItem = async function (ID, DATA) {
+  //strings
+  mem.dropList();
   try {
     let RES = await sql2(`SELECT SPEC FROM OBJECTS WHERE ID = '${ID}'`);
     SPEC = RES[0].SPEC;
@@ -998,7 +1068,7 @@ mem.editItem = async function (ID, DATA) { //strings
     await sql2(`UPDATE OBJECTS SET DATA = '${DATA}' WHERE ID = '${ID}'`);
     ARRAY = JSON.parse(DATA);
     if (ARRAY.length != SPEC.links.length) {
-      SPEC.links = []
+      SPEC.links = [];
       for (let i = 0; i < ARRAY.length; i++) {
         SPEC.links.push([]);
       }
@@ -1428,11 +1498,10 @@ browser.editFile = async function (id) {
     if (browser.changeDetected) await mem.editItem(id, rows);
     console.log("Q", id, qfields);
     if (browser.lockFieldEngaged) await mem.editItemQFields(id, qfields);
-    if (browser.lockFieldEngaged || browser.changeDetected) notifier.show(`📝 Edit successful`);
-    browser.lockFieldEngaged=0
+    if (browser.lockFieldEngaged || browser.changeDetected)
+      notifier.show(`📝 Edit successful`);
+    browser.lockFieldEngaged = 0;
     browser.changeDetected = false;
-
-    
   } else {
     notifier.show(`⚠️ Too little data`, true);
   }
@@ -1473,9 +1542,9 @@ browser.addDir = () => {
   let arr = [[icon, name], fields];
   if (arr.length * name.length * arr.length > 0) {
     mem.addDir(path[path.length - 1], arr);
-    notifier.show("📁 Added catalog")
+    notifier.show("📁 Added catalog");
   } else {
-    notifier.show("📁 Too little data",true)
+    notifier.show("📁 Too little data", true);
   }
   mem.terminalCommand("ls");
 };
@@ -1584,9 +1653,9 @@ browser.triggerChange = () => {
   browser.changeDetected = true;
 };
 browser.lockedElement = 0;
-browser.lockFieldEngaged = 0
+browser.lockFieldEngaged = 0;
 browser.lockField = (elm) => {
-  browser.lockFieldEngaged = 1
+  browser.lockFieldEngaged = 1;
   browser.lockedElement = elm;
   if (elm.children[0].innerHTML.includes("🔒")) {
     browser.lockedElement.children[0].innerHTML =
@@ -1683,7 +1752,6 @@ browser.renderFile = (obj) => {
     ".objects"
   ).innerHTML += `<div class="memobject md-ripples" onclick="browser.nullify('${obj[0].ID}')"><div class="memdata">⏲️ Nullify file</div></div>`;
 
-
   document.querySelector(
     ".objects"
   ).innerHTML += `<div class="memobject md-ripples" onclick="browser.removeFile('${obj[0].ID}')"><div class="memdata">🗑️ Delete file</div></div>`;
@@ -1731,7 +1799,7 @@ browser.nullify = (id) => {
   let confirm = prompt("Type `nullify` to confirm delete");
   if (confirm == "nullify") {
     mem.nullify(id);
-    browser.render(1,id)
+    browser.render(1, id);
   }
 };
 
@@ -1786,24 +1854,24 @@ mem.dropDatabase = async function () {
 };
 
 browser.importProgress = (str) => {
-  document.querySelector(".import").innerHTML = `${str}`
+  document.querySelector(".import").innerHTML = `${str}`;
   // console.log(str)
-}
+};
 
 async function importBackup(data) {
-  document.querySelector(".memotable").classList.toggle("noSnap")
-  document.querySelector(".memotable-upside").classList.toggle("noSnap")
+  document.querySelector(".memotable").classList.toggle("noSnap");
+  document.querySelector(".memotable-upside").classList.toggle("noSnap");
 
-  browser.importProgress('🎁 Initializing import sequence...')
-  notifier.show(`🎁 Inititslizing import...`)
-  browser.importProgress('🎁 Clearing database...')
+  browser.importProgress("🎁 Initializing import sequence...");
+  notifier.show(`🎁 Inititslizing import...`);
+  browser.importProgress("🎁 Clearing database...");
 
   await sql2("DROP TABLE OBJECTS");
   await sql2("DROP TABLE DIRS");
   await sql2("DROP TABLE MEMOROUTES");
   await sql2("DROP TABLE HISTORY");
 
-  browser.importProgress('🎁 Creating database...')
+  browser.importProgress("🎁 Creating database...");
   await sql2(
     `CREATE TABLE IF NOT EXISTS OBJECTS (ID unique, PID, DATA, RDATE, LREPEAT, SPEC)`
   );
@@ -1811,46 +1879,50 @@ async function importBackup(data) {
   await sql2(`CREATE TABLE IF NOT EXISTS MEMOROUTES (ID unique, DATA)`);
   await sql2(`CREATE TABLE IF NOT EXISTS HISTORY (ID unique, DATA)`);
 
-  browser.importProgress('Parsing data...')
+  browser.importProgress("Parsing data...");
   let parsed = JSON.parse(data);
   mem.parsedBackup = parsed;
 
   let object = parsed[0][0];
   let i = 0;
-  browser.importProgress('🎁 Inititslizing import...')
-  
-  browser.importProgress('🎁Counting cards...')
-  i = 0
+  browser.importProgress("🎁 Inititslizing import...");
+
+  browser.importProgress("🎁Counting cards...");
+  i = 0;
   while (object) {
-    object = parsed[0][i]
-    i++
+    object = parsed[0][i];
+    i++;
   }
 
-  let cardsAmount=i
+  let cardsAmount = i;
 
-  i = 0
+  i = 0;
   object = parsed[0][0];
-   
-  let time1 = Date.now()
+
+  let time1 = Date.now();
   while (object) {
     object.DATA = object.DATA.replaceAll(`'`, `''`);
     await sql2(
       `INSERT INTO OBJECTS (ID,PID, DATA, RDATE, LREPEAT, SPEC) VALUES ("${object.ID}","${object.PID}",'${object.DATA}',"${object.RDATE}", "${object.LREPEAT}", '${object.SPEC}')`
     );
-    browser.importProgress(`🎁 Importing cards (${(i*100/cardsAmount).toFixed(0)}%) ${i} of ${cardsAmount}`)
+    browser.importProgress(
+      `🎁 Importing cards (${((i * 100) / cardsAmount).toFixed(
+        0
+      )}%) ${i} of ${cardsAmount}`
+    );
     i++;
     object = parsed[0][i];
   }
 
-  console.log(Date.now()-time1)
+  console.log(Date.now() - time1);
   let dir = parsed[1][0];
-  i = 0
+  i = 0;
   while (dir) {
-    dir = parsed[1][i]
-    i++
+    dir = parsed[1][i];
+    i++;
   }
 
-  let foldersAmount=i
+  let foldersAmount = i;
 
   i = 0;
   dir = parsed[1][0];
@@ -1858,15 +1930,19 @@ async function importBackup(data) {
     await sql2(
       `INSERT INTO DIRS (ID, PID, DATA) VALUES ("${dir.ID}", "${dir.PID}", '${dir.DATA}')`
     );
-    browser.importProgress(`🎁 Importing dirs (${(i*100/foldersAmount).toFixed(0)}%) ${i} of ${foldersAmount}`)
+    browser.importProgress(
+      `🎁 Importing dirs (${((i * 100) / foldersAmount).toFixed(
+        0
+      )}%) ${i} of ${foldersAmount}`
+    );
     i++;
     dir = parsed[1][i];
   }
 
-  browser.importProgress(`🎁 Import data`)
-  notifier.show(`🎁 Import complete`)
-  document.querySelector(".memotable").classList.toggle("noSnap")
-  document.querySelector(".memotable-upside").classList.toggle("noSnap")
+  browser.importProgress(`🎁 Import data`);
+  notifier.show(`🎁 Import complete`);
+  document.querySelector(".memotable").classList.toggle("noSnap");
+  document.querySelector(".memotable-upside").classList.toggle("noSnap");
   mem.terminalCommand("ls");
 
   // for (let object of parsed[0]) {
@@ -1956,16 +2032,15 @@ browser.render = (showFile, id, data) => {
             ".objects"
           ).innerHTML += `<div class="memobject md-ripples" onclick="browser.newFileInit()"><div class="memdata">📝 Add card</div></div>`;
 
-          if (path[path.length - 1] == "/")
+        if (path[path.length - 1] == "/")
           document.querySelector(
             ".objects"
           ).innerHTML += `<div class="memobject md-ripples" onclick="mem.export()"><div class="memdata">📨 Export data</div></div>`;
 
-          if (path[path.length - 1] == "/")
+        if (path[path.length - 1] == "/")
           document.querySelector(
             ".objects"
           ).innerHTML += `<div class="memobject md-ripples" onclick="document.querySelector('#import').click()"><div class="memdata import">🎁 Import data</div></div>`;
-
 
         if (path[path.length - 1] == "/")
           document.querySelector(
@@ -1973,9 +2048,9 @@ browser.render = (showFile, id, data) => {
           ).innerHTML += `<input id="import" type="file" style='display: none' accept='text/plain' onchange='openFile(event)'/>`;
       }
       if (path[path.length - 1] !== "/")
-      document.querySelector(
-        ".objects"
-      ).innerHTML += `<div class="memobject md-ripples"><div class="memdata" id="total-objects"></div></div>`;
+        document.querySelector(
+          ".objects"
+        ).innerHTML += `<div class="memobject md-ripples"><div class="memdata" id="total-objects"></div></div>`;
 
       document.querySelector(
         ".objects"
@@ -2029,7 +2104,6 @@ browser.render = (showFile, id, data) => {
           `;
           }
 
-          
           document.querySelector(
             "#total-objects"
           ).innerHTML = `📚 TOTAL:  ${res[0].TOTAL}`;
@@ -2040,9 +2114,21 @@ browser.render = (showFile, id, data) => {
   } catch (e) {}
 };
 
+mem.newAvailable = () => {
+  if ((mem.nothing)&&(mem.list.length)) {
+    notifier.show("New cards available")
+    // mem.nothing=0
+    // mem.answered=0
+    // mem.define()
+    // check.next()
+  }
+}
+
 mem.collect(); //collect items to repeat
 setInterval(mem.collect, 5000);
 mem.when();
+mem.getWeakestItemInRepeat()
+mem.countQuery()
 mem.todayAnswered();
 mem.countDaily();
 mem.count();
@@ -2051,6 +2137,7 @@ mem.memoPower();
 // const clickHandler = (event) => event.target.focus()
 // document.addEventListener('click',clickHandler)
 setInterval(mem.when, 5000);
+setInterval(mem.newAvailable,5000)
 setInterval(() => {
   mem.circleData(1);
 }, 5000);
