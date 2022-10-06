@@ -215,6 +215,7 @@ check.exit = () => {
 cards = {};
 cards.timerInterval = 0;
 cards.init = () => {
+  document.querySelector("#papers").classList.remove("off")
   cards.animation = 1;
   mem.collect();
   mem.answered = 0;
@@ -627,6 +628,7 @@ cardid2 =
   "<div class='pos4 card'><div class='table'> <div class='table2'> <div class='cell pad'> <div> $id </div> </div></div></div></div>";
 
 cards.close = () => {
+  document.querySelector("#papers").classList.add("off")
   mem.showAnswer=0
   mem.nothing=0
   mem.code=null
