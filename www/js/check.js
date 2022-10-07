@@ -488,7 +488,9 @@ cards.set = (pos) => {
 
       renderedCard = renderedCard.replace(
         "$dirName",
-        JSON.parse(mem.res.dir)[0][1]
+      
+        `${(mem.list[mem.answered].INTERVAL<7200000)?("🍼"):("💪")}${ JSON.parse(mem.res.dir)[0][1]}`
+
       );
 
       renderedCard = renderedCard.replace(
@@ -501,7 +503,7 @@ cards.set = (pos) => {
         mem.res.reqFieldName
       );
 
-      renderedCard = renderedCard.replace("$isChild",`${mem.list[mem.answered].INTERVAL<7200000}`)
+      // renderedCard = renderedCard.replace("$isChild",`${(mem.list[mem.answered].INTERVAL<7200000)?("🍼"):("")}`)
 
     } else {
       renderedCard = cardWin
@@ -537,7 +539,6 @@ cardSample = `
 	<div class='datapanel'>
 		<div class='innerdata'>
 		$question
-    $isChild
 		</div>
 	</div>
  

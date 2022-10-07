@@ -608,8 +608,8 @@ mem.when2 = (res) => {
     )}`;
     // console.log(result);
     // if (mem.list.length) back=1
-    if (back) result = "+" + result;
-    document.querySelector("#info1").innerHTML = result + mem.whenStatus;
+    if (mem.whenStatus == "mem.list") result = "+" + result;
+    document.querySelector("#info1").innerHTML = result;
 
     return result;
   }
