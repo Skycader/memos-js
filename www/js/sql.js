@@ -257,6 +257,10 @@ mem.ask = (pos) => {
   cards.set(pos);
 };
 
+mem.setRDATE = async (id,hours) => {
+  await mem.update("RDATE", Date.now()+hours, "ID", id);
+}
+
 mem.answered = 0;
 mem.blockAnswer = 0;
 mem.answer = (answerIsCorrect) => {
@@ -485,14 +489,24 @@ mem.getWeakestItemInRepeat = async function() {
   mem.weakestItem = mem.convertHMS((interval)/1000)
   return mem.convertHMS((interval)/1000)
 }
-mem.when = (id) => {
-  method = "when";
-  if (!id) {
-    sql(
-      `SELECT ID, DATA, MIN(RDATE) AS RDATE, LREPEAT, SPEC FROM OBJECTS WHERE (1*RDATE > 1*LREPEAT) LIMIT 1`,
-      mem.when2
+mem.when = async (id) => {
+   //kids first
+    let res = await sql2(
+      `SELECT ID, DATA, RDATE, LREPEAT, (1*RDATE-1*LREPEAT) AS INTERVAL, SPEC FROM OBJECTS WHERE (1*RDATE > ${Date.now()}) AND INTERVAL<7200000 ORDER BY INTERVAL DESC LIMIT 1`
     );
-  }
+    
+    if (res.length == 0) { //nothing got returned
+      res = await sql2(
+        `SELECT ID, DATA, MIN(RDATE) AS RDATE, LREPEAT, SPEC FROM OBJECTS WHERE (1*RDATE > ${Date.now()}) LIMIT 1`
+      );
+    }
+
+    if (mem.list.length) { //if list has cards
+      console.log("123")
+      res = mem.list
+    }
+    mem.when2(res)
+   
 };
 
 mem.nextRepeatInValue = 0;
@@ -506,6 +520,7 @@ mem.nextRepeatIn = async function () {
 const zeroPad = (num, places) => String(num).padStart(places, "0");
 
 mem.when2 = (res) => {
+  console.log(res)
   let back = 0
   if (res[0].RDATE == null) {
     return 0;
@@ -514,6 +529,7 @@ mem.when2 = (res) => {
     date = new Date(res[0].RDATE * 1);
     // console.log(date);
     timeLeft = (res[0].RDATE * 1 - Date.now()) / 1000;
+    console.log(timeLeft)
     if (timeLeft < 0) {
       timeLeft = Math.abs(timeLeft);
       back=1
@@ -531,7 +547,9 @@ mem.when2 = (res) => {
       2
     )}`;
     // console.log(result);
+    if (mem.list.length) back=1
     if (back) result = "+"+result
+    console.log(result)
     document.querySelector("#info1").innerHTML = result
 
     return result;
@@ -842,8 +860,8 @@ mem.need = (LIMIT) => {
   );
 };
 
-mem.update = (FIELD, DATA, CON1, CON2) => {
-  sql(`UPDATE OBJECTS SET ${FIELD} = '${DATA}' WHERE ${CON1} = '${CON2}'`);
+mem.update = async (FIELD, DATA, CON1, CON2) => {
+  await sql2(`UPDATE OBJECTS SET ${FIELD} = '${DATA}' WHERE ${CON1} = '${CON2}'`);
 };
 
 mem.nullify = (ID) => {
@@ -1767,6 +1785,10 @@ browser.renderFile = (obj) => {
 
   document.querySelector(
     ".objects"
+  ).innerHTML += `<div class="memobject md-ripples" onclick="browser.postpone('${obj[0].ID}')"><div class="memdata">🕦 Postpone</div></div>`;
+
+  document.querySelector(
+    ".objects"
   ).innerHTML += `<div class="memobject md-ripples" onclick="browser.nullify('${obj[0].ID}')"><div class="memdata">⏲️ Nullify file</div></div>`;
 
   document.querySelector(
@@ -1811,6 +1833,13 @@ const readFields = (data) => {
 
   return str;
 };
+
+browser.postpone = async (id) => {
+  let hours = 1*prompt("Enter hours")
+  await mem.setRDATE(id,hours*1000*60*60)
+  mem.collect()
+  browser.render(1, id);
+}
 
 browser.nullify = (id) => {
   let confirm = prompt("Type `nullify` to confirm delete");

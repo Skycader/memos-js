@@ -628,7 +628,7 @@ cardid2 =
   "<div class='pos4 card'><div class='table'> <div class='table2'> <div class='cell pad'> <div> $id </div> </div></div></div></div>";
 
 cards.close = () => {
-  document.querySelector("#papers").classList.add("off")
+  
   mem.showAnswer=0
   mem.nothing=0
   mem.code=null
@@ -665,6 +665,7 @@ cards.close = () => {
   }
 
   function rem() {
+    document.querySelector("#papers").classList.add("off")
     for (var i = 0; i < 8; i++) {
       try {
         document.querySelector(".card").remove();
