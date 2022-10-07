@@ -164,7 +164,7 @@ check.mistakes = 0;
 document.getElementById("memosInput").addEventListener(
   "input",
   function () {
-    console.log("input event fired");
+    // console.log("input event fired");
     check.answer = document.querySelector("#memosInput").innerHTML;
     // check.answer = document.querySelector("#memosInput").value;
     if (!cards.animation) {
@@ -345,7 +345,6 @@ function toggleFullscreen() {
 cards.color = null;
 cards.animation = 0;
 check.next = (success) => {
- 
   cards.animation = 1;
   //Just moves the cards
   if (success == undefined) {
@@ -362,17 +361,6 @@ check.next = (success) => {
       cards.color = "loose";
       break;
   }
-  // if (success == 1) {
-  //   cards.color = "win"; //mode
-  // } else {
-  //   cards.color = "loose";
-  // }
-
-  // if ((success>0)&&(!mem.nothing)) {
-  // 	check.subNext();
-  // } else {
-  // 	check.subNext();
-  // }
 
   check.subNext();
 };
@@ -429,7 +417,7 @@ cards.initTimer = () => {
   if (!mem.nothing) {
     document.querySelector(".cardTimer").classList.add("timerStarted");
   }
-  console.log(document.querySelector(".cardTimer"));
+  // console.log(document.querySelector(".cardTimer"));
 };
 
 // theTime = 0
@@ -495,9 +483,9 @@ cards.set = (pos) => {
     let renderedCard = null;
     console.log(mem);
     if (!mem.nothing) {
+     
       renderedCard = cardSample.replace("$icon", JSON.parse(mem.res.dir)[0][0]);
 
-      
       renderedCard = renderedCard.replace(
         "$dirName",
         JSON.parse(mem.res.dir)[0][1]
@@ -512,6 +500,9 @@ cards.set = (pos) => {
         "$reqFieldName",
         mem.res.reqFieldName
       );
+
+      renderedCard = renderedCard.replace("$isChild",`${mem.list[mem.answered].INTERVAL<7200000}`)
+
     } else {
       renderedCard = cardWin
       if (mem.nextRepeatIn == 0) {
@@ -546,6 +537,7 @@ cardSample = `
 	<div class='datapanel'>
 		<div class='innerdata'>
 		$question
+    $isChild
 		</div>
 	</div>
  
