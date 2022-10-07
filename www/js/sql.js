@@ -110,15 +110,19 @@ mem.dropList = () => {
   mem.dirList = [];
   mem.idList = [];
 };
+
+mem.find = async (data) => {
+  return await sql2(`select * from objects where data like "%${data}%"`)
+}
 mem.collect = () => {
   sql(
-    `SELECT OBJECTS.ID, OBJECTS.DATA, RDATE, LREPEAT, (1*RDATE - 1*LREPEAT) AS INTERVAL, SPEC, DIRS.DATA AS DIRDATA FROM OBJECTS JOIN DIRS ON OBJECTS.PID=DIRS.ID AND (1*RDATE - 1*LREPEAT)<7200000 ORDER BY INTERVAL DESC LIMIT 10`,
+    `SELECT OBJECTS.ID, OBJECTS.DATA, RDATE, LREPEAT, (1*RDATE - 1*LREPEAT) AS INTERVAL, SPEC, DIRS.DATA AS DIRDATA FROM OBJECTS JOIN DIRS ON OBJECTS.PID=DIRS.ID AND (1*RDATE - 1*LREPEAT)<7200000 ORDER BY INTERVAL DESC LIMIT 100`,
     mem.collectCallback
   );
 
   sql(
     // `SELECT * FROM OBJECTS  LEFT JOIN DIRS ON OBJECTS.PID=DIRS.ID AND 1*RDATE < ${Date.now()} LIMIT 10`,
-    `SELECT OBJECTS.ID, OBJECTS.DATA, RDATE, LREPEAT,  (1*RDATE - 1*LREPEAT) AS INTERVAL, SPEC, DIRS.DATA AS DIRDATA FROM OBJECTS JOIN DIRS ON OBJECTS.PID=DIRS.ID AND 1*RDATE < ${Date.now()} AND (1*RDATE - 1*LREPEAT)>=7200000 LIMIT 10`,
+    `SELECT OBJECTS.ID, OBJECTS.DATA, RDATE, LREPEAT,  (1*RDATE - 1*LREPEAT) AS INTERVAL, SPEC, DIRS.DATA AS DIRDATA FROM OBJECTS JOIN DIRS ON OBJECTS.PID=DIRS.ID AND 1*RDATE < ${Date.now()} AND (1*RDATE - 1*LREPEAT)>=7200000 LIMIT 100`,
     mem.collectCallback
   );
 };
@@ -338,7 +342,8 @@ mem.answer = (answerIsCorrect) => {
           break; //same
         case 100:
           diff = Date.now() + 1000 * 60 * 60; //+1 hour
-          diff = Date.now() + 1000 * 20;
+          diff = Date.now() + 1000 * 20; //20 seconds
+          diff = Date.now() + 1000 * 60 * 10; //10 minutes
           console.log("+1 hour");
           break;
         default:
@@ -354,9 +359,11 @@ mem.answer = (answerIsCorrect) => {
       // console.log(`Repeat in ${repeatIn} hours`);
       mem.update("RDATE", diff, "ID", mem.res.obj.ID);
       mem.list[mem.answered].INTERVAL = diff - Date.now();
+      if (answerIsCorrect != 100) { //check for postpone 
       mem.update("LREPEAT", Date.now(), "ID", mem.res.obj.ID);
       mem.res.obj.SPEC = JSON.stringify(mem.res.obj.result[1]);
       mem.update("SPEC", mem.res.obj.SPEC, "ID", mem.res.obj.ID);
+      }
       mem.showAnswer = 0;
     } else {
       mem.update("RDATE", Date.now(), "ID", mem.res.obj.ID);
