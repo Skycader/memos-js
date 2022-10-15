@@ -1144,9 +1144,8 @@ mem.show = (DIRID, callback, order) => {
     ELSE ''
 END AS result
      FROM DIRS WHERE PID = "${DIRID}" ORDER BY 
-     result
-     ASC LIMIT ${mem.offset},10`,
-    callback
+     result`,
+    callback //     ASC LIMIT ${mem.offset},1000000`,
   );
   // mem.getDirById(DIRID,callback)
   switch (order) {
