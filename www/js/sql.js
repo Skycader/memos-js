@@ -1871,6 +1871,12 @@ browser.renderFile = (obj) => {
   document.querySelector(
     ".objects"
   ).innerHTML += `<div class="memobject md-ripples" onclick="browser.removeFile('${obj[0].ID}')"><div class="memdata">🗑️ Delete file</div></div>`;
+
+  document.querySelector(".page2-node4").scrollTo({
+    top: 0, //window.innerHeight-460
+    behavoir: "smooth"
+  })
+  
 };
 const readFields = (data) => {
   let obj = JSON.parse(data.DATA);
@@ -2113,6 +2119,7 @@ browser.goUp = () => {
 browser.showControlPanel = false;
 browser.thisDirTotal = 0;
 browser.render = (showFile, id, data) => {
+  
   try {
     if (showFile) {
       mem.get(id, browser.renderFile);
@@ -2235,6 +2242,11 @@ browser.render = (showFile, id, data) => {
       document.querySelector(".page2-node4").scrollBy(0, 50);
     }
   } catch (e) {}
+  
+  document.querySelector(".page2-node4").scrollTo({
+    top: 0, //window.innerHeight-460
+    behavoir: "smooth"
+  })
 };
 
 mem.newAvailable = () => {

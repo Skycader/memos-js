@@ -33,6 +33,8 @@ function openMemos(){
     document.querySelector("html").classList.add('memoscolor');
     document.querySelector(".menu").classList.remove('donotdisplay');
     document.querySelector(".curtain").scrollBy(0,$("#red").height()+100) 
+
+    
     
 }
 function curtain(){

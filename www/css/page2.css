@@ -41,7 +41,7 @@
 
 .page2-node3 {
     width: 100%; 
-    height: calc( 100% - 352px);  
+    height: calc( 100vh - 352px);  
     min-height:  150px; 
     border-radius: 10px; 
     /* background: grey;   */
@@ -74,6 +74,10 @@
     margin-top: 40px;
 }
 
+.align {
+    scroll-snap-align: start;
+    transition-duration: 0.2s;
+}
 
 .page2-node4 { 
     position: absolute;
