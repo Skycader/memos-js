@@ -1,3 +1,7 @@
 .noScroll {
     overflow: hidden !important;
 }
+
+#memosInput #memosInput2 #memosInput3 {
+	font-family: memoff
+}

@@ -122,7 +122,7 @@ mem.collect = () => {
 
   sql(
     // `SELECT * FROM OBJECTS  LEFT JOIN DIRS ON OBJECTS.PID=DIRS.ID AND 1*RDATE < ${Date.now()} LIMIT 10`,
-    `SELECT OBJECTS.ID, OBJECTS.DATA, RDATE, LREPEAT,  (1*RDATE - 1*LREPEAT) AS INTERVAL, SPEC, DIRS.DATA AS DIRDATA FROM OBJECTS JOIN DIRS ON OBJECTS.PID=DIRS.ID AND 1*RDATE < ${Date.now()} AND (1*RDATE - 1*LREPEAT)>=7200000 LIMIT 100`,
+    `SELECT OBJECTS.ID, OBJECTS.DATA, RDATE, LREPEAT,  (1*RDATE - 1*LREPEAT) AS INTERVAL, SPEC, DIRS.DATA AS DIRDATA FROM OBJECTS JOIN DIRS ON OBJECTS.PID=DIRS.ID AND 1*RDATE < ${Date.now()} AND (1*RDATE - 1*LREPEAT)>=7200000 ORDER BY INTERVAL LIMIT 100`,
     mem.collectCallback
   );
 };
@@ -287,7 +287,7 @@ mem.define = (increment, comment) => {
           console.log(mem.answered);
           mem.define(
             1,
-            `Query has child that didn't become adult ${JSON.stringify(
+            `Query has a child that didn't become adult ${JSON.stringify(
               mem.list[mem.answered]
             )}`
           );
@@ -685,13 +685,19 @@ mem.circleData = (update) => {
   );
   if (!isNaN(percentage) && Math.abs(percentage) != Infinity) {
     document.querySelector("#info3").innerHTML = percentage;
-    document.querySelector("#info4").innerHTML = mem.memoPowerResult;
+    document.querySelector("#info4").innerHTML = `${mem.deadItems} · ${zeroPad(Math.round(mem.deadItems*100/mem.countResult),3)} · ${mem.deadHours}`;
+
+    // document.querySelector("#info4").innerHTML = mem.memoPowerResult;
     // document.querySelector("#info5").innerHTML = mem.countTotalResult2;
     // document.querySelector("#info5").innerHTML = mem.weakestItem;
     document.querySelector("#info5").innerHTML = mem.inQuery;
 
     document.querySelector(".memobase-info-1").innerHTML =
-      `Total cards: ` + mem.countTotalResult2;
+      `Total cards ` + mem.countTotalResult2;
+
+    document.querySelector(".memobase-info-2").innerHTML =
+      `Memopower ` + mem.memoPowerResult;
+
     if (percentage > 0) {
       document.querySelector("#mycircle").classList.remove("hidden");
     } else {
@@ -705,6 +711,8 @@ mem.circleData = (update) => {
     mem.countQuery();
     mem.todayAnswered();
     mem.countDaily();
+    mem.countDeadItems()
+    mem.countDeadHours()
     mem.countTotal();
     mem.count();
     mem.memoPower();
@@ -824,6 +832,26 @@ mem.countDaily2 = (data) => {
   mem.countDailyResult = result;
   mem.circleData();
 };
+
+mem.deadItems = 0
+mem.countDeadItems = async () => {
+  let bodies = await sql2(`SELECT
+   COUNT(ID) AS DEAD,
+   (1*RDATE-1*LREPEAT) AS INTERVAL,
+   (1*${Date.now()}-1*RDATE) AS WT
+   FROM OBJECTS WHERE (INTERVAL<WT) AND (1*RDATE < ${Date.now()})`)
+   mem.deadItems = zeroPad(bodies[0]['DEAD'], 3);
+}
+
+mem.deadHours = 0
+mem.countDeadHours = async () => {
+  let dhours = await sql2(`SELECT
+   (1*${Date.now()}-1*RDATE) AS WT,
+   SUM(1*RDATE-1*LREPEAT) AS DHOURS,
+   (1*RDATE-1*LREPEAT) AS INTERVAL
+   FROM OBJECTS WHERE (INTERVAL<WT) AND (1*RDATE < ${Date.now()})`)
+   mem.deadHours = zeroPad((dhours[0]['DHOURS']*1/1000/60/60/24/30).toFixed(0),3)
+}
 
 mem.getDir = (string) => {
   // return string.split(".").slice(0,2).join(".");
@@ -1119,7 +1147,8 @@ function makeid(length) {
 }
 
 mem.offset = 0;
-mem.show = (DIRID, callback, order) => {
+mem.show = (DIRID, callback, order,SEARCH_DATA) => {
+  if (order != "find") {
   sql(
     `SELECT *,
     CASE 
@@ -1147,8 +1176,20 @@ END AS result
      result`,
     callback //     ASC LIMIT ${mem.offset},1000000`,
   );
+  } else {
+    sql(`SELECT * FROM DIRS LIMIT 0`, callback)
+  }
   // mem.getDirById(DIRID,callback)
   switch (order) {
+    case "find":
+      sql(`
+        SELECT * FROM OBJECTS WHERE DATA LIKE '% ${SEARCH_DATA} %' 
+        OR DATA LIKE '% ${SEARCH_DATA}%' 
+        OR DATA LIKE '% ${SEARCH_DATA} %' 
+        OR DATA LIKE '%${SEARCH_DATA}%' 
+        LIMIT ${mem.offset},10
+      `,callback)
+      break;
     case "interval":
       sql(
         `SELECT * FROM OBJECTS WHERE PID = "${DIRID}" GROUP BY ID ORDER BY SUM(RDATE-LREPEAT) LIMIT ${mem.offset},10`,
@@ -1229,7 +1270,11 @@ let choice = 0;
 let counter = 0;
 let path = ["/"];
 let pathNames = [];
-mem.browser = (goTo, order) => {
+mem.searchData = ""
+mem.browser = (goTo, order,SEARCH_DATA) => {
+  console.log("SEARCH_DATA", SEARCH_DATA)
+  if (SEARCH_DATA)
+  mem.searchData = SEARCH_DATA
   mem.when();
   counter = 0;
   cached = 0;
@@ -1239,7 +1284,7 @@ mem.browser = (goTo, order) => {
     goTo = "/";
   }
 
-  mem.show(goTo, mem.setCache, order);
+  mem.show(goTo, mem.setCache, order,SEARCH_DATA);
   mem.collect();
 };
 let cached = 0;
@@ -1311,25 +1356,6 @@ mem.setCache = (data) => {
       mem.terminalHelpMessage = "";
     }
 
-    //help
-    /*
-      cd -  go to dir (cd .. to go back);  
-        mkdir - create dir;  
-        touch - create file;  
-        edit - edit (number);  
-        cut/paste - cut/paste number  
-        rm (dir/file) - delete; 
-        exit - exit 
-        */
-    // quit=false
-    // choice = prompt(
-    //   "Current path: " + pathNames.join("/") + "\n" + browserString
-    // );
-
-    // command = choice.split(" ")[0];
-    // terminal.e.value += browserString + "\n"
-    // command = terminal.lastLine.split(" ")[0]
-    // choice = terminal.lastLine
   }
   browser.render();
 };
@@ -1368,6 +1394,8 @@ mem.terminalCommand = (choice) => {
     case "ls":
       mem.browser(path[path.length - 1]);
       break;
+    case "find":
+      mem.browser(path[path.length - 1],"find",choice.split(" ")[1].toLowerCase())
     case "lsi":
       mem.browser(path[path.length - 1], "interval");
       break;
@@ -1619,6 +1647,19 @@ browser.editFile = async function (id) {
   }
   mem.terminalCommand("ls");
 };
+
+browser.search = () => {
+  if (mem.terminalChoice.includes("find")) {
+    mem.terminalCommand("ls")
+    return
+  }
+  let search = prompt("Type a word")
+  if (search !== "") {
+    mem.terminalCommand("find "+search)
+  } else {
+    mem.terminalCommand("ls")
+  }
+}
 
 browser.newDir = () => {
   document.querySelector(
@@ -1919,6 +1960,10 @@ const readFields = (data) => {
 
 browser.postpone = async (id) => {
   let hours = 1 * prompt("Enter hours");
+	if (isNaN(hours)) {
+		alert("Iput is not a number")
+		return;
+	}
   await mem.setRDATE(id, hours * 1000 * 60 * 60);
   mem.collect();
   browser.render(1, id);
@@ -2110,7 +2155,12 @@ browser.switchPage = (next) => {
   } else {
     mem.offset -= 10;
   }
+  if (!mem.terminalChoice.includes("find")) {
   mem.terminalCommand("ls");
+  } else {
+  mem.terminalCommand("find "+mem.searchData);
+
+  }
 };
 browser.goUp = () => {
   mem.offset = 0;
@@ -2148,6 +2198,11 @@ browser.render = (showFile, id, data) => {
       }
 
       if (browser.showControlPanel) {
+        document.querySelector(
+          ".objects"
+        ).innerHTML += `<div class="memobject md-ripples" onclick="browser.search()"><div class="memdata">${(!mem.terminalChoice.includes("find")?"🔎 Search":"🚪 Back to list")}</div></div>`;
+
+        
         document.querySelector(
           ".objects"
         ).innerHTML += `<div class="memobject md-ripples" onclick="browser.newDir()"><div class="memdata">📁 Add catalog</div></div>`;
@@ -2220,15 +2275,20 @@ browser.render = (showFile, id, data) => {
         // .replace("$DATA", item.DATA)
       }
 
-      sql(
-        `select COUNT(ID) AS TOTAL FROM OBJECTS WHERE PID = '${
-          path[path.length - 1]
-        }'`,
+      let command = (!mem.terminalChoice.includes("find"))
+       ? `select COUNT(ID) AS TOTAL FROM OBJECTS WHERE PID = '${path[path.length - 1]}'`
+       : `select COUNT(ID) AS TOTAL FROM OBJECTS WHERE DATA LIKE '% ${mem.searchData} %' 
+       OR DATA LIKE '% ${mem.searchData}%' 
+       OR DATA LIKE '% ${mem.searchData} %' 
+       OR DATA LIKE '%${mem.searchData}%' `
+      console.log("COMMAND: ", command)
+      sql(command,
         (res) => {
           browser.thisDirTotal = res[0].TOTAL;
           let compare = mem.offset + 10;
           if (compare == 0) compare = 10;
           if (browser.thisDirTotal > compare) {
+            if ( !document.querySelector(".objects").innerHTML.includes("➡️"))
             document.querySelector(".objects").innerHTML += `
           <div class="memobject md-ripples" onclick="browser.switchPage(1)"><div class="memdata">➡️ Next page</div></div>
           `;
@@ -2272,6 +2332,8 @@ mem.countQuery();
 mem.todayAnswered();
 mem.countDaily();
 mem.count();
+mem.countDeadItems()
+mem.countDeadHours()
 mem.countTotal();
 mem.memoPower();
 // const clickHandler = (event) => event.target.focus()

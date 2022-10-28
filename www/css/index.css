@@ -343,9 +343,17 @@ textarea {
 
 	@font-face {
 				font-family: memoff; /* Имя шрифта */
-				src: url(memoff.woff);
+			/*	src: url(memoff.woff); */
+					src: url(Nunito-Medium.ttf);
          
-		   }	   
+		   }	 
+
+	@font-face {
+				font-family: memoff-was; /* Имя шрифта */
+			/*	src: url(memoff.woff); */
+					src: url(memoff.woff);
+         
+		   }	
 
 @media screen and (min-width: 354px) {
  #scrollable::-webkit-scrollbar {

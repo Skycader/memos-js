@@ -180,9 +180,9 @@ document.getElementById("memosInput").addEventListener(
 check.skipped = 0;
 check.focus = () => {
   check.skipped += 1;
-  if (check.skipped > 1) {
+  if (check.skipped > 2) {
     mem.answered++;
-    // check.next(0.5);
+    check.next(0.5);
     check.skipped = 0;
   }
   document.getElementById("memosInput").focus();
@@ -294,6 +294,7 @@ cards.call = () => {
 };
 
 cards.insert = (amount) => {
+  console.log("insert called")
   if (!amount) {
     amount = 1;
   }
