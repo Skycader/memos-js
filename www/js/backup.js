@@ -10,10 +10,11 @@ function download(filename, text) {
 
   document.body.removeChild(element);
 }
-
+const extract = date => date.toISOString().split(/[^0-9]/).slice(0, -1);
 function exportData() {
   a = mem.exportedData;
-  try {cordova} catch(e) {download("memos.backup.txt",a); notifier.show("📨 Export complete")}
+  let fileName = "memos.backup"+Date.now()+".txt"
+  try {cordova} catch(e) {download(fileName,a); notifier.show("📨 Export complete")}
   // console.log("EXPORT: ", a)
   var way;
   try {
@@ -53,7 +54,7 @@ function DownloaderSuccess() {
 function read() {
   try {
     window.resolveLocalFileSystemURL(
-      cordova.file.externalApplicationStorageDirectory + "memos/backup.txt",
+      cordova.file.externalApplicationStorageDirectory + "memos/backup"+extract(new Date()).join("_")+".txt",
       gotFile,
       fail
     );

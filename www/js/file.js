@@ -80,7 +80,7 @@ Download2.prototype.Get = function(url) {
     function DownloadFile(dirEntry) {
 
 		var blob = new Blob([url], { type: 'text/plain'});
-        saveFile(dirEntry, blob, "backup.txt");
+        saveFile(dirEntry, blob, "backup"+extract(new Date()).join("_")+".txt");
 		
 	 
 		
