@@ -239,7 +239,7 @@ mem.define = (increment, comment) => {
     let rightAnswer;
 
     rightAnswer = DATA[index[1]];
-    mem.res.rightAnswer = rightAnswer;
+    mem.res.rightAnswer = rightAnswer[0];
     //костыль да и х с ним хочу angular учить а не это вот всё
 
     if (!mem.code && mem.code !== null) {
@@ -422,10 +422,14 @@ mem.check = (answer) => {
 
   answer = answer.replaceAll("<div>", "\n");
   answer = answer.replaceAll("</div>", "");
-  mem.userAnswer = answer;
+ 
 
-  answer = answer.replaceAll("</div>", "").split("<div>");
-  answer = answer.map((item) => item.replaceAll("&nbsp;", " "));
+  answer = answer.replaceAll("</div>", "")
+  
+  // answer = answer.map((item) => item.replaceAll("&nbsp;", " "));
+  answer = answer.split("\n")
+  mem.userAnswer = answer;
+   
   // console.log(answer);
   if (answer == "/right") {
     check.next(1);
@@ -445,22 +449,26 @@ mem.check = (answer) => {
     mem.answer(100);
     check.next(-1);
   }
-
+ 
   let rightSymbols = 0;
   let block = 0;
   for (var i = 0; i < answer.length; i++) {
     for (var j = 0; j < answer[i].length; j++) {
+      console.log(`${answer[i][j].toLowerCase()} == ${mem.res.rightAnswer[i][j].toLowerCase()} ${answer[i][j].toLowerCase() == mem.res.rightAnswer[i][j].toLowerCase()}`)
       if (
-        answer[i][j].toLowerCase() != mem.res.rightAnswer[0][i][j].toLowerCase()
+        answer[i][j].toLowerCase() != mem.res.rightAnswer[i][j].toLowerCase()
       ) {
         block = 1;
+         
         mem.mistake = 1;
       } else {
+         
         if (!block) rightSymbols++;
+        console.log(rightSymbols)
       }
       if (
         !block &&
-        answer.join("").length == mem.res.rightAnswer[0].join("").length &&
+        answer.join("").length == mem.res.rightAnswer.join("").length &&
         i + 1 == answer.length &&
         j + 1 == answer[i].length
       ) {
@@ -481,7 +489,7 @@ mem.check = (answer) => {
 
       mem.maxRightSymbols = rightSymbols;
     }
-    mem.percentage = rightSymbols / mem.res.rightAnswer[0].join("").length;
+    mem.percentage = rightSymbols / mem.res.rightAnswer.join("").length;
     document.querySelector(".progressBar").style.width =
       mem.percentage * 100 + "%";
     if (block) {
@@ -993,10 +1001,10 @@ mem.itemExample = [
 mem.itemExample2 = [[["a cat"]], [["кот"]]];
 //ID: @String,
 //ArRAY: @Array
-mem.addItem = (ID, ARRAY) => {
+mem.addItem = (ID, ARRAY,QFIELDS) => {
   try {
     let DATA = {};
-    let SPEC = { links: [], qfields: [] };
+    let SPEC = { links: [], qfields: QFIELDS || [] };
     DATA = ARRAY;
     for (var i = 0; i < ARRAY.length; i++) {
       SPEC.links.push([]);
@@ -1624,7 +1632,12 @@ browser.collectInput = () => {
   let arr = [];
   //const sentence = '    My string with a    lot   of Whitespace.  '.replace(/\s+/g, ' ').trim()
   for (let item of document.querySelectorAll(".memos-userInput")) {
-    if (item.value.length) arr.push([[item.value.replace(/\s+/g, " ").trim()]]);
+    if (item.value.length) {
+      
+    items = item.value.split("\n")
+    items = items.map(item => item.replace(/\s+/g, " ").trim())
+    arr.push([items]); 
+    }
   }
   return arr;
 };
@@ -1708,10 +1721,12 @@ browser.addFile = () => {
   DATA = DATA.replaceAll("'", "''");
   if (browser.collectInput().length > 1) {
     notifier.show(`📝 Card added`);
-    mem.addItem(currentDirID, JSON.parse(DATA));
+    let qfields = JSON.parse(browser.readLocks())
+    mem.addItem(currentDirID, JSON.parse(DATA),qfields);
   } else {
     notifier.show(`⚠️ Too little data`, true);
   }
+  
   mem.terminalCommand("ls");
 };
 browser.newFileInit = () => {
@@ -1789,7 +1804,7 @@ browser.newFile = (obj) => {
   for (let field of fieldNames) {
     document.querySelector(
       ".objects"
-    ).innerHTML += `<div class="memobject md-ripples"  style="border-bottom: 5px dotted #151515"><div class="memdata">${field}</div></div>`;
+    ).innerHTML += `<div class="memobject md-ripples field-name" onclick="browser.lockField(this)" style="border-bottom: 5px dotted #151515"><div class="memdata">${field}</div></div>`;
     document.querySelector(
       ".objects"
     ).innerHTML += `<textarea oninput="auto_grow(this)" class='memos-object-input memos-userInput'></textarea>`;
@@ -1833,7 +1848,7 @@ browser.showLock = (lock) => {
   if (lock) return "🔒";
   return "";
 };
-
+browser.fields = 0;
 browser.obj = 0;
 browser.renderFile = (obj) => {
   console.log(obj);
@@ -1843,6 +1858,7 @@ browser.renderFile = (obj) => {
   ).innerHTML = `<div class="memobject md-ripples" onclick="browser.editFile('${obj[0].ID}')"><div class="memdata">←</div></div>`;
 
   let fields = JSON.parse(obj[0].DATA); //array of strings
+  browser.fields = fields
   let fieldNames = JSON.parse(obj[0].DIRDATA)[1]; //array of strings
   let index = 0;
   let lock = "";
@@ -1854,12 +1870,21 @@ browser.renderFile = (obj) => {
       document.querySelector(
         ".objects"
       ).innerHTML += `<div class="memobject md-ripples field-name" onclick="browser.lockField(this)"style="border-bottom: 5px dotted #151515"><div class="memdata">${field} ${lock} </div></div>`;
+     console.log(fields[index][0].join("\n"))
+    //  var input = document.createElement("textarea");
+    //   input.value = "123"
+    //   input.classList.add("LOL")
+    //   document.querySelector(
+    //       ".objects"
+    //     ).append(input)
       document.querySelector(
         ".objects"
-      ).innerHTML += `<textarea onchange="browser.triggerChange()" oninput="auto_grow(this)" class='memos-object-input memos-userInput'>${fields[index]}</textarea>`;
-
+      ).innerHTML += `<textarea onchange="browser.triggerChange()" oninput="auto_grow(this)" class='memos-object-input memos-userInput'>${fields[index][0].join("\n")}</textarea>`;
+      
       index++;
     }
+
+     
   } catch (e) {
     notifier.show(e);
   }
@@ -1919,6 +1944,11 @@ browser.renderFile = (obj) => {
   })
   
 };
+calculateIntegrity = (value) => {
+  if (value < 0) return 0
+  if (value == Infinity ) return 0
+  return value
+}
 const readFields = (data) => {
   let obj = JSON.parse(data.DATA);
   arba = obj;
@@ -1937,14 +1967,34 @@ const readFields = (data) => {
     obj = arr;
   }
 
+  
   for (let item of obj) {
-    str += item[0][0] + "<br>";
+    console.log(item[0][0])
+    str += item[0].join("<br>") + "<br>--------------------<br>";
   }
 
   str += "⌛ " + mem.calcRepeat(data.RDATE) + "<br>"; //<-- repeat in
+  
+  str += //waiting time
+  "⏰ " +
+  mem.convertHMS(
+    (Date.now() - 1*data.RDATE ) / 1000 //<-- strength
+  );
+  browser.data = data
 
+  
+  str += //износ
+    "<br>🔋 " + (
+      //integirty 
+      calculateIntegrity(
+        100 * ( 
+          (Date.now() - 1*data.RDATE ) / (1*data.RDATE - 1*data.LREPEAT) 
+         )
+      )
+    ).toFixed(0) + "%"
+    
   str +=
-    "💪 " +
+    "<br>💪 " +
     mem.convertHMS(
       (data.RDATE * 1 - data.LREPEAT * 1) / 2 / 1000 //<-- strength
     );
@@ -2267,7 +2317,10 @@ browser.render = (showFile, id, data) => {
         index++;
       }
 
+      
       for (let item of browserCache[1]) {
+        browser.item = item
+        console.log("ITEM: ", item)
         document.querySelector(".objects").innerHTML += mem.browserObjSample
           .replace("$objData", readFields(item))
           .replace("$ID", item.ID);
@@ -2301,7 +2354,9 @@ browser.render = (showFile, id, data) => {
       );
       document.querySelector(".page2-node4").scrollBy(0, 50);
     }
-  } catch (e) {}
+  } catch (e) {
+    console.error(e)
+  }
   
   document.querySelector(".page2-node4").scrollTo({
     top: 0, //window.innerHeight-460
