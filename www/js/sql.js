@@ -69,7 +69,7 @@ sql = (query, callback, error, arg1, arg2, arg3) => {
         }
       },
       function (tx, results) {
-        console.log(results, "ERROR");
+        console.log(results, query, "ERROR");
         error(arg1, arg2, arg3);
       }
     );
@@ -122,7 +122,7 @@ mem.collect = () => {
 
   sql(
     // `SELECT * FROM OBJECTS  LEFT JOIN DIRS ON OBJECTS.PID=DIRS.ID AND 1*RDATE < ${Date.now()} LIMIT 10`,
-    `SELECT OBJECTS.ID, OBJECTS.DATA, RDATE, LREPEAT,  (1*RDATE - 1*LREPEAT) AS INTERVAL, SPEC, DIRS.DATA AS DIRDATA FROM OBJECTS JOIN DIRS ON OBJECTS.PID=DIRS.ID AND 1*RDATE < ${Date.now()} AND (1*RDATE - 1*LREPEAT)>=7200000 ORDER BY INTERVAL LIMIT 100`,
+    `SELECT OBJECTS.ID, OBJECTS.DATA, RDATE, LREPEAT,  (1*RDATE - 1*LREPEAT) AS INTERVAL, SPEC, DIRS.DATA AS DIRDATA, (1*${Date.now()}-1*LREPEAT) AS WAITING, (1*${Date.now()}-1*LREPEAT)/(1.0*RDATE - 1.0*LREPEAT) AS INTEGRITY FROM OBJECTS JOIN DIRS ON OBJECTS.PID=DIRS.ID AND 1*RDATE < ${Date.now()} AND (1*RDATE - 1*LREPEAT)>=7200000 ORDER BY INTEGRITY DESC LIMIT 100`,
     mem.collectCallback
   );
 };
@@ -206,9 +206,10 @@ mem.getDirInfoCallback = (res) => {
 mem.answered = 0; //move forward in a list of files to answer
 
 mem.define = (increment, comment) => {
+
   if (increment) {
     mem.answered++;
-    console.log("Comment: ", comment);
+    console.log("Comment: ", comment, increment);
   }
   let DATA;
   let SPEC;
@@ -321,6 +322,7 @@ mem.setRDATE = async (id, hours) => {
 mem.answered = 0;
 mem.blockAnswer = 0;
 mem.answer = (answerIsCorrect) => {
+  
   if (!mem.blockAnswer) {
     mem.blockAnswer = 1;
     document.querySelector(".cardTimer").classList.add("no-trunsition");
@@ -390,6 +392,7 @@ mem.answer = (answerIsCorrect) => {
       mem.blockAnswer = 0;
     }, 1000);
   }
+
   //end of mem.answer
 };
 
@@ -1011,9 +1014,9 @@ mem.addItem = (ID, ARRAY,QFIELDS) => {
     }
 
     DATA = JSON.stringify(DATA);
-    console.log(DATA);
+    // console.log(DATA);
     SPEC = JSON.stringify(SPEC);
-    console.log(ARRAY.length);
+    // console.log(ARRAY.length);
     if (ARRAY.length > 1) {
       mem.setItem(ID, DATA, SPEC);
     } else {
@@ -1023,7 +1026,7 @@ mem.addItem = (ID, ARRAY,QFIELDS) => {
   } catch (e) {
     alert("Error: ", e);
     notifier.show(`⚠️ Error during adding ${e}`, true);
-    console.log(e);
+    // console.log(e);
   }
 };
 
@@ -1210,6 +1213,18 @@ END AS result
         callback
       );
       break;
+      case "integrity desc":
+        sql(
+          `SELECT * , (1*${Date.now()}-1*LREPEAT)/(1.0*RDATE - 1.0*LREPEAT) AS INTEGRITY FROM OBJECTS WHERE PID = "${DIRID}" GROUP BY ID ORDER BY INTEGRITY DESC LIMIT ${mem.offset},10`,
+          callback
+        );
+        break;
+      case "lastrepeat desc":
+      sql(
+        `SELECT * FROM OBJECTS WHERE PID = "${DIRID}" GROUP BY ID ORDER BY LREPEAT DESC LIMIT ${mem.offset},10`,
+        callback
+      );
+      break;
     default:
       sql(
         `SELECT * FROM OBJECTS WHERE PID = "${DIRID}" ORDER BY RDATE LIMIT ${mem.offset},10`,
@@ -1280,7 +1295,7 @@ let path = ["/"];
 let pathNames = [];
 mem.searchData = ""
 mem.browser = (goTo, order,SEARCH_DATA) => {
-  console.log("SEARCH_DATA", SEARCH_DATA)
+  // console.log("SEARCH_DATA", SEARCH_DATA)
   if (SEARCH_DATA)
   mem.searchData = SEARCH_DATA
   mem.when();
@@ -1410,6 +1425,12 @@ mem.terminalCommand = (choice) => {
     case "lsib":
       mem.browser(path[path.length - 1], "interval backwards");
       break;
+      case "lslrd":
+      mem.browser(path[path.length - 1], "lastrepeat desc");
+      break;
+      case "lsid":
+        mem.browser(path[path.length - 1], "integrity desc");
+        break;
     case "lslim":
       mem.browser(
         path[path.length - 1],
@@ -1632,12 +1653,12 @@ browser.collectInput = () => {
   let arr = [];
   //const sentence = '    My string with a    lot   of Whitespace.  '.replace(/\s+/g, ' ').trim()
   for (let item of document.querySelectorAll(".memos-userInput")) {
-    if (item.value.length) {
+    
       
     items = item.value.split("\n")
     items = items.map(item => item.replace(/\s+/g, " ").trim())
     arr.push([items]); 
-    }
+    
   }
   return arr;
 };
@@ -1858,25 +1879,20 @@ browser.renderFile = (obj) => {
   ).innerHTML = `<div class="memobject md-ripples" onclick="browser.editFile('${obj[0].ID}')"><div class="memdata">←</div></div>`;
 
   let fields = JSON.parse(obj[0].DATA); //array of strings
-  browser.fields = fields
+  
   let fieldNames = JSON.parse(obj[0].DIRDATA)[1]; //array of strings
   let index = 0;
   let lock = "";
   try {
     for (let field of fieldNames) {
-      if (fields[index] == undefined) fields[index] = "";
+      if (fields[index] == undefined) fields[index] = [[""]];
+      browser.fields = fields
       let qfields = JSON.parse(obj[0].SPEC).qfields; //array
       lock = browser.showLock(qfields.indexOf(index) > -1);
       document.querySelector(
         ".objects"
       ).innerHTML += `<div class="memobject md-ripples field-name" onclick="browser.lockField(this)"style="border-bottom: 5px dotted #151515"><div class="memdata">${field} ${lock} </div></div>`;
-     console.log(fields[index][0].join("\n"))
-    //  var input = document.createElement("textarea");
-    //   input.value = "123"
-    //   input.classList.add("LOL")
-    //   document.querySelector(
-    //       ".objects"
-    //     ).append(input)
+        if (fields[index][0] == undefined) fields[index][0] = [""]
       document.querySelector(
         ".objects"
       ).innerHTML += `<textarea onchange="browser.triggerChange()" oninput="auto_grow(this)" class='memos-object-input memos-userInput'>${fields[index][0].join("\n")}</textarea>`;
@@ -1886,6 +1902,7 @@ browser.renderFile = (obj) => {
 
      
   } catch (e) {
+    console.log(e)
     notifier.show(e);
   }
 
@@ -1969,8 +1986,8 @@ const readFields = (data) => {
 
   
   for (let item of obj) {
-    console.log(item[0][0])
-    str += item[0].join("<br>") + "<br>--------------------<br>";
+    // console.log(item[0])
+    str += (item[0].join("").length) ? item[0].join("<br>") + "<br>--------------------<br>" : ""
   }
 
   str += "⌛ " + mem.calcRepeat(data.RDATE) + "<br>"; //<-- repeat in
@@ -2057,6 +2074,10 @@ browser.selectOrder = () => {
       break;
     case "intervalb":
       mem.terminalCommand("lsib");
+      case "lastrepeatd":
+      mem.terminalCommand("lslrd");
+      case "integrityd":
+      mem.terminalCommand("lsid");
       break;
   }
 };
@@ -2252,6 +2273,9 @@ browser.render = (showFile, id, data) => {
           ".objects"
         ).innerHTML += `<div class="memobject md-ripples" onclick="browser.search()"><div class="memdata">${(!mem.terminalChoice.includes("find")?"🔎 Search":"🚪 Back to list")}</div></div>`;
 
+        document.querySelector(
+          ".objects"
+        ).innerHTML += `<div class="memobject md-ripples" onclick="mem.terminalCommand('ls')"><div class="memdata">🔃 Refresh</div></div>`
         
         document.querySelector(
           ".objects"
@@ -2295,6 +2319,8 @@ browser.render = (showFile, id, data) => {
       <option value="repeatin">By repeat in</option>
       <option value="interval">By interval ASC</option>
       <option value="intervalb">By interval DESC</option>
+      <option value="lastrepeatd">By last repeat DESC</option>
+      <option value="integrityd">By integrity DESC</option>
     </select>
     
     `;
@@ -2320,7 +2346,7 @@ browser.render = (showFile, id, data) => {
       
       for (let item of browserCache[1]) {
         browser.item = item
-        console.log("ITEM: ", item)
+        // console.log("ITEM: ", item)
         document.querySelector(".objects").innerHTML += mem.browserObjSample
           .replace("$objData", readFields(item))
           .replace("$ID", item.ID);
@@ -2334,7 +2360,7 @@ browser.render = (showFile, id, data) => {
        OR DATA LIKE '% ${mem.searchData}%' 
        OR DATA LIKE '% ${mem.searchData} %' 
        OR DATA LIKE '%${mem.searchData}%' `
-      console.log("COMMAND: ", command)
+      // console.log("COMMAND: ", command)
       sql(command,
         (res) => {
           browser.thisDirTotal = res[0].TOTAL;
@@ -2355,7 +2381,7 @@ browser.render = (showFile, id, data) => {
       document.querySelector(".page2-node4").scrollBy(0, 50);
     }
   } catch (e) {
-    console.error(e)
+    // console.error(e)
   }
   
   document.querySelector(".page2-node4").scrollTo({

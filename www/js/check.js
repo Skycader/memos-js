@@ -188,6 +188,8 @@ check.focus = () => {
   document.getElementById("memosInput").focus();
 };
 check.exit = () => {
+  mem.terminalCommand("ls"); //update browser on exit
+
   document.querySelector("#memosInput")?.classList.remove("redColor");
   check.clear();
   document.querySelector("#thatcircle").classList.remove("omniscale2");
