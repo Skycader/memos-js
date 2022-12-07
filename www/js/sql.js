@@ -1614,7 +1614,7 @@ mem.browserObjSample = `<div class="memobject md-ripples" onclick="browser.rende
 mem.currentDir = ``;
 let arba = 0;
 let browser = {};
-
+browser.movingDirID = ""
 browser.focus = (el) => {
   let p = el;
   let s = window.getSelection();
@@ -1660,6 +1660,12 @@ browser.collectInput = () => {
     arr.push([items]); 
     
   }
+  if (
+    arr.filter(
+      (item) => item[0][0].length > 0
+    )
+    .length < 1
+  ) return "ERROR"
   return arr;
 };
 
@@ -1740,14 +1746,14 @@ browser.addFile = () => {
   let currentDirID = path[path.length - 1];
   let DATA = JSON.stringify(browser.collectInput());
   DATA = DATA.replaceAll("'", "''");
-  if (browser.collectInput().length > 1) {
+  if (browser.collectInput() !== "ERROR") {
     notifier.show(`📝 Card added`);
     let qfields = JSON.parse(browser.readLocks())
     mem.addItem(currentDirID, JSON.parse(DATA),qfields);
   } else {
     notifier.show(`⚠️ Too little data`, true);
   }
-  
+  browser.lockFieldEngaged = 0 
   mem.terminalCommand("ls");
 };
 browser.newFileInit = () => {
@@ -1756,6 +1762,18 @@ browser.newFileInit = () => {
 browser.editDirInit = () => {
   mem.getDirById(path[path.length - 1], browser.editDir);
 };
+browser.moveDirInit = (ctx) => {
+  browser.movingDirID = path.at(-1)
+  browser.goUp()
+  notifier.show("🚚 Choose the dir to move to")
+
+}
+browser.moveDirFinish = (ctx) => {
+  mem.moveDir(browser.movingDirID, path.at(-1))
+  notifier.show("🚚 Moving complete")
+  browser.movingDirID = ""
+  mem.terminalCommand("ls")
+}
 browser.editDir = (obj) => {
   try {
     console.log(obj);
@@ -1896,7 +1914,6 @@ browser.renderFile = (obj) => {
       document.querySelector(
         ".objects"
       ).innerHTML += `<textarea onchange="browser.triggerChange()" oninput="auto_grow(this)" class='memos-object-input memos-userInput'>${fields[index][0].join("\n")}</textarea>`;
-      
       index++;
     }
 
@@ -1987,7 +2004,19 @@ const readFields = (data) => {
   
   for (let item of obj) {
     // console.log(item[0])
-    str += (item[0].join("").length) ? item[0].join("<br>") + "<br>--------------------<br>" : ""
+    try {
+    str += (item[0].join("").length) ? 
+    item[0].map(item => {
+      return item
+
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+     
+    })
+    .join("<br>")
+    
+    + "<br>--------------------<br>" : ""
+    } catch(e) {console.error(e)}
   }
 
   str += "⌛ " + mem.calcRepeat(data.RDATE) + "<br>"; //<-- repeat in
@@ -2056,7 +2085,8 @@ browser.removeDir = () => {
   if (confirm == "delete") {
     mem.rmdir(path[path.length - 1]);
   }
-  mem.terminalCommand("cd ..");
+  
+  mem.terminalCommand("ls");
 };
 browser.movePanel = () => {
   document
@@ -2285,6 +2315,17 @@ browser.render = (showFile, id, data) => {
           document.querySelector(
             ".objects"
           ).innerHTML += `<div class="memobject md-ripples" onclick="browser.editDirInit()"><div class="memdata">🔧 Edit this catalog</div></div>`;
+
+        if (path[path.length - 1] != "/")
+          document.querySelector(
+            ".objects"
+          ).innerHTML += `<div class="memobject md-ripples" onclick="browser.moveDirInit(this)"><div class="memdata">🚚 Move this catalog...</div></div>`;
+
+          if (browser.movingDirID !== "")
+          document.querySelector(
+            ".objects"
+          ).innerHTML += `<div class="memobject md-ripples" onclick="browser.moveDirFinish(this)"><div class="memdata">🚚 Move here</div></div>`;
+
 
         if (path[path.length - 1] != "/")
           document.querySelector(

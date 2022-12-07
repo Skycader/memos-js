@@ -498,7 +498,13 @@ cards.set = (pos) => {
 
       renderedCard = renderedCard.replace(
         "$question",
-        mem.res.question[0].join("<br>")
+        mem.res.question[0].map(item => {
+          return item
+    
+          .replaceAll("<", "&lt;")
+          .replaceAll(">", "&gt;")
+         
+        }).join("<br>")
       );
 
       renderedCard = renderedCard.replace(
