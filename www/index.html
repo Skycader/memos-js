@@ -110,7 +110,7 @@
             <input type="radio" name="slideItem" id="slide-item-3" class="slide-toggle" />
             <label onclick="goTo(2)" id='slide-item-3' for="slide-item-3">
                <p class="icon">★</p>
-               <span>Forum</span>
+               <span>Todo</span>
             </label>
             <!-- Item 4 -->
             <input type="radio" name="slideItem" id="slide-item-4" class="slide-toggle" />
@@ -289,9 +289,141 @@
             <div class='page4' style='     display: content'>
               
               
-               <div style="position: absolute; margin-top: 110px; width: 100%; height: calc(100% - 100px)">
+               <div style="position: absolute; margin-top: 110px; width: 100%; height: calc(100vh - 100px); overflow: auto">
                 
-                  <button onclick="(()=>{document.querySelector('.terminal').classList.toggle('off')})()">Toggle terminal</button>
+                  <div style="padding: 20px;">
+                  <h1 style="font-family: memoff;" onclick="document.querySelector('#guide').classList.toggle('hidden')">
+                     Memos quick start (tap to toggle)</h1> 
+                     <h3  style="font-family: memoff;" class="memos-guide ">
+                        <h3 id='guide' style="font-family: memoff;" class="hidden">
+                           <br>About Memos <br><br>
+                           Memos is an app meant to help you memorise
+                           practically any information by
+                           <br>
+                           1) Writing memo cards.
+                           <br>
+                           2) Regularly repeating them.
+                           <br>
+                           Sounds simple and it is simple. 
+                           <br>
+                           However there's some more things to know.
+                           <br>
+                           First, as a user you store your memo cards in catalogs.
+                           <br>
+                           They are just like folders in your filesystem. 
+                           <br>
+                           Create your first catalog by opening  controls panel 
+                           <br>
+                           ⚙️ Show controls 
+                           <br>
+                           Then, tap 
+                           <br>
+                           📁 Add catalog
+                           <br>
+                           Choose an icon, a simple emoji would do.
+                           <br>
+                           Choose a name, like French.
+                           <br>
+                           Last, but not least, the fields, or the sides of your memo card.
+                           <br>
+                           For French example, they could be Original, Translation, Transcription.
+                           <br>
+                           Now you see that memo cards in Memos can have more than two sides.
+                           <br>
+                           After that in your file browser, go to your new French dir and add some cards!
+                           <br>
+                           Or at least one.
+                           <br>
+                           Tap
+                           <br>
+                           📝 Add card
+                           <br>
+                           Fill in the required fields (at last 2).
+                           <br>
+                           Then just quit by tapping ← (arrow back).
+                           <br>
+                           You're ready to go!
+                           <br>
+                           <br>
+                           Memos repeat
+                           <br>
+                           <br>
+                           Tap the circle to enter the repeating mode.
+                           <br>
+                           When see a card with a text (for example, Un renard)
+                           <br>
+                           type the translation you filled in before and that's it!
+                           <br>
+                           Memos will double the waited time, so you repeat the card more rarely when you know it.
+                           <br>
+                           However, if you don't remeber, memos will nullify the full interval so you begin fresh headed.
+
+                           <br>
+                           <br>
+                           Memos card
+                           <br>
+                           <br>
+                           Properties
+                           <br>
+                           ⌛ Next repeat in <br>
+                           ⏰ When in need of repeat, waiting time start counting <br>
+                           🔋 Integrity, if waiting time is more than expected, it will go up to 100% and more, do not allow this <br>
+                           💪 Time it stood still, for example 2 days without repeat
+                           🚗 Current interval expected for the card to hold
+                           <br>
+                           <br>
+                           Repeat queue
+                           <br>
+                           <br>
+                           When cards need repeat, they go to repeat queue.
+                           It consist of two parts.
+                           <br>
+                           Children - cards whose interval is lower than N, by default 1 hour.
+                           <br> It's made so that you repeat one child until it becomes adult, and not all the kids you have.
+                           <br> Lets you focus on it.
+                           <br><br>
+                           Adult cards. Just repeat them.
+                           <br><br>Queue priority by default is
+                           <br>First cards by maximal integrity (biggest first).
+                           <br> It means memos will give you cards in highest need of repeat first.
+                           <br><br>
+                           Memos Circle
+                           <br>
+                           <br>
+                           Circle has 5 fields.
+                           <br>
+                           1) Time before next card needs repeat.
+                           <br>
+                           2) Cards repeated today | Cards needs repeat | Cards will be needed to repeated today
+                           <br>
+                           3) % of all cards that not in need of repeated
+                           <br>
+                           4) Cards that ran out of its waiting time and probably dead |
+                            % of integirty of the first card in queue, better be < 100% | 
+                            Average % of integirty among cards in repeat queue
+                           <br>
+                           5) Kids in Queue
+                           <br>
+
+                           <br>
+                           <br>
+                           Other stuff.
+                           <br>
+                           You can manipulate your cards and catalogs, move and edit them easily.
+                           <br> Change the order of displayment and search for a card.
+                           <br> Also, do not forget to regularly do your backups!
+                           <br> Some of features are still in development, so please be patient, tell your friends
+                           <br> or donate a little bit to help Open Source<br>
+                           Memos by Skycader, Vodri.
+                           <br><br>Memos uses WebSQL to store data.
+                           <br> Memos Version: 0.7
+                        </h3>
+                     </h3>
+
+                  <h1 style="font-family: memoff;" onclick="(()=>{document.querySelector('.terminal').classList.toggle('off')})()">
+                     Terminal (tap to toggle)</h1>
+                  </div>
+                
                   <div class="terminal off" >
                  <textarea id="terminal" style="background: #161616; color: white; width: 100%; height: calc(100vh - 280px); font-size: 25px; font-family: memoff"
                  ></textarea>

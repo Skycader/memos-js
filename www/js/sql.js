@@ -1010,7 +1010,11 @@ mem.addItem = (ID, ARRAY,QFIELDS) => {
     let SPEC = { links: [], qfields: QFIELDS || [] };
     DATA = ARRAY;
     for (var i = 0; i < ARRAY.length; i++) {
+      if (ARRAY[i][0][0] !== "") {
       SPEC.links.push([]);
+      } else {
+        SPEC.links.push(null)
+      }
     }
 
     DATA = JSON.stringify(DATA);
@@ -1113,6 +1117,7 @@ mem.linker = (SPEC) => {
     return result;
   } else {
     for (var i = 0; i < SPEC.links.length; i++) {
+      if (SPEC.links[i] !== null)
       SPEC.links[i] = [];
     }
     // console.log("SPEC: ", SPEC);
@@ -1129,7 +1134,8 @@ mem.sublinker = (SPEC) => {
   for (var i = 0; i < LINKS.length; i++) {
     for (var j = 0; j < LINKS.length; j++) {
       if (i != j) {
-        if (LINKS[i].indexOf(j) == -1 && SPEC.qfields.indexOf(j) == -1) {
+        if (LINKS[i] !== null && LINKS[j] !== null)
+        if (LINKS[i].indexOf(j) == -1 && SPEC.qfields.indexOf(j) == -1 ) {
           LINKS[i].push(j);
           SPEC.links = LINKS;
 
@@ -1243,16 +1249,22 @@ mem.editItem = async function (ID, DATA) {
     SPEC = JSON.parse(SPEC);
     await sql2(`UPDATE OBJECTS SET DATA = '${DATA}' WHERE ID = '${ID}'`);
     ARRAY = JSON.parse(DATA);
-    if (ARRAY.length != SPEC.links.length) {
+    browser.ARRAY = ARRAY
+    browser.SPEC = SPEC
+    if (ARRAY.filter(item => !!item[0][0]).length != SPEC.links.length) {
       SPEC.links = [];
       for (let i = 0; i < ARRAY.length; i++) {
+        if (ARRAY[i][0][0] !== "") {
         SPEC.links.push([]);
+        } else {
+          SPEC.links.push(null)
+        }
       }
       SPEC = JSON.stringify(SPEC);
       await sql2(`UPDATE OBJECTS SET SPEC = '${SPEC}' WHERE ID = '${ID}'`);
     }
   } catch (e) {
-    log(e);
+     
     notifier.show(e, true);
   }
 };
@@ -1664,17 +1676,19 @@ browser.collectInput = () => {
     arr.filter(
       (item) => item[0][0].length > 0
     )
-    .length < 1
+    .length < 2
   ) return "ERROR"
+  
   return arr;
 };
 
 browser.editFile = async function (id) {
   qfields = browser.readLocks();
   let rows = browser.collectInput();
-  if (rows.length > 1) {
+  if (rows !== "ERROR") {
     rows = JSON.stringify(rows);
     rows = rows.replaceAll("'", "''");
+
     if (browser.changeDetected) await mem.editItem(id, rows);
     console.log("Q", id, qfields);
     if (browser.lockFieldEngaged) await mem.editItemQFields(id, qfields);
@@ -2077,6 +2091,7 @@ browser.removeFile = (id) => {
   let confirm = prompt("Type `delete` to confirm delete");
   if (confirm == "delete") {
     mem.rem(id);
+    notifier.show("🗑️ Card erased")
   }
   mem.terminalCommand("ls");
 };
