@@ -95,6 +95,9 @@
   /*otherwise scrollable content is not fully displated */
   text-align: center;
   word-break: break-word;
+  width: 100%;
+  /* height: 100%; */
+  overflow-y: auto;
 }
 .table {
   display: flex;

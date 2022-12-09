@@ -179,7 +179,7 @@ document.getElementById("memosInput").addEventListener(
 );
 check.skipped = 0;
 check.focus = () => {
-  check.skipped += 1;
+  // check.skipped += 1;
   if (check.skipped > 2) {
     mem.answered++;
     check.next(0.5);
@@ -306,7 +306,7 @@ cards.insert = (amount) => {
       .querySelector("#papers")
       .insertAdjacentHTML(
         "afterbegin",
-        " <div class='pos4 card'><div class='table'> <div class='table2'> <div class='cell pad'> <div> </div> </div></div></div></div>"
+        " <div onclick = 'check.focus()' class='pos4 card'><div class='table'> <div class='table2'> <div class='cell pad'> <div> </div> </div></div></div></div>"
       );
   }
 };
@@ -412,7 +412,7 @@ check.p4 = () => {
 check.p5 = () => {
   document
     .querySelector("#papers")
-    .insertAdjacentHTML("afterbegin", " <div class='pos4 card'></div>");
+    .insertAdjacentHTML("afterbegin", " <div onclick = 'check.focus()' class='pos4 card'></div>");
 };
 
 cards.timeout = 0;
