@@ -154,9 +154,9 @@
                            <text id='info5' x="50%" y="75%" text-anchor="middle" class='opacive' font-family="Round"
                               fill="white" font-size="2.2px" stroke-width="1px" dy=".3em">000.000.000</text>
 
-                           <rect x="16%" y="45%" rx="1" ry="1" width="5.5" height="2.5"
+                           <rect id="left-bulb" x="16%" y="45%" rx="1" ry="1" width="5.5" height="2.5"
                               style="fill:rgb(30, 255, 0); filter: drop-shadow( 0px 0px 2px rgb(2, 255, 14));" />
-                           <rect x="67%" y="45%" rx="1" ry="1" width="5.5" height="2.5"
+                           <rect id="right-bulb" x="67%" y="45%" rx="1" ry="1" width="5.5" height="2.5"
                               style="fill:rgb(30, 255, 0); filter: drop-shadow( 0px 0px 2px rgb(2, 255, 14));" />
                            </g>
 
@@ -257,6 +257,7 @@
                            <div class="memobase-info-1"></div>
                            <div class="memobase-info-2"></div>
                            <div class="memobase-info-3"></div>
+                           <div class="memobase-info-4"></div>
                         </div>
                      </div>
                   </div>
@@ -403,13 +404,13 @@
                             % of integirty of the first card in queue, better be < 100% | 
                             Average % of integirty among cards in repeat queue
                            <br>
-                           5) Kids in Queue
+                           5) Hours you may earn if complete all cards in queue
                            <br>
                            Also two lights bulbs.
                            <br> Left one displays how many cards in queue in need of repeat.
                            <br> Green -> Red (Red if you better start repeating at last).
                            <br> Right displays the median interval of all cards. 
-                           <br> If Green, it means all the cards are strong and you now can add more.
+                           <br> If Red, it means all the cards are strong and you now should add more.
                            <br>
                            <br>
                            Other stuff.

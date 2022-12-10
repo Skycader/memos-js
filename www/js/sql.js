@@ -112,8 +112,8 @@ mem.dropList = () => {
 };
 
 mem.find = async (data) => {
-  return await sql2(`select * from objects where data like "%${data}%"`)
-}
+  return await sql2(`select * from objects where data like "%${data}%"`);
+};
 mem.collect = () => {
   sql(
     `SELECT OBJECTS.ID, OBJECTS.DATA, RDATE, LREPEAT, (1*RDATE - 1*LREPEAT) AS INTERVAL, SPEC, DIRS.DATA AS DIRDATA FROM OBJECTS JOIN DIRS ON OBJECTS.PID=DIRS.ID AND (1*RDATE - 1*LREPEAT)<7200000 ORDER BY INTERVAL DESC LIMIT 100`,
@@ -210,7 +210,6 @@ mem.getDirInfoCallback = (res) => {
 mem.answered = 0; //move forward in a list of files to answer
 
 mem.define = (increment, comment) => {
-
   if (increment) {
     mem.answered++;
     console.log("Comment: ", comment, increment);
@@ -326,7 +325,6 @@ mem.setRDATE = async (id, hours) => {
 mem.answered = 0;
 mem.blockAnswer = 0;
 mem.answer = (answerIsCorrect) => {
-  
   if (!mem.blockAnswer) {
     mem.blockAnswer = 1;
     document.querySelector(".cardTimer").classList.add("no-trunsition");
@@ -365,10 +363,11 @@ mem.answer = (answerIsCorrect) => {
       // console.log(`Repeat in ${repeatIn} hours`);
       mem.update("RDATE", diff, "ID", mem.res.obj.ID);
       mem.list[mem.answered].INTERVAL = diff - Date.now();
-      if (answerIsCorrect != 100) { //check for postpone 
-      mem.update("LREPEAT", Date.now(), "ID", mem.res.obj.ID);
-      mem.res.obj.SPEC = JSON.stringify(mem.res.obj.result[1]);
-      mem.update("SPEC", mem.res.obj.SPEC, "ID", mem.res.obj.ID);
+      if (answerIsCorrect != 100) {
+        //check for postpone
+        mem.update("LREPEAT", Date.now(), "ID", mem.res.obj.ID);
+        mem.res.obj.SPEC = JSON.stringify(mem.res.obj.result[1]);
+        mem.update("SPEC", mem.res.obj.SPEC, "ID", mem.res.obj.ID);
       }
       mem.showAnswer = 0;
     } else {
@@ -429,14 +428,13 @@ mem.check = (answer) => {
 
   answer = answer.replaceAll("<div>", "\n");
   answer = answer.replaceAll("</div>", "");
- 
 
-  answer = answer.replaceAll("</div>", "")
-  
+  answer = answer.replaceAll("</div>", "");
+
   // answer = answer.map((item) => item.replaceAll("&nbsp;", " "));
-  answer = answer.split("\n")
+  answer = answer.split("\n");
   mem.userAnswer = answer;
-   
+
   // console.log(answer);
   if (answer == "/right") {
     check.next(1);
@@ -456,22 +454,27 @@ mem.check = (answer) => {
     mem.answer(100);
     check.next(-1);
   }
- 
+
   let rightSymbols = 0;
   let block = 0;
   for (var i = 0; i < answer.length; i++) {
     for (var j = 0; j < answer[i].length; j++) {
-      console.log(`${answer[i][j].toLowerCase()} == ${mem.res.rightAnswer[i][j].toLowerCase()} ${answer[i][j].toLowerCase() == mem.res.rightAnswer[i][j].toLowerCase()}`)
+      console.log(
+        `${answer[i][j].toLowerCase()} == ${mem.res.rightAnswer[i][
+          j
+        ].toLowerCase()} ${
+          answer[i][j].toLowerCase() == mem.res.rightAnswer[i][j].toLowerCase()
+        }`
+      );
       if (
         answer[i][j].toLowerCase() != mem.res.rightAnswer[i][j].toLowerCase()
       ) {
         block = 1;
-         
+
         mem.mistake = 1;
       } else {
-         
         if (!block) rightSymbols++;
-        console.log(rightSymbols)
+        console.log(rightSymbols);
       }
       if (
         !block &&
@@ -559,12 +562,12 @@ mem.when = async (id) => {
   // if (kids[0].RDATE*1>Date.now()) kids=null
 
   if (kids?.length && adults?.length) {
-    if (kids[0].RDATE*1<adults[0].RDATE) {
-      mem.whenStatus = "kids"
-      res = kids
+    if (kids[0].RDATE * 1 < adults[0].RDATE) {
+      mem.whenStatus = "kids";
+      res = kids;
     } else {
-      mem.whenStatus = "adults"
-      res = adults
+      mem.whenStatus = "adults";
+      res = adults;
     }
   } else {
     if (kids?.length || adults?.length) {
@@ -603,7 +606,7 @@ const zeroPad = (num, places) => String(num).padStart(places, "0");
 mem.when2 = (res) => {
   // console.log("RES", res);
   let back = 0;
-  if (res == null) return 0
+  if (res == null) return 0;
   if (res[0].RDATE == null) {
     return 0;
   }
@@ -700,23 +703,64 @@ mem.circleData = (update) => {
   );
   if (!isNaN(percentage) && Math.abs(percentage) != Infinity) {
     document.querySelector("#info3").innerHTML = percentage;
-    document.querySelector("#info4").innerHTML 
-    = 
-    `${mem.deadItems} · ${mem.maxIntegrityValue} · ${mem.averageIntegrityValue}`;
+    document.querySelector(
+      "#info4"
+    ).innerHTML = `${mem.deadItems} · ${mem.maxIntegrityValue} · ${mem.averageIntegrityValue}`;
 
+    switch (Math.floor(mem.averageIntegrityValue / 25)) {
+      case 0:
+        circle.leftBulb.green();
+        break;
+      case 1:
+        circle.leftBulb.yellow();
+        break;
+      case 2:
+        circle.leftBulb.orange();
+        break;
+      case 3:
+        circle.leftBulb.red();
+        break;
+      default:
+        circle.leftBulb.red();
+        break;
+    }
+
+    switch (Math.floor(mem.minimalIntervalValue / 6)) {
+      case 0:
+        circle.rightBulb.green();
+        break;
+      case 1:
+        circle.rightBulb.yellow();
+        break;
+      case 2:
+        circle.rightBulb.orange();
+        break;
+      case 3:
+        circle.rightBulb.red();
+        break;
+      default:
+        circle.rightBulb.red();
+        break;
+    }
     // document.querySelector("#info4").innerHTML = mem.memoPowerResult;
     // document.querySelector("#info5").innerHTML = mem.countTotalResult2;
     // document.querySelector("#info5").innerHTML = mem.weakestItem;
-    document.querySelector("#info5").innerHTML = numberWithCommas(zeroPad(mem.canEarnValue, 9), ".");
+    document.querySelector("#info5").innerHTML = numberWithCommas(
+      zeroPad(mem.canEarnValue, 9),
+      "."
+    );
 
     document.querySelector(".memobase-info-1").innerHTML =
       `Total cards ` + mem.countTotalResult2;
 
     document.querySelector(".memobase-info-2").innerHTML =
-      `Memopower ` + mem.memoPowerResult;
+      `Memopower ` + mem.memoPowerResult + "h";
 
-      document.querySelector(".memobase-info-3").innerHTML =
+    document.querySelector(".memobase-info-3").innerHTML =
       `Children ` + mem.inQuery;
+
+      document.querySelector(".memobase-info-4").innerHTML =
+      `Weakest card ` + mem.minimalIntervalIcon + " " + Math.floor(mem.minimalIntervalValue) + "h";
 
     if (percentage > 0) {
       document.querySelector("#mycircle").classList.remove("hidden");
@@ -731,13 +775,14 @@ mem.circleData = (update) => {
     mem.countQuery();
     mem.todayAnswered();
     mem.countDaily();
-    mem.countDeadItems()
-    mem.countDeadHours()
+    mem.countDeadItems();
+    mem.countDeadHours();
     mem.countTotal();
     mem.count();
     mem.memoPower();
     mem.maxIntegrity();
-    mem.averageIntegrity()
+    mem.averageIntegrity();
+    mem.minimalInterval()
     mem.canEarn();
   }
 };
@@ -756,7 +801,7 @@ mem.countTotal2 = (data) => {
   mem.circleData();
 };
 
-mem.maxIntegrityValue = 0
+mem.maxIntegrityValue = 0;
 
 mem.maxIntegrity = async () => {
   res = await sql2(
@@ -764,25 +809,23 @@ mem.maxIntegrity = async () => {
      FROM OBJECTS
      ORDER BY INTEGRITY DESC
      LIMIT 1`
-  )
-  mem.maxIntegrityValue = zeroPad(
-    1*(res[0].INTEGRITY*100).toFixed(0),
-    3)
-}
+  );
+  mem.maxIntegrityValue = zeroPad(1 * (res[0].INTEGRITY * 100).toFixed(0), 3);
+};
 
-mem.canEarnValue = 0
+mem.canEarnValue = 0;
 mem.canEarn = async () => {
   let res = await sql2(`
   SELECT
   SUM(2*(1*${Date.now()}-1*LREPEAT)) AS CAN_EARN
   FROM OBJECTS
   WHERE (1*RDATE < ${Date.now()})
-  `)
+  `);
 
-  mem.canEarnValue = 1*((res[0]['CAN_EARN'])/1000/60/60).toFixed(0)
-}
+  mem.canEarnValue = 1 * (res[0]["CAN_EARN"] / 1000 / 60 / 60).toFixed(0);
+};
 
-mem.averageIntegrityValue = 0
+mem.averageIntegrityValue = 0;
 
 mem.averageIntegrity = async () => {
   let res = await sql2(`
@@ -791,11 +834,35 @@ mem.averageIntegrity = async () => {
   (1*RDATE-1*LREPEAT) AS INTERVAL
   FROM OBJECTS
   WHERE (INTERVAL > 0) AND (1*RDATE < ${Date.now()})
-  `)
+  `);
   mem.averageIntegrityValue = zeroPad(
-    1*(res[0]['AVG_INTEGRITY']*100).toFixed(),
-    3)
+    1 * (res[0]["AVG_INTEGRITY"] * 100).toFixed(),
+    3
+  );
+};
+mem.minimalIntervalValue = 0
+mem.minimalIntervalIcon = 0
+mem.minimalIntervalCard = 0
+mem.minimalInterval = async () => {
+  let res = await sql2(`
+
+  SELECT (1*RDATE-1*LREPEAT) AS INTERVAL,
+  OBJECTS.PID,
+  OBJECTS.DATA AS OBJECTS_DATA,
+  DIRS.DATA AS DIRS_DATA
+  FROM OBJECTS 
+  JOIN DIRS ON OBJECTS.PID=DIRS.ID
+  WHERE INTERVAL > 0
+  ORDER BY INTERVAL ASC
+  LIMIT 1
+  `)
+
+  mem.minimalIntervalValue = (res[0].INTERVAL/1000/60/60)
+  mem.minimalIntervalCard = res[0].OBJECTS_DATA
+
+  mem.minimalIntervalIcon = JSON.parse(res[0].DIRS_DATA)[0][0]
 }
+
 mem.memoPowerResult = 0;
 mem.memoPower = () => {
   sql("SELECT SUM(RDATE-LREPEAT) FROM OBJECTS", mem.memoPower2);
@@ -896,7 +963,7 @@ mem.countDaily2 = (data) => {
   mem.circleData();
 };
 
-mem.deadItems = 0
+mem.deadItems = 0;
 mem.countDeadItems = async () => {
   let bodies = await sql2(`SELECT
   *,
@@ -904,20 +971,23 @@ mem.countDeadItems = async () => {
   (1*RDATE-1*LREPEAT) AS INTERVAL,
   (1*${Date.now()}-1*RDATE) AS WT,
   (1*${Date.now()}-1*LREPEAT)/(1.0*RDATE - 1.0*LREPEAT) AS INTEGRITY
-  FROM OBJECTS WHERE (INTERVAL<WT) AND (INTERVAL > 0) AND (1*RDATE < ${Date.now()})`)
+  FROM OBJECTS WHERE (INTERVAL<WT) AND (INTERVAL > 0) AND (1*RDATE < ${Date.now()})`);
 
-   mem.deadItems = zeroPad(bodies[0]['DEAD'], 3);
-}
+  mem.deadItems = zeroPad(bodies[0]["DEAD"], 3);
+};
 
-mem.deadHours = 0
+mem.deadHours = 0;
 mem.countDeadHours = async () => {
   let dhours = await sql2(`SELECT
    (1*${Date.now()}-1*RDATE) AS WT,
    SUM(1*RDATE-1*LREPEAT) AS DHOURS,
    (1*RDATE-1*LREPEAT) AS INTERVAL
-   FROM OBJECTS WHERE (INTERVAL<WT) AND (1*RDATE < ${Date.now()})`)
-   mem.deadHours = zeroPad((dhours[0]['DHOURS']*1/1000/60/60/24/30).toFixed(0),3)
-}
+   FROM OBJECTS WHERE (INTERVAL<WT) AND (1*RDATE < ${Date.now()})`);
+  mem.deadHours = zeroPad(
+    ((dhours[0]["DHOURS"] * 1) / 1000 / 60 / 60 / 24 / 30).toFixed(0),
+    3
+  );
+};
 
 mem.getDir = (string) => {
   // return string.split(".").slice(0,2).join(".");
@@ -1059,16 +1129,16 @@ mem.itemExample = [
 mem.itemExample2 = [[["a cat"]], [["кот"]]];
 //ID: @String,
 //ArRAY: @Array
-mem.addItem = (ID, ARRAY,QFIELDS) => {
+mem.addItem = (ID, ARRAY, QFIELDS) => {
   try {
     let DATA = {};
     let SPEC = { links: [], qfields: QFIELDS || [] };
     DATA = ARRAY;
     for (var i = 0; i < ARRAY.length; i++) {
       if (ARRAY[i][0][0] !== "") {
-      SPEC.links.push([]);
+        SPEC.links.push([]);
       } else {
-        SPEC.links.push(null)
+        SPEC.links.push(null);
       }
     }
 
@@ -1172,8 +1242,7 @@ mem.linker = (SPEC) => {
     return result;
   } else {
     for (var i = 0; i < SPEC.links.length; i++) {
-      if (SPEC.links[i] !== null)
-      SPEC.links[i] = [];
+      if (SPEC.links[i] !== null) SPEC.links[i] = [];
     }
     // console.log("SPEC: ", SPEC);
 
@@ -1190,12 +1259,12 @@ mem.sublinker = (SPEC) => {
     for (var j = 0; j < LINKS.length; j++) {
       if (i != j) {
         if (LINKS[i] !== null && LINKS[j] !== null)
-        if (LINKS[i].indexOf(j) == -1 && SPEC.qfields.indexOf(j) == -1 ) {
-          LINKS[i].push(j);
-          SPEC.links = LINKS;
+          if (LINKS[i].indexOf(j) == -1 && SPEC.qfields.indexOf(j) == -1) {
+            LINKS[i].push(j);
+            SPEC.links = LINKS;
 
-          return [[i, j], SPEC];
-        }
+            return [[i, j], SPEC];
+          }
       }
     }
   }
@@ -1219,10 +1288,10 @@ function makeid(length) {
 }
 
 mem.offset = 0;
-mem.show = (DIRID, callback, order,SEARCH_DATA) => {
+mem.show = (DIRID, callback, order, SEARCH_DATA) => {
   if (order != "find") {
-  sql(
-    `SELECT *,
+    sql(
+      `SELECT *,
     CASE 
     WHEN substr(DATA,2,1) = ',' THEN substr(DATA,3)
     WHEN substr(DATA,3,1) = ',' THEN substr(DATA,4)
@@ -1246,21 +1315,24 @@ mem.show = (DIRID, callback, order,SEARCH_DATA) => {
 END AS result
      FROM DIRS WHERE PID = "${DIRID}" ORDER BY 
      result`,
-    callback //     ASC LIMIT ${mem.offset},1000000`,
-  );
+      callback //     ASC LIMIT ${mem.offset},1000000`,
+    );
   } else {
-    sql(`SELECT * FROM DIRS LIMIT 0`, callback)
+    sql(`SELECT * FROM DIRS LIMIT 0`, callback);
   }
   // mem.getDirById(DIRID,callback)
   switch (order) {
     case "find":
-      sql(`
+      sql(
+        `
         SELECT * FROM OBJECTS WHERE DATA LIKE '% ${SEARCH_DATA} %' 
         OR DATA LIKE '% ${SEARCH_DATA}%' 
         OR DATA LIKE '% ${SEARCH_DATA} %' 
         OR DATA LIKE '%${SEARCH_DATA}%' 
         LIMIT ${mem.offset},10
-      `,callback)
+      `,
+        callback
+      );
       break;
     case "interval":
       sql(
@@ -1274,13 +1346,15 @@ END AS result
         callback
       );
       break;
-      case "integrity desc":
-        sql(
-          `SELECT * , (1*${Date.now()}-1*LREPEAT)/(1.0*RDATE - 1.0*LREPEAT) AS INTEGRITY FROM OBJECTS WHERE PID = "${DIRID}" GROUP BY ID ORDER BY INTEGRITY DESC LIMIT ${mem.offset},10`,
-          callback
-        );
-        break;
-      case "lastrepeat desc":
+    case "integrity desc":
+      sql(
+        `SELECT * , (1*${Date.now()}-1*LREPEAT)/(1.0*RDATE - 1.0*LREPEAT) AS INTEGRITY FROM OBJECTS WHERE PID = "${DIRID}" GROUP BY ID ORDER BY INTEGRITY DESC LIMIT ${
+          mem.offset
+        },10`,
+        callback
+      );
+      break;
+    case "lastrepeat desc":
       sql(
         `SELECT * FROM OBJECTS WHERE PID = "${DIRID}" GROUP BY ID ORDER BY LREPEAT DESC LIMIT ${mem.offset},10`,
         callback
@@ -1304,22 +1378,21 @@ mem.editItem = async function (ID, DATA) {
     SPEC = JSON.parse(SPEC);
     await sql2(`UPDATE OBJECTS SET DATA = '${DATA}' WHERE ID = '${ID}'`);
     ARRAY = JSON.parse(DATA);
-    browser.ARRAY = ARRAY
-    browser.SPEC = SPEC
-    if (ARRAY.filter(item => !!item[0][0]).length != SPEC.links.length) {
+    browser.ARRAY = ARRAY;
+    browser.SPEC = SPEC;
+    if (ARRAY.filter((item) => !!item[0][0]).length != SPEC.links.length) {
       SPEC.links = [];
       for (let i = 0; i < ARRAY.length; i++) {
         if (ARRAY[i][0][0] !== "") {
-        SPEC.links.push([]);
+          SPEC.links.push([]);
         } else {
-          SPEC.links.push(null)
+          SPEC.links.push(null);
         }
       }
       SPEC = JSON.stringify(SPEC);
       await sql2(`UPDATE OBJECTS SET SPEC = '${SPEC}' WHERE ID = '${ID}'`);
     }
   } catch (e) {
-     
     notifier.show(e, true);
   }
 };
@@ -1360,11 +1433,10 @@ let choice = 0;
 let counter = 0;
 let path = ["/"];
 let pathNames = [];
-mem.searchData = ""
-mem.browser = (goTo, order,SEARCH_DATA) => {
+mem.searchData = "";
+mem.browser = (goTo, order, SEARCH_DATA) => {
   // console.log("SEARCH_DATA", SEARCH_DATA)
-  if (SEARCH_DATA)
-  mem.searchData = SEARCH_DATA
+  if (SEARCH_DATA) mem.searchData = SEARCH_DATA;
   mem.when();
   counter = 0;
   cached = 0;
@@ -1374,7 +1446,7 @@ mem.browser = (goTo, order,SEARCH_DATA) => {
     goTo = "/";
   }
 
-  mem.show(goTo, mem.setCache, order,SEARCH_DATA);
+  mem.show(goTo, mem.setCache, order, SEARCH_DATA);
   mem.collect();
 };
 let cached = 0;
@@ -1445,7 +1517,6 @@ mem.setCache = (data) => {
       ).value = `Memos Terminal v 0.1.5 \n ${mem.terminalHelpMessage}`;
       mem.terminalHelpMessage = "";
     }
-
   }
   browser.render();
 };
@@ -1485,19 +1556,23 @@ mem.terminalCommand = (choice) => {
       mem.browser(path[path.length - 1]);
       break;
     case "find":
-      mem.browser(path[path.length - 1],"find",choice.split(" ")[1].toLowerCase())
+      mem.browser(
+        path[path.length - 1],
+        "find",
+        choice.split(" ")[1].toLowerCase()
+      );
     case "lsi":
       mem.browser(path[path.length - 1], "interval");
       break;
     case "lsib":
       mem.browser(path[path.length - 1], "interval backwards");
       break;
-      case "lslrd":
+    case "lslrd":
       mem.browser(path[path.length - 1], "lastrepeat desc");
       break;
-      case "lsid":
-        mem.browser(path[path.length - 1], "integrity desc");
-        break;
+    case "lsid":
+      mem.browser(path[path.length - 1], "integrity desc");
+      break;
     case "lslim":
       mem.browser(
         path[path.length - 1],
@@ -1681,7 +1756,7 @@ mem.browserObjSample = `<div class="memobject md-ripples" onclick="browser.rende
 mem.currentDir = ``;
 let arba = 0;
 let browser = {};
-browser.movingDirID = ""
+browser.movingDirID = "";
 browser.focus = (el) => {
   let p = el;
   let s = window.getSelection();
@@ -1720,20 +1795,12 @@ browser.collectInput = () => {
   let arr = [];
   //const sentence = '    My string with a    lot   of Whitespace.  '.replace(/\s+/g, ' ').trim()
   for (let item of document.querySelectorAll(".memos-userInput")) {
-    
-      
-    items = item.value.split("\n")
-    items = items.map(item => item.replace(/\s+/g, " ").trim())
-    arr.push([items]); 
-    
+    items = item.value.split("\n");
+    items = items.map((item) => item.replace(/\s+/g, " ").trim());
+    arr.push([items]);
   }
-  if (
-    arr.filter(
-      (item) => item[0][0].length > 0
-    )
-    .length < 2
-  ) return "ERROR"
-  
+  if (arr.filter((item) => item[0][0].length > 0).length < 2) return "ERROR";
+
   return arr;
 };
 
@@ -1759,16 +1826,16 @@ browser.editFile = async function (id) {
 
 browser.search = () => {
   if (mem.terminalChoice.includes("find")) {
-    mem.terminalCommand("ls")
-    return
+    mem.terminalCommand("ls");
+    return;
   }
-  let search = prompt("Type a word")
+  let search = prompt("Type a word");
   if (search !== "") {
-    mem.terminalCommand("find "+search)
+    mem.terminalCommand("find " + search);
   } else {
-    mem.terminalCommand("ls")
+    mem.terminalCommand("ls");
   }
-}
+};
 
 browser.newDir = () => {
   document.querySelector(
@@ -1817,12 +1884,12 @@ browser.addFile = () => {
   DATA = DATA.replaceAll("'", "''");
   if (browser.collectInput() !== "ERROR") {
     notifier.show(`📝 Card added`);
-    let qfields = JSON.parse(browser.readLocks())
-    mem.addItem(currentDirID, JSON.parse(DATA),qfields);
+    let qfields = JSON.parse(browser.readLocks());
+    mem.addItem(currentDirID, JSON.parse(DATA), qfields);
   } else {
     notifier.show(`⚠️ Too little data`, true);
   }
-  browser.lockFieldEngaged = 0 
+  browser.lockFieldEngaged = 0;
   mem.terminalCommand("ls");
 };
 browser.newFileInit = () => {
@@ -1832,17 +1899,16 @@ browser.editDirInit = () => {
   mem.getDirById(path[path.length - 1], browser.editDir);
 };
 browser.moveDirInit = (ctx) => {
-  browser.movingDirID = path.at(-1)
-  browser.goUp()
-  notifier.show("🚚 Choose the dir to move to")
-
-}
+  browser.movingDirID = path.at(-1);
+  browser.goUp();
+  notifier.show("🚚 Choose the dir to move to");
+};
 browser.moveDirFinish = (ctx) => {
-  mem.moveDir(browser.movingDirID, path.at(-1))
-  notifier.show("🚚 Moving complete")
-  browser.movingDirID = ""
-  mem.terminalCommand("ls")
-}
+  mem.moveDir(browser.movingDirID, path.at(-1));
+  notifier.show("🚚 Moving complete");
+  browser.movingDirID = "";
+  mem.terminalCommand("ls");
+};
 browser.editDir = (obj) => {
   try {
     console.log(obj);
@@ -1966,29 +2032,29 @@ browser.renderFile = (obj) => {
   ).innerHTML = `<div class="memobject md-ripples" onclick="browser.editFile('${obj[0].ID}')"><div class="memdata">←</div></div>`;
 
   let fields = JSON.parse(obj[0].DATA); //array of strings
-  
+
   let fieldNames = JSON.parse(obj[0].DIRDATA)[1]; //array of strings
   let index = 0;
   let lock = "";
   try {
     for (let field of fieldNames) {
       if (fields[index] == undefined) fields[index] = [[""]];
-      browser.fields = fields
+      browser.fields = fields;
       let qfields = JSON.parse(obj[0].SPEC).qfields; //array
       lock = browser.showLock(qfields.indexOf(index) > -1);
       document.querySelector(
         ".objects"
       ).innerHTML += `<div class="memobject md-ripples field-name" onclick="browser.lockField(this)"style="border-bottom: 5px dotted #151515"><div class="memdata">${field} ${lock} </div></div>`;
-        if (fields[index][0] == undefined) fields[index][0] = [""]
+      if (fields[index][0] == undefined) fields[index][0] = [""];
       document.querySelector(
         ".objects"
-      ).innerHTML += `<textarea onchange="browser.triggerChange()" oninput="auto_grow(this)" class='memos-object-input memos-userInput'>${fields[index][0].join("\n")}</textarea>`;
+      ).innerHTML += `<textarea onchange="browser.triggerChange()" oninput="auto_grow(this)" class='memos-object-input memos-userInput'>${fields[
+        index
+      ][0].join("\n")}</textarea>`;
       index++;
     }
-
-     
   } catch (e) {
-    console.log(e)
+    console.log(e);
     notifier.show(e);
   }
 
@@ -2043,15 +2109,14 @@ browser.renderFile = (obj) => {
 
   document.querySelector(".page2-node4").scrollTo({
     top: 0, //window.innerHeight-460
-    behavoir: "smooth"
-  })
-  
+    behavoir: "smooth",
+  });
 };
 calculateIntegrity = (value) => {
-  if (value < 0) return 0
-  if (value == Infinity ) return 0
-  return value
-}
+  if (value < 0) return 0;
+  if (value == Infinity) return 0;
+  return value;
+};
 const readFields = (data) => {
   let obj = JSON.parse(data.DATA);
   arba = obj;
@@ -2070,44 +2135,39 @@ const readFields = (data) => {
     obj = arr;
   }
 
-  
   for (let item of obj) {
     // console.log(item[0])
     try {
-    str += (item[0].join("").length) ? 
-    item[0].map(item => {
-      return item
-
-      .replaceAll("<", "&lt;")
-      .replaceAll(">", "&gt;")
-     
-    })
-    .join("<br>")
-    
-    + "<br>--------------------<br>" : ""
-    } catch(e) {console.error(e)}
+      str += item[0].join("").length
+        ? item[0]
+            .map((item) => {
+              return item.replaceAll("<", "&lt;").replaceAll(">", "&gt;");
+            })
+            .join("<br>") + "<br>--------------------<br>"
+        : "";
+    } catch (e) {
+      console.error(e);
+    }
   }
 
   str += "⌛ " + mem.calcRepeat(data.RDATE) + "<br>"; //<-- repeat in
-  
-  str += //waiting time
-  "⏰ " +
-  mem.convertHMS(
-    (Date.now() - 1*data.RDATE ) / 1000 //<-- strength
-  );
-  browser.data = data
 
-  
+  str += //waiting time
+    "⏰ " +
+    mem.convertHMS(
+      (Date.now() - 1 * data.RDATE) / 1000 //<-- strength
+    );
+  browser.data = data;
+
   str += //износ
-    "<br>🔋 " + (
-      //integirty 
-      calculateIntegrity(
-        100 * ( 
-          (Date.now() - 1*data.RDATE ) / (1*data.RDATE - 1*data.LREPEAT) 
-         )
-      )
-    ).toFixed(0) + "%"
-    
+    "<br>🔋 " +
+    //integirty
+    calculateIntegrity(
+      100 *
+        ((Date.now() - 1 * data.RDATE) / (1 * data.RDATE - 1 * data.LREPEAT))
+    ).toFixed(0) +
+    "%";
+
   str +=
     "<br>💪 " +
     mem.convertHMS(
@@ -2125,10 +2185,10 @@ const readFields = (data) => {
 
 browser.postpone = async (id) => {
   let hours = 1 * prompt("Enter hours");
-	if (isNaN(hours)) {
-		alert("Iput is not a number")
-		return;
-	}
+  if (isNaN(hours)) {
+    alert("Iput is not a number");
+    return;
+  }
   await mem.setRDATE(id, hours * 1000 * 60 * 60);
   mem.collect();
   browser.render(1, id);
@@ -2146,7 +2206,7 @@ browser.removeFile = (id) => {
   let confirm = prompt("Type `delete` to confirm delete");
   if (confirm == "delete") {
     mem.rem(id);
-    notifier.show("🗑️ Card erased")
+    notifier.show("🗑️ Card erased");
   }
   mem.terminalCommand("ls");
 };
@@ -2155,7 +2215,7 @@ browser.removeDir = () => {
   if (confirm == "delete") {
     mem.rmdir(path[path.length - 1]);
   }
-  
+
   mem.terminalCommand("ls");
 };
 browser.movePanel = () => {
@@ -2174,9 +2234,9 @@ browser.selectOrder = () => {
       break;
     case "intervalb":
       mem.terminalCommand("lsib");
-      case "lastrepeatd":
+    case "lastrepeatd":
       mem.terminalCommand("lslrd");
-      case "integrityd":
+    case "integrityd":
       mem.terminalCommand("lsid");
       break;
   }
@@ -2327,10 +2387,9 @@ browser.switchPage = (next) => {
     mem.offset -= 10;
   }
   if (!mem.terminalChoice.includes("find")) {
-  mem.terminalCommand("ls");
+    mem.terminalCommand("ls");
   } else {
-  mem.terminalCommand("find "+mem.searchData);
-
+    mem.terminalCommand("find " + mem.searchData);
   }
 };
 browser.goUp = () => {
@@ -2340,7 +2399,6 @@ browser.goUp = () => {
 browser.showControlPanel = false;
 browser.thisDirTotal = 0;
 browser.render = (showFile, id, data) => {
-  
   try {
     if (showFile) {
       mem.get(id, browser.renderFile);
@@ -2371,12 +2429,14 @@ browser.render = (showFile, id, data) => {
       if (browser.showControlPanel) {
         document.querySelector(
           ".objects"
-        ).innerHTML += `<div class="memobject md-ripples" onclick="browser.search()"><div class="memdata">${(!mem.terminalChoice.includes("find")?"🔎 Search":"🚪 Back to list")}</div></div>`;
+        ).innerHTML += `<div class="memobject md-ripples" onclick="browser.search()"><div class="memdata">${
+          !mem.terminalChoice.includes("find") ? "🔎 Search" : "🚪 Back to list"
+        }</div></div>`;
 
         document.querySelector(
           ".objects"
-        ).innerHTML += `<div class="memobject md-ripples" onclick="mem.terminalCommand('ls')"><div class="memdata">🔃 Refresh</div></div>`
-        
+        ).innerHTML += `<div class="memobject md-ripples" onclick="mem.terminalCommand('ls')"><div class="memdata">🔃 Refresh</div></div>`;
+
         document.querySelector(
           ".objects"
         ).innerHTML += `<div class="memobject md-ripples" onclick="browser.newDir()"><div class="memdata">📁 Add catalog</div></div>`;
@@ -2391,11 +2451,10 @@ browser.render = (showFile, id, data) => {
             ".objects"
           ).innerHTML += `<div class="memobject md-ripples" onclick="browser.moveDirInit(this)"><div class="memdata">🚚 Move this catalog...</div></div>`;
 
-          if (browser.movingDirID !== "")
+        if (browser.movingDirID !== "")
           document.querySelector(
             ".objects"
           ).innerHTML += `<div class="memobject md-ripples" onclick="browser.moveDirFinish(this)"><div class="memdata">🚚 Move here</div></div>`;
-
 
         if (path[path.length - 1] != "/")
           document.querySelector(
@@ -2454,9 +2513,8 @@ browser.render = (showFile, id, data) => {
         index++;
       }
 
-      
       for (let item of browserCache[1]) {
-        browser.item = item
+        browser.item = item;
         // console.log("ITEM: ", item)
         document.querySelector(".objects").innerHTML += mem.browserObjSample
           .replace("$objData", readFields(item))
@@ -2465,40 +2523,40 @@ browser.render = (showFile, id, data) => {
         // .replace("$DATA", item.DATA)
       }
 
-      let command = (!mem.terminalChoice.includes("find"))
-       ? `select COUNT(ID) AS TOTAL FROM OBJECTS WHERE PID = '${path[path.length - 1]}'`
-       : `select COUNT(ID) AS TOTAL FROM OBJECTS WHERE DATA LIKE '% ${mem.searchData} %' 
+      let command = !mem.terminalChoice.includes("find")
+        ? `select COUNT(ID) AS TOTAL FROM OBJECTS WHERE PID = '${
+            path[path.length - 1]
+          }'`
+        : `select COUNT(ID) AS TOTAL FROM OBJECTS WHERE DATA LIKE '% ${mem.searchData} %' 
        OR DATA LIKE '% ${mem.searchData}%' 
        OR DATA LIKE '% ${mem.searchData} %' 
-       OR DATA LIKE '%${mem.searchData}%' `
+       OR DATA LIKE '%${mem.searchData}%' `;
       // console.log("COMMAND: ", command)
-      sql(command,
-        (res) => {
-          browser.thisDirTotal = res[0].TOTAL;
-          let compare = mem.offset + 10;
-          if (compare == 0) compare = 10;
-          if (browser.thisDirTotal > compare) {
-            if ( !document.querySelector(".objects").innerHTML.includes("➡️"))
+      sql(command, (res) => {
+        browser.thisDirTotal = res[0].TOTAL;
+        let compare = mem.offset + 10;
+        if (compare == 0) compare = 10;
+        if (browser.thisDirTotal > compare) {
+          if (!document.querySelector(".objects").innerHTML.includes("➡️"))
             document.querySelector(".objects").innerHTML += `
           <div class="memobject md-ripples" onclick="browser.switchPage(1)"><div class="memdata">➡️ Next page</div></div>
           `;
-          }
-
-          document.querySelector(
-            "#total-objects"
-          ).innerHTML = `📚 TOTAL:  ${res[0].TOTAL}`;
         }
-      );
+
+        document.querySelector(
+          "#total-objects"
+        ).innerHTML = `📚 TOTAL:  ${res[0].TOTAL}`;
+      });
       document.querySelector(".page2-node4").scrollBy(0, 50);
     }
   } catch (e) {
     // console.error(e)
   }
-  
+
   document.querySelector(".page2-node4").scrollTo({
     top: 0, //window.innerHeight-460
-    behavoir: "smooth"
-  })
+    behavoir: "smooth",
+  });
 };
 
 mem.newAvailable = () => {
@@ -2524,13 +2582,14 @@ mem.countQuery();
 mem.todayAnswered();
 mem.countDaily();
 mem.count();
-mem.countDeadItems()
-mem.countDeadHours()
+mem.countDeadItems();
+mem.countDeadHours();
 mem.countTotal();
 mem.memoPower();
 mem.maxIntegrity();
-mem.averageIntegrity()
-mem.canEarn()
+mem.averageIntegrity();
+mem.minimalInterval()
+mem.canEarn();
 // const clickHandler = (event) => event.target.focus()
 // document.addEventListener('click',clickHandler)
 setInterval(mem.when, 5000);
