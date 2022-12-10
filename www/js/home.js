@@ -40,7 +40,7 @@ circle.rightBulb.green = () => {
 }
 circle.rightBulb.yellow = () => {
   document.querySelector("#right-bulb").style.fill  = 'rgb(255,255,0)'
-  document.querySelector("#left-bulb").style.filter = 'drop-shadow(rgb(255, 255, 0) 0px 0px 2px)'
+  document.querySelector("#right-bulb").style.filter = 'drop-shadow(rgb(255, 255, 0) 0px 0px 2px)'
 }
 circle.rightBulb.orange = () => {
   document.querySelector("#right-bulb").style.fill  = 'rgb(255,128,0)'

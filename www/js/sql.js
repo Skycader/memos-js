@@ -115,8 +115,20 @@ mem.find = async (data) => {
   return await sql2(`select * from objects where data like "%${data}%"`);
 };
 mem.collect = () => {
+
   sql(
-    `SELECT OBJECTS.ID, OBJECTS.DATA, RDATE, LREPEAT, (1*RDATE - 1*LREPEAT) AS INTERVAL, SPEC, DIRS.DATA AS DIRDATA FROM OBJECTS JOIN DIRS ON OBJECTS.PID=DIRS.ID AND (1*RDATE - 1*LREPEAT)<7200000 ORDER BY INTERVAL DESC LIMIT 100`,
+    // `SELECT * FROM OBJECTS  LEFT JOIN DIRS ON OBJECTS.PID=DIRS.ID AND 1*RDATE < ${Date.now()} LIMIT 10`,
+    `SELECT OBJECTS.ID, OBJECTS.DATA, RDATE, LREPEAT,  
+    (1*RDATE - 1*LREPEAT) AS INTERVAL, SPEC, DIRS.DATA AS DIRDATA, 
+    (1*${Date.now()}-1*LREPEAT) AS WAITING, ((1*${Date.now()}-1*LREPEAT)/(1.0*RDATE - 1.0*LREPEAT)-1) AS INTEGRITY 
+    FROM OBJECTS JOIN DIRS ON OBJECTS.PID=DIRS.ID AND 1*RDATE < ${Date.now()} AND (1*RDATE - 1*LREPEAT)>=7200000 
+    AND INTEGRITY>2
+    ORDER BY INTEGRITY DESC LIMIT 100`,
+    mem.collectCallback
+  );
+
+  sql(
+    `SELECT OBJECTS.ID, OBJECTS.DATA, RDATE, LREPEAT, (1*${Date.now()}-1*LREPEAT) AS WAITING, (1*RDATE - 1*LREPEAT) AS INTERVAL, ((1*${Date.now()}-1*LREPEAT)/(1.0*RDATE - 1.0*LREPEAT)-1) AS INTEGRITY, SPEC, DIRS.DATA AS DIRDATA FROM OBJECTS JOIN DIRS ON OBJECTS.PID=DIRS.ID AND (1*RDATE - 1*LREPEAT)<7200000 ORDER BY INTERVAL DESC LIMIT 100`,
     mem.collectCallback
   );
 
@@ -459,13 +471,13 @@ mem.check = (answer) => {
   let block = 0;
   for (var i = 0; i < answer.length; i++) {
     for (var j = 0; j < answer[i].length; j++) {
-      console.log(
-        `${answer[i][j].toLowerCase()} == ${mem.res.rightAnswer[i][
-          j
-        ].toLowerCase()} ${
-          answer[i][j].toLowerCase() == mem.res.rightAnswer[i][j].toLowerCase()
-        }`
-      );
+      // console.log(
+      //   `${answer[i][j].toLowerCase()} == ${mem.res.rightAnswer[i][
+      //     j
+      //   ].toLowerCase()} ${
+      //     answer[i][j].toLowerCase() == mem.res.rightAnswer[i][j].toLowerCase()
+      //   }`
+      // );
       if (
         answer[i][j].toLowerCase() != mem.res.rightAnswer[i][j].toLowerCase()
       ) {
@@ -725,6 +737,7 @@ mem.circleData = (update) => {
         break;
     }
 
+
     switch (Math.floor(mem.minimalIntervalValue / 6)) {
       case 0:
         circle.rightBulb.green();
@@ -741,6 +754,10 @@ mem.circleData = (update) => {
       default:
         circle.rightBulb.red();
         break;
+    }
+
+    if (mem.children > 0) {
+      circle.rightBulb.green();
     }
     // document.querySelector("#info4").innerHTML = mem.memoPowerResult;
     // document.querySelector("#info5").innerHTML = mem.countTotalResult2;
@@ -885,11 +902,13 @@ function numberWithCommas(num, sep) {
 }
 
 mem.inQuery = 0;
+mem.children = 0
 mem.countQuery = async () => {
   let res = await sql2(
     `SELECT COUNT(ID), RDATE, (1*RDATE-1*LREPEAT) AS INTERVAL FROM OBJECTS WHERE (1*RDATE-1*LREPEAT)<7200000`
   );
   res = res[0]["COUNT(ID)"];
+  mem.children = res
   res = numberWithCommas(zeroPad(res, 9), ".");
   mem.inQuery = res;
   return res;

@@ -488,7 +488,10 @@ cards.set = (pos) => {
     if (!mem.nothing) {
      
       renderedCard = cardSample.replace("$icon", JSON.parse(mem.res.dir)[0][0]);
-
+      
+      renderedCard = renderedCard.replace("$INTEGRITY",(100*mem.res.obj.INTEGRITY).toFixed(0))
+      renderedCard = renderedCard.replace("$EARN", mem.convertHMS(1*mem.res.obj.WAITING/1000))
+     
       renderedCard = renderedCard.replace(
         "$dirName",
       
@@ -550,7 +553,22 @@ cardSample = `
 		$question
 		</div>
 	</div>
- 
+
+  <div class="infopanel" style="height: 50px;margin-bottom: 40px;border-top: 1px solid #373737;padding-top: 40px;">
+<div class="diricon">
+  <div class="forpicture" style="
+  min-height: 40px;
+  height: 40px;
+  font-size: 30px;
+">🔋</div>
+  <div class="prepare2"> 
+    <div class="prepare3">
+      <p class="tip">$INTEGRITY%</p>
+    </div>
+</div>
+</div>
+<div class="dirname">⌛$EARN</div>
+</div>
 `;
 
 cardWin = `
