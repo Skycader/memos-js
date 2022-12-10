@@ -128,7 +128,11 @@ mem.collect = () => {
   );
 
   sql(
-    `SELECT OBJECTS.ID, OBJECTS.DATA, RDATE, LREPEAT, (1*${Date.now()}-1*LREPEAT) AS WAITING, (1*RDATE - 1*LREPEAT) AS INTERVAL, ((1*${Date.now()}-1*LREPEAT)/(1.0*RDATE - 1.0*LREPEAT)-1) AS INTEGRITY, SPEC, DIRS.DATA AS DIRDATA FROM OBJECTS JOIN DIRS ON OBJECTS.PID=DIRS.ID AND (1*RDATE - 1*LREPEAT)<7200000 ORDER BY INTERVAL DESC LIMIT 100`,
+    `SELECT OBJECTS.ID, OBJECTS.DATA, RDATE, LREPEAT, 
+    (1*${Date.now()}-1*LREPEAT) AS WAITING, (1*RDATE - 1*LREPEAT) AS INTERVAL, 
+    ((1*${Date.now()}-1*LREPEAT)/(1.0*RDATE - 1.0*LREPEAT)-1) AS INTEGRITY, SPEC, 
+    DIRS.DATA AS DIRDATA FROM OBJECTS JOIN DIRS ON OBJECTS.PID=DIRS.ID AND 
+    (1*RDATE - 1*LREPEAT)<7200000 ORDER BY INTEGRITY DESC LIMIT 100`,
     mem.collectCallback
   );
 
@@ -486,7 +490,7 @@ mem.check = (answer) => {
         mem.mistake = 1;
       } else {
         if (!block) rightSymbols++;
-        console.log(rightSymbols);
+        // console.log(rightSymbols);
       }
       if (
         !block &&
@@ -822,8 +826,10 @@ mem.maxIntegrityValue = 0;
 
 mem.maxIntegrity = async () => {
   res = await sql2(
-    `SELECT ((1*${Date.now()}-1*LREPEAT)/(1.0*RDATE - 1.0*LREPEAT)-1) AS INTEGRITY
+    `SELECT ((1*${Date.now()}-1*LREPEAT)/(1.0*RDATE - 1.0*LREPEAT)-1) AS INTEGRITY,
+    (1*RDATE-1*LREPEAT) AS INTERVAL
      FROM OBJECTS
+     WHERE (1*RDATE < ${Date.now()})
      ORDER BY INTEGRITY DESC
      LIMIT 1`
   );
