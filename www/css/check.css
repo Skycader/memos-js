@@ -45,7 +45,7 @@
   align-items: center;
   justify-content: center;
   width: 100%;
-  height: 100vh;
+  height: 100%;
   font-family: memoff;
   font-size: 26px;
   color: white;
@@ -53,6 +53,9 @@
   word-break: break-all;
   word-wrap: break-word;
   padding: 10px; /*top right bottom left */
+  margin-top: 5px;
+  margin-bottom: 5px;
+  margin-left: -5px;
 }
 
 /* .redColor {
@@ -93,12 +96,17 @@
 }
 .innerdata {
   /*otherwise scrollable content is not fully displated */
+
+  display: flex; align-items: center; justify-content: center;
   text-align: center;
   word-break: break-word;
   width: 100%;
-  /* height: 100%; */
+  padding: 0px 20px;
+  height: auto;
   overflow-y: auto;
+  margin: auto;
 }
+
 .table {
   display: flex;
   position: absolute;
@@ -387,8 +395,31 @@
 }
 
 .datapanel::-webkit-scrollbar {
-  display: none;
+  /* display: none; */
 }
+
+.datapanel::-webkit-scrollbar {
+  width: 8px;
+    background: transparent;
+  }
+  .datapanel::-webkit-scrollbar-track {
+  
+  
+  border: solid 0px red;
+  border-radius: 25px;
+  }
+   
+  .datapanel::-webkit-scrollbar-thumb {
+  background-color: #8a8a8a; 
+  box-shadow: inset 0 0 20px 16px #8a8a8a;
+  border: solid 0px red;
+  border-radius: 25px;
+  
+  }
+  .datapanel::-webkit-scrollbar-thumb:hover {
+  box-shadow: inset 0 0  0px 16px  purple;
+  border: solid 0px transparent;
+  }
 
 .scrollBarNone::-webkit-scrollbar {
   display: none;

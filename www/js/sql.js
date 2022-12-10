@@ -122,7 +122,11 @@ mem.collect = () => {
 
   sql(
     // `SELECT * FROM OBJECTS  LEFT JOIN DIRS ON OBJECTS.PID=DIRS.ID AND 1*RDATE < ${Date.now()} LIMIT 10`,
-    `SELECT OBJECTS.ID, OBJECTS.DATA, RDATE, LREPEAT,  (1*RDATE - 1*LREPEAT) AS INTERVAL, SPEC, DIRS.DATA AS DIRDATA, (1*${Date.now()}-1*LREPEAT) AS WAITING, (1*${Date.now()}-1*LREPEAT)/(1.0*RDATE - 1.0*LREPEAT) AS INTEGRITY FROM OBJECTS JOIN DIRS ON OBJECTS.PID=DIRS.ID AND 1*RDATE < ${Date.now()} AND (1*RDATE - 1*LREPEAT)>=7200000 ORDER BY INTEGRITY DESC LIMIT 100`,
+    `SELECT OBJECTS.ID, OBJECTS.DATA, RDATE, LREPEAT,  
+    (1*RDATE - 1*LREPEAT) AS INTERVAL, SPEC, DIRS.DATA AS DIRDATA, 
+    (1*${Date.now()}-1*LREPEAT) AS WAITING, ((1*${Date.now()}-1*LREPEAT)/(1.0*RDATE - 1.0*LREPEAT)-1) AS INTEGRITY 
+    FROM OBJECTS JOIN DIRS ON OBJECTS.PID=DIRS.ID AND 1*RDATE < ${Date.now()} AND (1*RDATE - 1*LREPEAT)>=7200000 
+    ORDER BY INTEGRITY DESC LIMIT 100`,
     mem.collectCallback
   );
 };
@@ -696,18 +700,23 @@ mem.circleData = (update) => {
   );
   if (!isNaN(percentage) && Math.abs(percentage) != Infinity) {
     document.querySelector("#info3").innerHTML = percentage;
-    document.querySelector("#info4").innerHTML = `${mem.deadItems} · ${zeroPad(Math.round(mem.deadItems*100/mem.countResult),3)} · ${mem.deadHours}`;
+    document.querySelector("#info4").innerHTML 
+    = 
+    `${mem.deadItems} · ${mem.maxIntegrityValue} · ${mem.averageIntegrityValue}`;
 
     // document.querySelector("#info4").innerHTML = mem.memoPowerResult;
     // document.querySelector("#info5").innerHTML = mem.countTotalResult2;
     // document.querySelector("#info5").innerHTML = mem.weakestItem;
-    document.querySelector("#info5").innerHTML = mem.inQuery;
+    document.querySelector("#info5").innerHTML = numberWithCommas(zeroPad(mem.canEarnValue, 9), ".");
 
     document.querySelector(".memobase-info-1").innerHTML =
       `Total cards ` + mem.countTotalResult2;
 
     document.querySelector(".memobase-info-2").innerHTML =
       `Memopower ` + mem.memoPowerResult;
+
+      document.querySelector(".memobase-info-3").innerHTML =
+      `Children ` + mem.inQuery;
 
     if (percentage > 0) {
       document.querySelector("#mycircle").classList.remove("hidden");
@@ -727,6 +736,9 @@ mem.circleData = (update) => {
     mem.countTotal();
     mem.count();
     mem.memoPower();
+    mem.maxIntegrity();
+    mem.averageIntegrity()
+    mem.canEarn();
   }
 };
 
@@ -744,6 +756,46 @@ mem.countTotal2 = (data) => {
   mem.circleData();
 };
 
+mem.maxIntegrityValue = 0
+
+mem.maxIntegrity = async () => {
+  res = await sql2(
+    `SELECT ((1*${Date.now()}-1*LREPEAT)/(1.0*RDATE - 1.0*LREPEAT)-1) AS INTEGRITY
+     FROM OBJECTS
+     ORDER BY INTEGRITY DESC
+     LIMIT 1`
+  )
+  mem.maxIntegrityValue = zeroPad(
+    1*(res[0].INTEGRITY*100).toFixed(0),
+    3)
+}
+
+mem.canEarnValue = 0
+mem.canEarn = async () => {
+  let res = await sql2(`
+  SELECT
+  SUM(2*(1*${Date.now()}-1*LREPEAT)) AS CAN_EARN
+  FROM OBJECTS
+  WHERE (1*RDATE < ${Date.now()})
+  `)
+
+  mem.canEarnValue = 1*((res[0]['CAN_EARN'])/1000/60/60).toFixed(0)
+}
+
+mem.averageIntegrityValue = 0
+
+mem.averageIntegrity = async () => {
+  let res = await sql2(`
+  SELECT
+  AVG((1*${Date.now()}-1*LREPEAT)/(1.0*RDATE - 1.0*LREPEAT)-1) AS AVG_INTEGRITY,
+  (1*RDATE-1*LREPEAT) AS INTERVAL
+  FROM OBJECTS
+  WHERE (INTERVAL > 0) AND (1*RDATE < ${Date.now()})
+  `)
+  mem.averageIntegrityValue = zeroPad(
+    1*(res[0]['AVG_INTEGRITY']*100).toFixed(),
+    3)
+}
 mem.memoPowerResult = 0;
 mem.memoPower = () => {
   sql("SELECT SUM(RDATE-LREPEAT) FROM OBJECTS", mem.memoPower2);
@@ -847,10 +899,13 @@ mem.countDaily2 = (data) => {
 mem.deadItems = 0
 mem.countDeadItems = async () => {
   let bodies = await sql2(`SELECT
-   COUNT(ID) AS DEAD,
-   (1*RDATE-1*LREPEAT) AS INTERVAL,
-   (1*${Date.now()}-1*RDATE) AS WT
-   FROM OBJECTS WHERE (INTERVAL<WT) AND (1*RDATE < ${Date.now()})`)
+  *,
+  COUNT(ID) AS DEAD,
+  (1*RDATE-1*LREPEAT) AS INTERVAL,
+  (1*${Date.now()}-1*RDATE) AS WT,
+  (1*${Date.now()}-1*LREPEAT)/(1.0*RDATE - 1.0*LREPEAT) AS INTEGRITY
+  FROM OBJECTS WHERE (INTERVAL<WT) AND (INTERVAL > 0) AND (1*RDATE < ${Date.now()})`)
+
    mem.deadItems = zeroPad(bodies[0]['DEAD'], 3);
 }
 
@@ -2473,6 +2528,9 @@ mem.countDeadItems()
 mem.countDeadHours()
 mem.countTotal();
 mem.memoPower();
+mem.maxIntegrity();
+mem.averageIntegrity()
+mem.canEarn()
 // const clickHandler = (event) => event.target.focus()
 // document.addEventListener('click',clickHandler)
 setInterval(mem.when, 5000);
