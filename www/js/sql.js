@@ -122,7 +122,7 @@ mem.collect = () => {
     (1*RDATE - 1*LREPEAT) AS INTERVAL, SPEC, DIRS.DATA AS DIRDATA, 
     (1*${Date.now()}-1*LREPEAT) AS WAITING, ((1*${Date.now()}-1*LREPEAT)/(1.0*RDATE - 1.0*LREPEAT)-1) AS INTEGRITY 
     FROM OBJECTS JOIN DIRS ON OBJECTS.PID=DIRS.ID AND 1*RDATE < ${Date.now()} AND (1*RDATE - 1*LREPEAT)>=7200000 
-    AND INTEGRITY>2
+    AND INTEGRITY>1
     ORDER BY INTEGRITY DESC LIMIT 100`,
     mem.collectCallback
   );
@@ -132,7 +132,7 @@ mem.collect = () => {
     (1*${Date.now()}-1*LREPEAT) AS WAITING, (1*RDATE - 1*LREPEAT) AS INTERVAL, 
     ((1*${Date.now()}-1*LREPEAT)/(1.0*RDATE - 1.0*LREPEAT)-1) AS INTEGRITY, SPEC, 
     DIRS.DATA AS DIRDATA FROM OBJECTS JOIN DIRS ON OBJECTS.PID=DIRS.ID AND 
-    (1*RDATE - 1*LREPEAT)<7200000 ORDER BY INTEGRITY DESC LIMIT 100`,
+    (1*RDATE - 1*LREPEAT)<7200000 ORDER BY INTERVAL DESC LIMIT 100`,
     mem.collectCallback
   );
 
@@ -829,7 +829,7 @@ mem.maxIntegrity = async () => {
     `SELECT ((1*${Date.now()}-1*LREPEAT)/(1.0*RDATE - 1.0*LREPEAT)-1) AS INTEGRITY,
     (1*RDATE-1*LREPEAT) AS INTERVAL
      FROM OBJECTS
-     WHERE (1*RDATE < ${Date.now()})
+     WHERE (INTERVAL > 7200000) AND (1*RDATE < ${Date.now()})
      ORDER BY INTEGRITY DESC
      LIMIT 1`
   );
@@ -856,7 +856,7 @@ mem.averageIntegrity = async () => {
   AVG((1*${Date.now()}-1*LREPEAT)/(1.0*RDATE - 1.0*LREPEAT)-1) AS AVG_INTEGRITY,
   (1*RDATE-1*LREPEAT) AS INTERVAL
   FROM OBJECTS
-  WHERE (INTERVAL > 0) AND (1*RDATE < ${Date.now()})
+  WHERE (INTERVAL > 7200000) AND (1*RDATE < ${Date.now()})
   `);
   mem.averageIntegrityValue = zeroPad(
     1 * (res[0]["AVG_INTEGRITY"] * 100).toFixed(),
