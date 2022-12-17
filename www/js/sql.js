@@ -70,6 +70,7 @@ sql = (query, callback, error, arg1, arg2, arg3) => {
       },
       function (tx, results) {
         console.log(results, query, "ERROR");
+		alert(JSON.stringify(results), JSON.stringify(query), JSON.stringify(tx))
         error(arg1, arg2, arg3);
       }
     );
@@ -1086,9 +1087,9 @@ mem.setDir = (PID, DATA) => {
   G_DATA = DATA;
   G_COUNT++;
   //let ID = "tZNZZV"
-  if (G_COUNT < 1000) {
+  if (G_COUNT < 1) {
     sql(
-      `INSERT INTO DIRS (ID, PID, DATA) VALUES ("${ID}", "${G_PID}", '${G_DATA}')`,
+      `INSERT2 INTO DIRS (ID, PID, DATA) VALUES ("${ID}", "${G_PID}", '${G_DATA}')`,
       undefined,
       mem.setDir,
       PID,
@@ -1350,28 +1351,25 @@ END AS result
     case "find":
       sql(
         `
-        SELECT * FROM OBJECTS WHERE DATA LIKE '% ${SEARCH_DATA} %' 
-        OR DATA LIKE '% ${SEARCH_DATA}%' 
-        OR DATA LIKE '% ${SEARCH_DATA} %' 
-        OR DATA LIKE '%${SEARCH_DATA}%' 
+        SELECT * FROM OBJECTS WHERE DATA LIKE '%${SEARCH_DATA}%' 
         LIMIT ${mem.offset},10
       `,
         callback
       );
       break;
-    case "interval":
+    case "intervalAsc":
       sql(
         `SELECT * FROM OBJECTS WHERE PID = "${DIRID}" GROUP BY ID ORDER BY SUM(RDATE-LREPEAT) LIMIT ${mem.offset},10`,
         callback
       );
       break;
-    case "interval backwards":
+    case "intervalDesc":
       sql(
         `SELECT * FROM OBJECTS WHERE PID = "${DIRID}" GROUP BY ID ORDER BY SUM(RDATE-LREPEAT) DESC LIMIT ${mem.offset},10`,
         callback
       );
       break;
-    case "integrity desc":
+    case "integrityDesc":
       sql(
         `SELECT * , (1*${Date.now()}-1*LREPEAT)/(1.0*RDATE - 1.0*LREPEAT) AS INTEGRITY FROM OBJECTS WHERE PID = "${DIRID}" GROUP BY ID ORDER BY INTEGRITY DESC LIMIT ${
           mem.offset
@@ -1379,7 +1377,7 @@ END AS result
         callback
       );
       break;
-    case "lastrepeat desc":
+    case "lastRepeatDesc":
       sql(
         `SELECT * FROM OBJECTS WHERE PID = "${DIRID}" GROUP BY ID ORDER BY LREPEAT DESC LIMIT ${mem.offset},10`,
         callback
@@ -1471,7 +1469,7 @@ mem.browser = (goTo, order, SEARCH_DATA) => {
     goTo = "/";
   }
 
-  mem.show(goTo, mem.setCache, order, SEARCH_DATA);
+  mem.show(goTo, mem.setCache, browser.order, SEARCH_DATA);
   mem.collect();
 };
 let cached = 0;
@@ -1568,7 +1566,10 @@ mem.terminalHelp = () => {
 
 mem.terminalChoice = "";
 mem.terminalCommand = (choice) => {
+	console.log(choice)
+  if (mem.searchData !== "") choice = "find "+mem.searchData
   ITEM_G_COUNT = 0;
+  G_COUNT = 0;
   if (pathNames.length == 0) {
     pathNames[0] = "/";
   }
@@ -1578,13 +1579,13 @@ mem.terminalCommand = (choice) => {
   switch (command) {
     //0: list content
     case "ls":
-      mem.browser(path[path.length - 1]);
+      mem.browser(path[path.length - 1],browser.order);
       break;
     case "find":
       mem.browser(
         path[path.length - 1],
         "find",
-        choice.split(" ")[1].toLowerCase()
+        choice.split(" ").slice(1).join(" ").toLowerCase()
       );
     case "lsi":
       mem.browser(path[path.length - 1], "interval");
@@ -1850,6 +1851,7 @@ browser.editFile = async function (id) {
 };
 
 browser.search = () => {
+  mem.searchData = ""
   if (mem.terminalChoice.includes("find")) {
     mem.terminalCommand("ls");
     return;
@@ -2248,21 +2250,26 @@ browser.movePanel = () => {
     .querySelector(".memotable-upside")
     .classList.toggle("memotable-upside-down");
 };
+browser.order = "repeat in asc"
 browser.selectOrder = () => {
-  let order = document.querySelector("select").value;
+	console.log("ORDER")
+  browser.order = document.querySelector("#order").value
+  let order = browser.order
   switch (order) {
-    case "repeatin":
-      mem.terminalCommand("ls");
+    case "repeatInAsc":
+      mem.terminalCommand("ls repeatIn");
+      break; 
+    case "intervalAsc":
+      mem.terminalCommand("ls intervalAsc");
       break;
-    case "interval":
-      mem.terminalCommand("lsi");
-      break;
-    case "intervalb":
-      mem.terminalCommand("lsib");
-    case "lastrepeatd":
-      mem.terminalCommand("lslrd");
-    case "integrityd":
-      mem.terminalCommand("lsid");
+    case "intervalDesc":
+      mem.terminalCommand("ls intervalDesc");
+	   break
+    case "lastRepeatDesc":
+      mem.terminalCommand("ls lastRepeatDesc");
+	  break
+    case "integrityDesc":
+      mem.terminalCommand("ls integrityDesc");
       break;
   }
 };
@@ -2506,19 +2513,20 @@ browser.render = (showFile, id, data) => {
           ".objects"
         ).innerHTML += `<div class="memobject md-ripples"><div class="memdata" id="total-objects"></div></div>`;
 
+	  document.cre
       document.querySelector(
         ".objects"
       ).innerHTML += `<label id="label">Select order</label>
       <select onchange="browser.selectOrder()" name="cars" id="order">
-      <option value="repeatin">Select order</option>
-      <option value="repeatin">By repeat in</option>
-      <option value="interval">By interval ASC</option>
-      <option value="intervalb">By interval DESC</option>
-      <option value="lastrepeatd">By last repeat DESC</option>
-      <option value="integrityd">By integrity DESC</option>
+      <option value="${browser.order}">${browser.order}</option>
+      <option value="repeatInAsc">By repeat in</option>
+      <option value="intervalAsc">By interval ASC</option>
+      <option value="intervalDesc">By interval DESC</option>
+      <option value="lastRepeatDesc">By last repeat DESC</option>
+      <option value="integrityDesc">By integrity DESC</option>
     </select>
-    
-    `;
+	`;
+		//console.log(document.querySelector("#order").value)
 
       if (mem.offset != 0)
         document.querySelector(".objects").innerHTML += `
@@ -2552,10 +2560,7 @@ browser.render = (showFile, id, data) => {
         ? `select COUNT(ID) AS TOTAL FROM OBJECTS WHERE PID = '${
             path[path.length - 1]
           }'`
-        : `select COUNT(ID) AS TOTAL FROM OBJECTS WHERE DATA LIKE '% ${mem.searchData} %' 
-       OR DATA LIKE '% ${mem.searchData}%' 
-       OR DATA LIKE '% ${mem.searchData} %' 
-       OR DATA LIKE '%${mem.searchData}%' `;
+        : `select COUNT(ID) AS TOTAL FROM OBJECTS WHERE DATA LIKE '%${mem.searchData}%' `;
       // console.log("COMMAND: ", command)
       sql(command, (res) => {
         browser.thisDirTotal = res[0].TOTAL;
