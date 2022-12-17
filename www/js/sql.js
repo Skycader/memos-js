@@ -1469,7 +1469,7 @@ mem.browser = (goTo, order, SEARCH_DATA) => {
     goTo = "/";
   }
 
-  mem.show(goTo, mem.setCache, browser.order, SEARCH_DATA);
+  mem.show(goTo, mem.setCache, order, SEARCH_DATA);
   mem.collect();
 };
 let cached = 0;
@@ -1642,7 +1642,7 @@ mem.terminalCommand = (choice) => {
       } else if (choice.split(" ")[1] == "/") {
         path = ["/"];
         pathNames = ["/"];
-        mem.browser(path[path.length - 1]);
+        mem.browser(path[path.length - 1],browser.order);
       } else {
         newChoice = 1 * choice.split(" ")[1] - 1;
         DIRID = browserCache[0][newChoice].ID;
@@ -1653,7 +1653,7 @@ mem.terminalCommand = (choice) => {
         pathNames[pathNames.length - 1] +=
           " " + JSON.parse(browserCache[0][newChoice].DATA)[0][1];
         // mem.browser(DIRID);
-        mem.browser(path[path.length - 1]);
+        mem.browser(path[path.length - 1],browser.order);
         break;
       }
       break;
