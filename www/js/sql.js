@@ -1050,7 +1050,7 @@ mem.setItem = function (PID, DATA, SPEC) {
   var LREPEAT = Date.now();
   // console.log(`INSERT INTO OBJECTS (ID,PID, DATA, RDATE, LREPEAT, SPEC) VALUES ("${ID}","${PID}",'${DATA}',"${RDATE}", "${LREPEAT}", "${SPEC}")`)
 
-  if (ITEM_G_COUNT < 1) {
+  if (ITEM_G_COUNT < 2000) {
     ITEM_G_COUNT++;
     sql2(
       `INSERT INTO OBJECTS (ID,PID, DATA, RDATE, LREPEAT, SPEC) VALUES ("${ID}","${PID}",'${DATA}',"${RDATE}", "${LREPEAT}", '${SPEC}')`
@@ -1087,7 +1087,7 @@ mem.setDir = (PID, DATA) => {
   G_DATA = DATA;
   G_COUNT++;
   //let ID = "tZNZZV"
-  if (G_COUNT < 1) {
+  if (G_COUNT < 2000) {
     sql(
       `INSERT INTO DIRS (ID, PID, DATA) VALUES ("${ID}", "${G_PID}", '${G_DATA}')`,
       undefined,
