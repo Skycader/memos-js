@@ -55,6 +55,7 @@
     content: '';
     width: 90%;
     height: calc( 100% - 421px);
+	min-height: 188px; /* that grey class */
     margin-top: 10px;
     border-radius: 25px;
     margin: 0 auto;

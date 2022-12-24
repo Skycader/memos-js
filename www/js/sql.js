@@ -615,7 +615,8 @@ mem.nextRepeatIn = async function () {
   let res = await sql2(
     `SELECT ID, DATA, MIN(RDATE) AS RDATE, LREPEAT, SPEC FROM OBJECTS WHERE 1*RDATE>${Date.now()} LIMIT 1`
   );
-  mem.nextRepeatInValue = mem.calcRepeat(res[0].RDATE * 1);
+  
+  mem.nextRepeatInValue = mem.convertHMS((res[0].RDATE * 1 - Date.now())/1000);
 };
 
 const zeroPad = (num, places) => String(num).padStart(places, "0");
@@ -651,7 +652,7 @@ mem.when2 = (res) => {
     // console.log(result);
     // if (mem.list.length) back=1
     if (mem.whenStatus == "mem.list") result = "+" + result;
-    document.querySelector("#info1").innerHTML = result;
+    document.querySelector("#info1").innerHTML = mem.nextRepeatInValue;
 
     return result;
   }
@@ -794,6 +795,7 @@ mem.circleData = (update) => {
     percentage + ", 100";
   if (update) {
     mem.getWeakestItemInRepeat();
+    mem.nextRepeatIn()
     mem.countQuery();
     mem.todayAnswered();
     mem.countDaily();
@@ -876,7 +878,7 @@ mem.minimalInterval = async () => {
   DIRS.DATA AS DIRS_DATA
   FROM OBJECTS 
   JOIN DIRS ON OBJECTS.PID=DIRS.ID
-  WHERE INTERVAL > 0
+  WHERE INTERVAL > 7200000
   ORDER BY INTERVAL ASC
   LIMIT 1
   `)
@@ -2465,13 +2467,22 @@ browser.render = (showFile, id, data) => {
           !mem.terminalChoice.includes("find") ? "🔎 Search" : "🚪 Back to list"
         }</div></div>`;
 
-        document.querySelector(
-          ".objects"
-        ).innerHTML += `<div class="memobject md-ripples" onclick="mem.terminalCommand('ls')"><div class="memdata">🔃 Refresh</div></div>`;
+		if (path[path.length - 1] != "/")
+          document.querySelector(
+            ".objects"
+          ).innerHTML += `<div class="memobject md-ripples" onclick="browser.newFileInit()"><div class="memdata">📝 Add card</div></div>`;
+
 
         document.querySelector(
           ".objects"
         ).innerHTML += `<div class="memobject md-ripples" onclick="browser.newDir()"><div class="memdata">📁 Add catalog</div></div>`;
+
+	
+		 // document.querySelector(
+          //".objects"
+		  //).innerHTML += `<div class="memobject md-ripples" onclick="mem.terminalCommand('ls')"><div class="memdata">🔃 Refresh</div></div>`;
+
+
 
         if (path[path.length - 1] != "/")
           document.querySelector(
@@ -2488,11 +2499,7 @@ browser.render = (showFile, id, data) => {
             ".objects"
           ).innerHTML += `<div class="memobject md-ripples" onclick="browser.moveDirFinish(this)"><div class="memdata">🚚 Move here</div></div>`;
 
-        if (path[path.length - 1] != "/")
-          document.querySelector(
-            ".objects"
-          ).innerHTML += `<div class="memobject md-ripples" onclick="browser.newFileInit()"><div class="memdata">📝 Add card</div></div>`;
-
+       
         if (path[path.length - 1] == "/")
           document.querySelector(
             ".objects"
@@ -2608,6 +2615,7 @@ mem.collect(); //collect items to repeat
 setInterval(mem.collect, 5000);
 mem.when();
 mem.getWeakestItemInRepeat();
+mem.nextRepeatIn();
 mem.countQuery();
 mem.todayAnswered();
 mem.countDaily();
