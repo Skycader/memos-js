@@ -843,9 +843,11 @@ mem.canEarnValue = 0;
 mem.canEarn = async () => {
   let res = await sql2(`
   SELECT
-  SUM(2*(1*${Date.now()}-1*LREPEAT)) AS CAN_EARN
+  SUM(2*(1*${Date.now()}-1*LREPEAT)) AS CAN_EARN,
+  1*RDATE - 1*LREPEAT AS INTERVAL
   FROM OBJECTS
   WHERE (1*RDATE < ${Date.now()})
+  AND INTERVAL > 0;
   `);
 
   mem.canEarnValue = 1 * (res[0]["CAN_EARN"] / 1000 / 60 / 60).toFixed(0);
@@ -2073,7 +2075,7 @@ browser.renderFile = (obj) => {
       lock = browser.showLock(qfields.indexOf(index) > -1);
       document.querySelector(
         ".objects"
-      ).innerHTML += `<div class="memobject md-ripples field-name" onclick="browser.lockField(this)"style="border-bottom: 5px dotted #151515"><div class="memdata">${field} ${lock} </div></div>`;
+      ).innerHTML += `<div class="memobject md-ripples field-name" onclick="browser.lockField(this)"style="border-bottom: 5px dotted #151515"><div class="memdata">${field.trim()} ${lock} </div></div>`;
       if (fields[index][0] == undefined) fields[index][0] = [""];
       document.querySelector(
         ".objects"

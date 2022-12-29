@@ -487,9 +487,11 @@ cards.set = (pos) => {
     console.log(mem);
     if (!mem.nothing) {
      
+	  mem.res.obj.INTEGRITY = (100*mem.res.obj.INTEGRITY).toFixed(0)
       renderedCard = cardSample.replace("$icon", JSON.parse(mem.res.dir)[0][0]);
-      
-      renderedCard = renderedCard.replace("$INTEGRITY",(100*mem.res.obj.INTEGRITY).toFixed(0))
+	  if (mem.res.obj.INTERVAL < 0) mem.res.obj.INTEGRITY = 0 
+	  if (Math.abs(mem.res.obj.INTEGIRTY)>999) mem.res.obj.INTEGRITY = "999+"
+      renderedCard = renderedCard.replace("$INTEGRITY",mem.res.obj.INTEGRITY)
       renderedCard = renderedCard.replace("$EARN", mem.convertHMS(1*mem.res.obj.WAITING/1000))
      
       renderedCard = renderedCard.replace(
@@ -512,7 +514,7 @@ cards.set = (pos) => {
 
       renderedCard = renderedCard.replace(
         "$reqFieldName",
-        mem.res.reqFieldName
+        mem.res.reqFieldName.trim()
       );
 
       // renderedCard = renderedCard.replace("$isChild",`${(mem.list[mem.answered].INTERVAL<7200000)?("🍼"):("")}`)
