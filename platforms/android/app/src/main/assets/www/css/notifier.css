@@ -1,0 +1,29 @@
+.notifier {
+    transition-duration: 0.5s;
+    position: fixed; 
+    width: 100%; 
+    z-index: 999999;
+    transform: translateY(-15px)
+}
+
+.notifier-warning {
+    color: red !important
+}
+
+.notifier-content {
+    width: calc(100% - 50px); 
+    height: 100px; 
+    margin: 25px; 
+    border-radius: 25px; 
+    background: #1d1d1d;
+    color: white;
+    font-size: 25px;
+    font-family: memoff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+} 
+
+.notifier-up {
+    transform: translateY(-200px)
+}

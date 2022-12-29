@@ -1,0 +1,128 @@
+<h1>Memowiki</h1><br><br>
+<h2>Documentation version: 0.1</h2><br><br>
+<br><br>
+<h3>Contents</h3>
+<h4></h4>
+<br><br>
+<p id="memos">
+   <b> Memos </b> - software designed to automate repetition of data for more efficient memorization.<br><br>
+</p>
+<br><br>
+<b> Repetition </b>
+<br><br>
+<p> In Memos entered points of data are asked on a regular bases.<br>
+ Each answered is analyzed to provide a better and more efficient repetition time. <br>
+</p><br>
+
+<br><br>
+<b>Memos structure.</b>
+<br><br>
+<p>
+Memos has directories and objects.<br>
+Directories can have name. They can be put inside each other.<br>
+Directories are required to have icons as three letters (FRE for french for example) or an emoji for a simple icon.<br>
+Also font awesome is available for usage.<br>
+Objects can be put inside directories.<br>
+Memos has one root folder.<br>
+</p>
+<br><br>
+<b>Memos fields.</b>
+<br><br>
+<p>Objects have fields. Each field can have a name and data. </p>
+<br><br>
+<b>Memos samples.</b>
+<br><br>
+<p>For optimization purposes a directory can have a field sample. For example:<br>
+Directory name: French language<br>
+Sample: 1: Original, 2: Transcription, 3: Translation<br>
+Object: 1: Un renard; 2:[ʀ(ə)naʀ ]; 3: A fox. Since there can be thousands of such objects, there's no need to write <br>
+field name every time. But the name field is mentioned while asking the object for simpleness. <br>
+</p><br>
+<br><br>
+<b>Memos cards</b>
+<br><br>
+<p>
+    To check the object integrity,<br>
+Memos can give any field name, such as original, and ask user to provide a translation for it. Also, the folder host is<br>
+mentioned in the card for easier understanding. If field length is too long, theere will be seceral cards before answered<br> 
+is required.<br>
+Like so:<br>
+<Card number/Card total> <French language> <Un renard> <Translation>
+    <br><br>
+Memos can also use ID system, which is already used inside database.<br>
+Like so: 1.2.3:4.5.6<br>
+Which stands for: Folder 1, in which folder 2, in which object by id 3 (or third). Inside, the fourth field, the 5th word <br>
+and the 6th letter. The last 2 numbers may be absent.<br>
+</p>
+
+<b>Memos routes</b>
+<p>Memos has built in algorithm of repetition - MEMOSA. Acronym for:
+<br>Most efficient Memorization Oriented Smart Algorithm. It analyzes the user repeats by several parameters, such as 
+<br>MDI, MSI, MTI (decoding provided below) to tell the next repetition time the most accurate, way so the object is not
+<br>repetated too often, saving time, and not too late, to be forgotten.
+<br>However, using MDI user can decide how exactly to trust this system. It works just like difficulty choice in a game.</p>
+<br><br>
+<b>Memoroutes</b>
+<p>
+<br>Memoroute is a system to allow user to make their own path in memorization.
+<br>It's a nanolanguage with some basic variables and if statements. Using memorutes users can:
+<br>- Make object repeats every day whatever happends;
+<br>- Make object repeat every day unless it's repeted 30 times (one month). Then be repeated using MEMOSA or any additional conditions.
+<br><br>
+<br>MDI - Memos Danger Index
+<br>From start: (60 minutes)
+<br>Green: 5-10 m (0-25%) repetition is not necessary, but appriciated.
+<br>Yellow: 10-20 m (26-50%) repetition recommended.
+<br>Orange: 20-30 m (51%-75%) in danger of forgetting.
+<br>RED: 40-60m (76%-100%) in high danger of forgetting.
+<br>PURPLE: (101%+) considered to be nearly dead.
+<br><br>
+Each zone is asked in descreasing order.
+Like so: OVERKILL goes first, if presented. Next red zone, up until Green zone, which can be skipped, if you think too much of your memory.
+<br><br>
+<br>MTI Memos Trust Index:
+<br>1. First level: write all field data
+<br>2. Second level: write one word from field
+<br>3. Third level: write one letter from a word
+<br>MSI Memos Speed Index
+<br>Goes 0.1 every success
+<br><br>
+<br>Memos entering system:
+<br>1. Enter data by enter
+<br>2. Autoenter
+<br>If auntoenter memos gives 1 second for each second to enter and 10 seconds to recall an object. If object was entered successfully, the time spent on the object becomes default. If:
+<br> 0 - 25% of the time has gone, it is considered as 1 mistake.
+<br>25-50 - 2 mistakes.
+<br>50 - 75 - 3 mistakes.
+<br>75 - 100 - 4 mistakes.
+<br><br>
+<br>Memos errors track on enter:
+<br>1st mistake: warning
+<br>2nd mistake: TI goes to 1. Next repetition in half the time. But, since MSI was not changed, the object may quickly retain its speed.
+<br>3rd:  MSI goes -1. Next repeat is as max as the previous max time of repeat.
+<br>4th mistake: Msi goes to 1. Object is now considered forgotten. 
+<br>If the warning and three mistakes appeared after it without any success, the object is considered forgotten and is zeroed.
+<br><br>
+<br>Memos circle:
+<br>In the center has percentage of fullfilled objects. Also the border of the circle is lightened.
+<br>1/4 info field has a time left before another objects needs repeat.
+<br>2/4 info field: x of y objects repeated.
+<br>3/4 info field: total memorating.
+<br>4/4 info field: approximately how much time is needed for repetition.
+<br><br>
+<br>On the left there can be a light bult significating by color how good the memorization process goes. Such as light if there ar many successful answers. Above it: successful answered, below it failures, in percents.
+<br><br>
+<br><br>On the right:
+
+<br><br>Indicator of MDIs objects.
+<br><br>Green if there are more green objects or not in need objects than yellow, yellow > red, red if anythign else. 
+
+<br><br>Memos statistics:
+<br><br>It collects almost any aspect of repeat to provide a better analyzsis and preditction.
+</p>
+<br><br>
+<b>Curtains</b><br><br>
+<p><br><br>
+    <br><br> Upper curtain has the cards that has been repeted or mistaken, as well modes to control Memos.
+    <br><br> Lower curtain has statistics.
+</p><br><br>
