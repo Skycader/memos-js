@@ -744,7 +744,7 @@ mem.circleData = (update) => {
     }
 
 
-    switch (Math.floor(mem.minimalIntervalValue / 6)) {
+    switch (Math.floor(mem.minimalIntervalValue / 24)) {
       case 0:
         circle.rightBulb.green();
         break;
@@ -762,9 +762,10 @@ mem.circleData = (update) => {
         break;
     }
 
-    if (mem.children > 0) {
+    /*if (mem.children > 0) {
       circle.rightBulb.green();
-    }
+    }*/
+
     // document.querySelector("#info4").innerHTML = mem.memoPowerResult;
     // document.querySelector("#info5").innerHTML = mem.countTotalResult2;
     // document.querySelector("#info5").innerHTML = mem.weakestItem;
@@ -1568,6 +1569,17 @@ mem.terminalHelp = () => {
   `;
 };
 
+mem.freeSpace = async () => {
+	const estimate = await navigator.storage.estimate()
+	mem.terminalHelpMessage = `
+	Usage: ${estimate.usage} bytes;
+	Quota: ${estimate.quota} bytes;
+	Percentage: ${(estimate.usage/estimate.quota * 100).toFixed(2)}%
+	`
+	mem.browser(path[path.length - 1],browser.order);
+
+}
+
 mem.terminalChoice = "";
 mem.terminalCommand = (choice) => {
 	console.log(choice)
@@ -1630,6 +1642,10 @@ mem.terminalCommand = (choice) => {
       mem.terminalHelp();
       mem.browser(path[path.length - 1]);
       break;
+
+	case "free":
+		  mem.freeSpace()
+		  break;
     case "fixlinker":
       mem.fixLinker();
       break;
