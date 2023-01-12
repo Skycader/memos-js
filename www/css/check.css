@@ -179,7 +179,7 @@
 .timerStarted {
   width: 0%;
   background: red !important;
-  transition-duration: 10s !important;
+  transition-duration: 15s !important;
   transition-timing-function: linear !important;
 }
 

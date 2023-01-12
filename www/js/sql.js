@@ -117,17 +117,64 @@ mem.find = async (data) => {
 };
 mem.collect = () => {
 
+	switch (rightBulb) {
+		case 'green':
+			addAdults()
+			addChildren()
+			break
+		case 'yellow':
+			addPriority(50)
+			addChildren()
+			addAdults()
+			break
+		case 'orange':
+			addPriority(75)
+			addChildren()
+			addAdults()
+			break
+		case 'red':
+			addPriority(100)
+			addChildren()
+			addAdults()
+			break
+
+	}
+
+  function addPriority(n) {
+	  n = n / 100
+  /*
+   * Cards with N%+ wearout
+   */
   sql(
     // `SELECT * FROM OBJECTS  LEFT JOIN DIRS ON OBJECTS.PID=DIRS.ID AND 1*RDATE < ${Date.now()} LIMIT 10`,
     `SELECT OBJECTS.ID, OBJECTS.DATA, RDATE, LREPEAT,  
     (1*RDATE - 1*LREPEAT) AS INTERVAL, SPEC, DIRS.DATA AS DIRDATA, 
     (1*${Date.now()}-1*LREPEAT) AS WAITING, ((1*${Date.now()}-1*LREPEAT)/(1.0*RDATE - 1.0*LREPEAT)-1) AS INTEGRITY 
     FROM OBJECTS JOIN DIRS ON OBJECTS.PID=DIRS.ID AND 1*RDATE < ${Date.now()} AND (1*RDATE - 1*LREPEAT)>=7200000 
-    AND INTEGRITY>1
+    AND INTEGRITY>${n}
     ORDER BY INTEGRITY DESC LIMIT 100`,
     mem.collectCallback
   );
+}
+	function addAdults() {
+	/*
+	* Adults
+	*/
+	sql(
+		// `SELECT * FROM OBJECTS  LEFT JOIN DIRS ON OBJECTS.PID=DIRS.ID AND 1*RDATE < ${Date.now()} LIMIT 10`,
+		`SELECT OBJECTS.ID, OBJECTS.DATA, RDATE, LREPEAT,  
+		(1*RDATE - 1*LREPEAT) AS INTERVAL, SPEC, DIRS.DATA AS DIRDATA, 
+		(1*${Date.now()}-1*LREPEAT) AS WAITING, ((1*${Date.now()}-1*LREPEAT)/(1.0*RDATE - 1.0*LREPEAT)-1) AS INTEGRITY 
+		FROM OBJECTS JOIN DIRS ON OBJECTS.PID=DIRS.ID AND 1*RDATE < ${Date.now()} AND (1*RDATE - 1*LREPEAT)>=7200000 
+		ORDER BY INTEGRITY DESC LIMIT 100`,
+	 mem.collectCallback
+	 );
+	}
 
+	function addChildren() {
+  /*
+   * Children
+   * */
   sql(
     `SELECT OBJECTS.ID, OBJECTS.DATA, RDATE, LREPEAT, 
     (1*${Date.now()}-1*LREPEAT) AS WAITING, (1*RDATE - 1*LREPEAT) AS INTERVAL, 
@@ -136,16 +183,8 @@ mem.collect = () => {
     (1*RDATE - 1*LREPEAT)<7200000 ORDER BY INTERVAL DESC LIMIT 100`,
     mem.collectCallback
   );
+	}
 
-  sql(
-    // `SELECT * FROM OBJECTS  LEFT JOIN DIRS ON OBJECTS.PID=DIRS.ID AND 1*RDATE < ${Date.now()} LIMIT 10`,
-    `SELECT OBJECTS.ID, OBJECTS.DATA, RDATE, LREPEAT,  
-    (1*RDATE - 1*LREPEAT) AS INTERVAL, SPEC, DIRS.DATA AS DIRDATA, 
-    (1*${Date.now()}-1*LREPEAT) AS WAITING, ((1*${Date.now()}-1*LREPEAT)/(1.0*RDATE - 1.0*LREPEAT)-1) AS INTEGRITY 
-    FROM OBJECTS JOIN DIRS ON OBJECTS.PID=DIRS.ID AND 1*RDATE < ${Date.now()} AND (1*RDATE - 1*LREPEAT)>=7200000 
-    ORDER BY INTEGRITY DESC LIMIT 100`,
-    mem.collectCallback
-  );
 };
 mem.fixLinker = () => {
   sql("select id,spec from objects", (res) => {
@@ -706,6 +745,9 @@ mem.calcRepeat = (date) => {
   return result;
 };
 
+let leftBulb = 0
+let rightBulb = 0
+
 mem.circleData = (update) => {
   let res = `${mem.todayAnsweredResult} | ${mem.countResult} | ${mem.countDailyResult}`;
   if (
@@ -727,18 +769,23 @@ mem.circleData = (update) => {
 
     switch (Math.floor(mem.averageIntegrityValue / 25)) {
       case 0:
+		leftBulb = 'green'
         circle.leftBulb.green();
         break;
       case 1:
+		leftBulb = 'yellow'
         circle.leftBulb.yellow();
         break;
       case 2:
+		leftBulb = 'orange'
         circle.leftBulb.orange();
         break;
       case 3:
+		leftBulb = 'red'
         circle.leftBulb.red();
         break;
       default:
+		leftBulb = 'red'
         circle.leftBulb.red();
         break;
     }
@@ -746,22 +793,27 @@ mem.circleData = (update) => {
 
     switch (Math.floor(mem.minimalIntervalValue / 24)) {
       case 0:
+		rightBulb = 'green'
         circle.rightBulb.green();
         break;
       case 1:
+		rightBulb = 'yellow'
         circle.rightBulb.yellow();
         break;
       case 2:
+		rightBulb = 'orange'
         circle.rightBulb.orange();
         break;
       case 3:
+		rightBulb = 'red'
         circle.rightBulb.red();
         break;
       default:
+		rightBulb = 'red'
         circle.rightBulb.red();
         break;
     }
-
+	
     /*if (mem.children > 0) {
       circle.rightBulb.green();
     }*/
