@@ -364,7 +364,7 @@ mem.define = (increment, comment) => {
         mem.list[mem.answered].INTERVAL < 7200000
       );
 
-      if ((mem.list[mem.answered].RDATE * 1 > Date.now())||( mem.minimalIntervalValue < 24 )) {
+      if ((mem.list[mem.answered].RDATE * 1 > Date.now())||( mem.list[mem.answered-1]?.INTERVAL*2 < 24 * 60 * 60 * 1000 )) {
         mem.define(
           1,
           `This child is not ready yet ${JSON.stringify(
@@ -804,7 +804,7 @@ mem.circleData = (update) => {
     document.querySelector("#info3").innerHTML = percentage;
     document.querySelector(
       "#info4"
-    ).innerHTML = `${mem.deadItems} · ${mem.maxIntegrityValue} · ${mem.averageIntegrityValue}`;
+    ).innerHTML = `${mem.deadItems} · ${zeroPad(mem.maxIntegrityValue,3)} · ${mem.averageIntegrityValue}`;
 
     switch (Math.floor(mem.averageIntegrityValue / 25)) {
       case 0:
@@ -1024,14 +1024,35 @@ mem.count = async function () {
     `SELECT COUNT(ID) FROM OBJECTS WHERE 1*RDATE < ${Date.now()} AND (1*RDATE-1*LREPEAT)>7200000`
   );
   repeats = repeats[0]["COUNT(ID)"];
-  let kids = await sql2(
+  /*let kids = await sql2(
     `SELECT ID, DATA, RDATE, (1*RDATE-1*LREPEAT) AS INTERVAL FROM OBJECTS WHERE (1*RDATE-1*LREPEAT)<7200000 ORDER BY INTERVAL DESC LIMIT 1`
-  );
+  );*/
+ 
+let kids = await sql2(`SELECT CASE
+		WHEN (SELECT (1*RDATE-1*LREPEAT) AS INTERVAL FROM OBJECTS WHERE INTERVAL>7200000 ORDER BY INTERVAL LIMIT 1) > ${24*60*60*1000} 
+		THEN 1 
+		ELSE 0
+		END AS NEEDKIDS, 
+		OBJECTS.ID, OBJECTS.DATA, RDATE, LREPEAT, 
+        (1*${Date.now()}-1*LREPEAT) AS WAITING,
+		(1*RDATE - 1*LREPEAT) AS INTERVAL, 
+		((1*${Date.now()}-1*LREPEAT)/(1.0*RDATE - 1.0*LREPEAT)-1) AS INTEGRITY,
+		SPEC, 
+		DIRS.DATA AS DIRDATA
+		FROM OBJECTS
+		JOIN DIRS ON OBJECTS.PID=DIRS.ID 
+		AND 
+		(1*RDATE - 1*LREPEAT)<7200000 
+		AND
+		NEEDKIDS=1 
+		ORDER BY INTERVAL DESC 
+		LIMIT 1`)
+
   let res = [repeats, kids];
   if (kids.length && kids[0].RDATE * 1 < Date.now()) repeats++;
-
   let result = zeroPad(repeats, 3);
   mem.countResult = result;
+  
   mem.circleData();
   return res;
 };

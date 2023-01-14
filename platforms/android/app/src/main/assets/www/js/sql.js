@@ -117,6 +117,7 @@ mem.find = async (data) => {
 };
 mem.collect = () => {
 
+	/*
 	switch (rightBulb) {
 		case 'green':
 			addAdults()
@@ -138,13 +139,45 @@ mem.collect = () => {
 			addAdults()
 			break
 		default:
-			addPriority(10)
-			addChildren()
+		//	addPriority(50)
+			addChildrenIfNeeded(24)
+		//	addChildren()
 			addAdults()
 			break
 
 	}
+	*/
 
+  addPriority(100)
+  addChildrenIfNeeded(96)
+  addPriority(75)
+  addChildrenIfNeeded(48)
+  addPriority(50)
+  addChildrenIfNeeded(24)
+  addAdults()
+
+  function addChildrenIfNeeded(hours) {
+	sql(`SELECT CASE
+		WHEN (SELECT (1*RDATE-1*LREPEAT) AS INTERVAL FROM OBJECTS WHERE INTERVAL>7200000 ORDER BY INTERVAL LIMIT 1) > ${hours*60*60*1000} 
+		THEN 1 
+		ELSE 0
+		END AS NEEDKIDS, 
+		OBJECTS.ID, OBJECTS.DATA, RDATE, LREPEAT, 
+        (1*${Date.now()}-1*LREPEAT) AS WAITING,
+		(1*RDATE - 1*LREPEAT) AS INTERVAL, 
+		((1*${Date.now()}-1*LREPEAT)/(1.0*RDATE - 1.0*LREPEAT)-1) AS INTEGRITY,
+		SPEC, 
+		DIRS.DATA AS DIRDATA
+		FROM OBJECTS
+		JOIN DIRS ON OBJECTS.PID=DIRS.ID 
+		AND 
+		(1*RDATE - 1*LREPEAT)<7200000 
+		AND
+		NEEDKIDS=1 
+		ORDER BY INTERVAL DESC 
+		LIMIT 50`,
+		mem.collectCallback)
+  }
   function addPriority(n) {
 	  n = n / 100
   /*
@@ -331,7 +364,7 @@ mem.define = (increment, comment) => {
         mem.list[mem.answered].INTERVAL < 7200000
       );
 
-      if (mem.list[mem.answered].RDATE * 1 > Date.now()) {
+      if ((mem.list[mem.answered].RDATE * 1 > Date.now())||( mem.list[mem.answered-1]?.INTERVAL*2 < 24 * 60 * 60 * 1000 )) {
         mem.define(
           1,
           `This child is not ready yet ${JSON.stringify(
@@ -771,7 +804,7 @@ mem.circleData = (update) => {
     document.querySelector("#info3").innerHTML = percentage;
     document.querySelector(
       "#info4"
-    ).innerHTML = `${mem.deadItems} · ${mem.maxIntegrityValue} · ${mem.averageIntegrityValue}`;
+    ).innerHTML = `${mem.deadItems} · ${zeroPad(mem.maxIntegrityValue,3)} · ${mem.averageIntegrityValue}`;
 
     switch (Math.floor(mem.averageIntegrityValue / 25)) {
       case 0:
@@ -991,14 +1024,35 @@ mem.count = async function () {
     `SELECT COUNT(ID) FROM OBJECTS WHERE 1*RDATE < ${Date.now()} AND (1*RDATE-1*LREPEAT)>7200000`
   );
   repeats = repeats[0]["COUNT(ID)"];
-  let kids = await sql2(
+  /*let kids = await sql2(
     `SELECT ID, DATA, RDATE, (1*RDATE-1*LREPEAT) AS INTERVAL FROM OBJECTS WHERE (1*RDATE-1*LREPEAT)<7200000 ORDER BY INTERVAL DESC LIMIT 1`
-  );
+  );*/
+ 
+let kids = await sql2(`SELECT CASE
+		WHEN (SELECT (1*RDATE-1*LREPEAT) AS INTERVAL FROM OBJECTS WHERE INTERVAL>7200000 ORDER BY INTERVAL LIMIT 1) > ${24*60*60*1000} 
+		THEN 1 
+		ELSE 0
+		END AS NEEDKIDS, 
+		OBJECTS.ID, OBJECTS.DATA, RDATE, LREPEAT, 
+        (1*${Date.now()}-1*LREPEAT) AS WAITING,
+		(1*RDATE - 1*LREPEAT) AS INTERVAL, 
+		((1*${Date.now()}-1*LREPEAT)/(1.0*RDATE - 1.0*LREPEAT)-1) AS INTEGRITY,
+		SPEC, 
+		DIRS.DATA AS DIRDATA
+		FROM OBJECTS
+		JOIN DIRS ON OBJECTS.PID=DIRS.ID 
+		AND 
+		(1*RDATE - 1*LREPEAT)<7200000 
+		AND
+		NEEDKIDS=1 
+		ORDER BY INTERVAL DESC 
+		LIMIT 1`)
+
   let res = [repeats, kids];
   if (kids.length && kids[0].RDATE * 1 < Date.now()) repeats++;
-
   let result = zeroPad(repeats, 3);
   mem.countResult = result;
+  
   mem.circleData();
   return res;
 };
@@ -1382,8 +1436,7 @@ mem.offset = 0;
 mem.show = (DIRID, callback, order, SEARCH_DATA) => {
   if (order != "find") {
     sql(
-      `SELECT *,
-    CASE 
+      `SELECT * , CASE 
     WHEN substr(DATA,2,1) = ',' THEN substr(DATA,3)
     WHEN substr(DATA,3,1) = ',' THEN substr(DATA,4)
     WHEN substr(DATA,4,1) = ',' THEN substr(DATA,5)
