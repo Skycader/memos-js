@@ -113,7 +113,7 @@ mem.dropList = () => {
 };
 
 mem.find = async (data) => {
-  return await sql2(`select * from objects where data like "%${data}%"`);
+  return await sql2(`select LOWER(data), * from objects where data like "%${data}%"`);
 };
 mem.collect = () => {
 
