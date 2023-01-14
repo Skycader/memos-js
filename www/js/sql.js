@@ -117,6 +117,7 @@ mem.find = async (data) => {
 };
 mem.collect = () => {
 
+	/*
 	switch (rightBulb) {
 		case 'green':
 			addAdults()
@@ -137,9 +138,46 @@ mem.collect = () => {
 			addChildren()
 			addAdults()
 			break
+		default:
+		//	addPriority(50)
+			addChildrenIfNeeded(24)
+		//	addChildren()
+			addAdults()
+			break
 
 	}
+	*/
 
+  addPriority(100)
+  addChildrenIfNeeded(96)
+  addPriority(75)
+  addChildrenIfNeeded(48)
+  addPriority(50)
+  addChildrenIfNeeded(24)
+  addAdults()
+
+  function addChildrenIfNeeded(hours) {
+	sql(`SELECT CASE
+		WHEN (SELECT (1*RDATE-1*LREPEAT) AS INTERVAL FROM OBJECTS WHERE INTERVAL>7200000 ORDER BY INTERVAL LIMIT 1) > ${hours*60*60*1000} 
+		THEN 1 
+		ELSE 0
+		END AS NEEDKIDS, 
+		OBJECTS.ID, OBJECTS.DATA, RDATE, LREPEAT, 
+        (1*${Date.now()}-1*LREPEAT) AS WAITING,
+		(1*RDATE - 1*LREPEAT) AS INTERVAL, 
+		((1*${Date.now()}-1*LREPEAT)/(1.0*RDATE - 1.0*LREPEAT)-1) AS INTEGRITY,
+		SPEC, 
+		DIRS.DATA AS DIRDATA
+		FROM OBJECTS
+		JOIN DIRS ON OBJECTS.PID=DIRS.ID 
+		AND 
+		(1*RDATE - 1*LREPEAT)<7200000 
+		AND
+		NEEDKIDS=1 
+		ORDER BY INTERVAL DESC 
+		LIMIT 50`,
+		mem.collectCallback)
+  }
   function addPriority(n) {
 	  n = n / 100
   /*
@@ -152,7 +190,7 @@ mem.collect = () => {
     (1*${Date.now()}-1*LREPEAT) AS WAITING, ((1*${Date.now()}-1*LREPEAT)/(1.0*RDATE - 1.0*LREPEAT)-1) AS INTEGRITY 
     FROM OBJECTS JOIN DIRS ON OBJECTS.PID=DIRS.ID AND 1*RDATE < ${Date.now()} AND (1*RDATE - 1*LREPEAT)>=7200000 
     AND INTEGRITY>${n}
-    ORDER BY INTEGRITY DESC LIMIT 100`,
+    ORDER BY INTEGRITY DESC LIMIT 50`,
     mem.collectCallback
   );
 }
@@ -166,7 +204,7 @@ mem.collect = () => {
 		(1*RDATE - 1*LREPEAT) AS INTERVAL, SPEC, DIRS.DATA AS DIRDATA, 
 		(1*${Date.now()}-1*LREPEAT) AS WAITING, ((1*${Date.now()}-1*LREPEAT)/(1.0*RDATE - 1.0*LREPEAT)-1) AS INTEGRITY 
 		FROM OBJECTS JOIN DIRS ON OBJECTS.PID=DIRS.ID AND 1*RDATE < ${Date.now()} AND (1*RDATE - 1*LREPEAT)>=7200000 
-		ORDER BY INTEGRITY DESC LIMIT 100`,
+		ORDER BY INTEGRITY DESC LIMIT 50`,
 	 mem.collectCallback
 	 );
 	}
@@ -180,7 +218,7 @@ mem.collect = () => {
     (1*${Date.now()}-1*LREPEAT) AS WAITING, (1*RDATE - 1*LREPEAT) AS INTERVAL, 
     ((1*${Date.now()}-1*LREPEAT)/(1.0*RDATE - 1.0*LREPEAT)-1) AS INTEGRITY, SPEC, 
     DIRS.DATA AS DIRDATA FROM OBJECTS JOIN DIRS ON OBJECTS.PID=DIRS.ID AND 
-    (1*RDATE - 1*LREPEAT)<7200000 ORDER BY INTERVAL DESC LIMIT 100`,
+    (1*RDATE - 1*LREPEAT)<7200000 ORDER BY INTERVAL DESC LIMIT 50`,
     mem.collectCallback
   );
 	}
@@ -326,7 +364,7 @@ mem.define = (increment, comment) => {
         mem.list[mem.answered].INTERVAL < 7200000
       );
 
-      if (mem.list[mem.answered].RDATE * 1 > Date.now()) {
+      if ((mem.list[mem.answered].RDATE * 1 > Date.now())||( mem.minimalIntervalValue < 24 )) {
         mem.define(
           1,
           `This child is not ready yet ${JSON.stringify(
@@ -745,10 +783,11 @@ mem.calcRepeat = (date) => {
   return result;
 };
 
-let leftBulb = 0
-let rightBulb = 0
+let leftBulb = null
+let rightBulb = null
 
 mem.circleData = (update) => {
+//	console.log(mem.list.length)
   let res = `${mem.todayAnsweredResult} | ${mem.countResult} | ${mem.countDailyResult}`;
   if (
     mem.todayAnsweredResult != undefined &&
@@ -813,6 +852,8 @@ mem.circleData = (update) => {
         circle.rightBulb.red();
         break;
     }
+
+	mem.collect()
 	
     /*if (mem.children > 0) {
       circle.rightBulb.green();
@@ -1374,8 +1415,7 @@ mem.offset = 0;
 mem.show = (DIRID, callback, order, SEARCH_DATA) => {
   if (order != "find") {
     sql(
-      `SELECT *,
-    CASE 
+      `SELECT * , CASE 
     WHEN substr(DATA,2,1) = ',' THEN substr(DATA,3)
     WHEN substr(DATA,3,1) = ',' THEN substr(DATA,4)
     WHEN substr(DATA,4,1) = ',' THEN substr(DATA,5)
@@ -2681,8 +2721,9 @@ mem.setAvailable = () => {
   check.next();
 };
 
-mem.collect(); //collect items to repeat
-setInterval(mem.collect, 5000);
+mem.circleData(1)
+//mem.collect(); //collect items to repeat
+//setInterval(mem.collect, 5000);
 mem.when();
 mem.getWeakestItemInRepeat();
 mem.nextRepeatIn();

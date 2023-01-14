@@ -137,6 +137,11 @@ mem.collect = () => {
 			addChildren()
 			addAdults()
 			break
+		default:
+			addPriority(10)
+			addChildren()
+			addAdults()
+			break
 
 	}
 
@@ -152,7 +157,7 @@ mem.collect = () => {
     (1*${Date.now()}-1*LREPEAT) AS WAITING, ((1*${Date.now()}-1*LREPEAT)/(1.0*RDATE - 1.0*LREPEAT)-1) AS INTEGRITY 
     FROM OBJECTS JOIN DIRS ON OBJECTS.PID=DIRS.ID AND 1*RDATE < ${Date.now()} AND (1*RDATE - 1*LREPEAT)>=7200000 
     AND INTEGRITY>${n}
-    ORDER BY INTEGRITY DESC LIMIT 100`,
+    ORDER BY INTEGRITY DESC LIMIT 50`,
     mem.collectCallback
   );
 }
@@ -166,7 +171,7 @@ mem.collect = () => {
 		(1*RDATE - 1*LREPEAT) AS INTERVAL, SPEC, DIRS.DATA AS DIRDATA, 
 		(1*${Date.now()}-1*LREPEAT) AS WAITING, ((1*${Date.now()}-1*LREPEAT)/(1.0*RDATE - 1.0*LREPEAT)-1) AS INTEGRITY 
 		FROM OBJECTS JOIN DIRS ON OBJECTS.PID=DIRS.ID AND 1*RDATE < ${Date.now()} AND (1*RDATE - 1*LREPEAT)>=7200000 
-		ORDER BY INTEGRITY DESC LIMIT 100`,
+		ORDER BY INTEGRITY DESC LIMIT 50`,
 	 mem.collectCallback
 	 );
 	}
@@ -180,7 +185,7 @@ mem.collect = () => {
     (1*${Date.now()}-1*LREPEAT) AS WAITING, (1*RDATE - 1*LREPEAT) AS INTERVAL, 
     ((1*${Date.now()}-1*LREPEAT)/(1.0*RDATE - 1.0*LREPEAT)-1) AS INTEGRITY, SPEC, 
     DIRS.DATA AS DIRDATA FROM OBJECTS JOIN DIRS ON OBJECTS.PID=DIRS.ID AND 
-    (1*RDATE - 1*LREPEAT)<7200000 ORDER BY INTERVAL DESC LIMIT 100`,
+    (1*RDATE - 1*LREPEAT)<7200000 ORDER BY INTERVAL DESC LIMIT 50`,
     mem.collectCallback
   );
 	}
@@ -745,10 +750,11 @@ mem.calcRepeat = (date) => {
   return result;
 };
 
-let leftBulb = 0
-let rightBulb = 0
+let leftBulb = null
+let rightBulb = null
 
 mem.circleData = (update) => {
+//	console.log(mem.list.length)
   let res = `${mem.todayAnsweredResult} | ${mem.countResult} | ${mem.countDailyResult}`;
   if (
     mem.todayAnsweredResult != undefined &&
@@ -813,6 +819,8 @@ mem.circleData = (update) => {
         circle.rightBulb.red();
         break;
     }
+
+	mem.collect()
 	
     /*if (mem.children > 0) {
       circle.rightBulb.green();
@@ -2681,8 +2689,9 @@ mem.setAvailable = () => {
   check.next();
 };
 
-mem.collect(); //collect items to repeat
-setInterval(mem.collect, 5000);
+mem.circleData(1)
+//mem.collect(); //collect items to repeat
+//setInterval(mem.collect, 5000);
 mem.when();
 mem.getWeakestItemInRepeat();
 mem.nextRepeatIn();
