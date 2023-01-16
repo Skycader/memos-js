@@ -364,7 +364,7 @@ mem.define = (increment, comment) => {
         mem.list[mem.answered].INTERVAL < 7200000
       );
 
-      if ((mem.list[mem.answered].RDATE * 1 > Date.now())||( mem.list[mem.answered-1]?.INTERVAL*2 < 24 * 60 * 60 * 1000 )) {
+      if ((mem.list[mem.answered].RDATE * 1 > Date.now())||( mem.list[mem.answered-1]?.INTERVAL*2 > 24 * 60 * 60 * 1000 )) { //if prev to become >24 hours (48 f.e.)
         mem.define(
           1,
           `This child is not ready yet ${JSON.stringify(
