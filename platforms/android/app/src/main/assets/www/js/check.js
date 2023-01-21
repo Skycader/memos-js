@@ -179,7 +179,7 @@ document.getElementById("memosInput").addEventListener(
 );
 check.skipped = 0;
 check.focus = () => {
-  // check.skipped += 1;
+  check.skipped += 1; //turn on skipping
   if (check.skipped > 2) {
     mem.answered++;
     check.next(0.5);

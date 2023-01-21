@@ -113,7 +113,7 @@ mem.dropList = () => {
 };
 
 mem.find = async (data) => {
-  return await sql2(`select * from objects where data like "%${data}%"`);
+  return await sql2(`select LOWER(data), * from objects where data like "%${data}%"`);
 };
 mem.collect = () => {
 
@@ -364,13 +364,26 @@ mem.define = (increment, comment) => {
         mem.list[mem.answered].INTERVAL < 7200000
       );
 
-      if ((mem.list[mem.answered].RDATE * 1 > Date.now())||( mem.list[mem.answered-1]?.INTERVAL*2 < 24 * 60 * 60 * 1000 )) {
+	//Should the child be skipped?
+//	console.log()
+	if (mem.list[mem.answered].RDATE * 1 > Date.now()) { // если где-то там в будущем то скипать {
+		console.log("Карточка ещё не готова тк повтор в будущем! Будет скип?")
+		if (mem.answered>0)
+		if (mem.list[mem.answered-1]?.INTERVAL*2 > 24 * 60 * 60 * 1000 ) {
+			//abort skip if the card won't become required adult
+			console.log("Скипа всё таки не будет тк предыдущая карточка стала взрослой и нужны ещё дети!")
+			return 0;
+		}
+		console.log("скип будет!")
+	//if prev to become 48<24 hours (48 f.e.), skip is not needed
+		  
         mem.define(
           1,
           `This child is not ready yet ${JSON.stringify(
             mem.list[mem.answered]
           )}`
         );
+	  
       }
       for (let i = 0; i < mem.answered; i++) {
         item = mem.list[i];
@@ -419,6 +432,7 @@ mem.setRDATE = async (id, hours) => {
 mem.answered = 0;
 mem.blockAnswer = 0;
 mem.answer = (answerIsCorrect) => {
+  let datenow = Date.now()
   if (!mem.blockAnswer) {
     mem.blockAnswer = 1;
     document.querySelector(".cardTimer").classList.add("no-trunsition");
@@ -430,8 +444,7 @@ mem.answer = (answerIsCorrect) => {
       console.log("OK");
 
       mem.code = 1; //code OK
-
-      let diff = Date.now() - mem.res.obj.LREPEAT * 1;
+      let diff = datenow - mem.res.obj.LREPEAT * 1;
 
       console.log("Different in hours: " + diff / 1000 / 60 / 60);
       switch (answerIsCorrect) {
@@ -445,11 +458,11 @@ mem.answer = (answerIsCorrect) => {
           console.log("+1 hour");
           break;
         default:
-          diff = 2 * diff + Date.now() + 10 * 1000;
+          diff = 2 * diff + datenow + 10 * 1000;
           break;
       }
 
-      let repeatIn = diff - Date.now();
+      let repeatIn = diff - datenow;
       // console.log('!!!',repeatIn)
       notifier.show(`⌛ +${mem.convertHMS(repeatIn / 1000)}`);
       repeatIn = repeatIn / 1000 / 60 / 60;
@@ -459,14 +472,14 @@ mem.answer = (answerIsCorrect) => {
       mem.list[mem.answered].INTERVAL = diff - Date.now();
       if (answerIsCorrect != 100) {
         //check for postpone
-        mem.update("LREPEAT", Date.now(), "ID", mem.res.obj.ID);
+        mem.update("LREPEAT", datenow, "ID", mem.res.obj.ID);
         mem.res.obj.SPEC = JSON.stringify(mem.res.obj.result[1]);
         mem.update("SPEC", mem.res.obj.SPEC, "ID", mem.res.obj.ID);
       }
       mem.showAnswer = 0;
     } else {
-      mem.update("RDATE", Date.now(), "ID", mem.res.obj.ID);
-      mem.update("LREPEAT", Date.now(), "ID", mem.res.obj.ID);
+      mem.update("RDATE", datenow, "ID", mem.res.obj.ID);
+      mem.update("LREPEAT", datenow, "ID", mem.res.obj.ID);
       if (!(mem.showAnswer % 2))
         notifier.show(
           `⌛ - ${mem.convertHMS(
@@ -475,7 +488,7 @@ mem.answer = (answerIsCorrect) => {
           true
         );
       console.log("ZEROING FILE");
-      mem.res.obj.LREPEAT = Date.now();
+      mem.res.obj.LREPEAT = datenow
       mem.code = 0;
     }
 
