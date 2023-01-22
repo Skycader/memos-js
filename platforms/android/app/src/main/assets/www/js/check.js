@@ -180,7 +180,7 @@ document.getElementById("memosInput").addEventListener(
 check.skipped = 0;
 check.focus = () => {
   check.skipped += 1; //turn on skipping
-  if (check.skipped > 2) {
+  if (check.skipped > 3) {
     mem.answered++;
     check.next(0.5);
     check.skipped = 0;
@@ -415,10 +415,17 @@ check.p5 = () => {
     .insertAdjacentHTML("afterbegin", " <div onclick = 'check.focus()' class='pos4 card'></div>");
 };
 
+cards.freezeTimer = () => {
+	    document.querySelector(".cardTimer").classList.remove("timerStarted");
+}
+
 cards.timeout = 0;
 cards.initTimer = () => {
   if (!mem.nothing) {
+	      document.querySelector(".cardTimer").style.transitionDuration = document.querySelector(".innerdata").innerText.length*0.5 + 15 + 's' 
+
     document.querySelector(".cardTimer").classList.add("timerStarted");
+	  console.log(document.querySelector(".innerdata").innerText.length + 's')
   }
   // console.log(document.querySelector(".cardTimer"));
 };

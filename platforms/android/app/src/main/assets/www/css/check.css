@@ -168,6 +168,10 @@
   }
 }
 
+.immediate {
+	transition-duration: 0s !important
+}
+
 .cardTimer {
   width: 100%;
   height: 2px;
@@ -179,7 +183,8 @@
 .timerStarted {
   width: 0%;
   background: red !important;
-  transition-duration: 15s !important;
+ /* transition-duration: 15s !important; */ /* JS now */
+  transition-duration: 15s;
   transition-timing-function: linear !important;
 }
 

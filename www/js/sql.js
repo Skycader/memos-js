@@ -370,7 +370,7 @@ mem.define = (increment, comment) => {
 		console.log("Карточка ещё не готова тк повтор в будущем! Будет скип?")
 
 		if (mem.list[mem.answered].INTERVAL/1000/60/60 * 2 <= 24) {
-			mem.minimalIntervalValue = mem.list[mem.answered].INTERVAL*2 
+			mem.minimalIntervalValue = mem.list[mem.answered].INTERVAL/1000/60/60 * 2 
 		}
 		if (mem.minimalIntervalValue < 24) {
 			console.log('Скип отмёнен, дети нужны')
@@ -631,10 +631,18 @@ mem.check = (answer) => {
       }
     }
     if (rightSymbols > mem.maxRightSymbols) {
+	 // document.querySelector(".cardTimer").style.transitionDuration("0s")
+	  document.querySelector(".cardTimer").classList.add("immediate")
       document.querySelector(".cardTimer").classList.remove("timerStarted");
 
+	 // document.querySelector(".cardTimer").style.transitionDuration("0s")
+	 // document.querySelector(".cardTimer").style.transitionDuration = document.querySelector(".innerdata").innerText.length*0.5 + 15 + 's' 
+
+
       setTimeout(() => {
+		  document.querySelector(".cardTimer").classList.remove("immediate")
         cards.initTimer();
+
       }, 500);
 
       mem.maxRightSymbols = rightSymbols;

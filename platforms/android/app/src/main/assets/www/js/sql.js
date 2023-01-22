@@ -368,12 +368,20 @@ mem.define = (increment, comment) => {
 //	console.log()
 	if (mem.list[mem.answered].RDATE * 1 > Date.now()) { // если где-то там в будущем то скипать {
 		console.log("Карточка ещё не готова тк повтор в будущем! Будет скип?")
-		if (mem.answered>0)
+
+		if (mem.list[mem.answered].INTERVAL/1000/60/60 * 2 <= 24) {
+			mem.minimalIntervalValue = mem.list[mem.answered].INTERVAL/1000/60/60 * 2 
+		}
+		if (mem.minimalIntervalValue < 24) {
+			console.log('Скип отмёнен, дети нужны')
+			return;
+		}
+	/*	if (mem.answered>0)
 		if (mem.list[mem.answered-1]?.INTERVAL*2 > 24 * 60 * 60 * 1000 ) {
 			//abort skip if the card won't become required adult
 			console.log("Скипа всё таки не будет тк предыдущая карточка стала взрослой и нужны ещё дети!")
 			return 0;
-		}
+		} */
 		console.log("скип будет!")
 	//if prev to become 48<24 hours (48 f.e.), skip is not needed
 		  
@@ -432,6 +440,8 @@ mem.setRDATE = async (id, hours) => {
 mem.answered = 0;
 mem.blockAnswer = 0;
 mem.answer = (answerIsCorrect) => {
+  mem.typoCount = 0 /*Обнулеие счётчика опечаток (per card) */
+  mem.AnswerPrevLength = 0
   let datenow = Date.now()
   if (!mem.blockAnswer) {
     mem.blockAnswer = 1;
@@ -522,6 +532,9 @@ mem.percentage = 0;
 mem.progress = 0;
 mem.userAnswer = "";
 mem.showAnswer = 0;
+mem.answerPrevLength = 0
+mem.typoCount = 0
+mem.writingDirection = 0
 mem.check = (answer) => {
   if (mem.showAnswer % 2) return 0;
   // document.querySelector("#memosInput").innerHTML.replaceAll("&nbsp;", " ");
@@ -561,8 +574,27 @@ mem.check = (answer) => {
     mem.answer(100);
     check.next(-1);
   }
-
   let rightSymbols = 0;
+
+	console.log("right symbols: ", rightSymbols)
+	console.log(answer.join().length, mem.maxRightSymbols)
+	  if (mem.answerPrevLength > answer.join().length) {
+
+		 if ((mem.writingDirection === 1)&&(mem.mistake)) {
+	  console.log(mem.answerPrevLength, answer.join().length)
+	  mem.typoCount++
+	  
+	  check.wrong()
+		  }
+	  if (mem.typoCount > 6) {
+		mem.answer(0)
+	  }
+	  mem.writingDirection = -1
+  } else {
+	  mem.writingDirection = 1
+  }
+
+
   let block = 0;
   for (var i = 0; i < answer.length; i++) {
     for (var j = 0; j < answer[i].length; j++) {
@@ -580,6 +612,7 @@ mem.check = (answer) => {
 
         mem.mistake = 1;
       } else {
+		mem.mistake=0
         if (!block) rightSymbols++;
         // console.log(rightSymbols);
       }
@@ -598,10 +631,18 @@ mem.check = (answer) => {
       }
     }
     if (rightSymbols > mem.maxRightSymbols) {
+	 // document.querySelector(".cardTimer").style.transitionDuration("0s")
+	  document.querySelector(".cardTimer").classList.add("immediate")
       document.querySelector(".cardTimer").classList.remove("timerStarted");
 
+	 // document.querySelector(".cardTimer").style.transitionDuration("0s")
+	 // document.querySelector(".cardTimer").style.transitionDuration = document.querySelector(".innerdata").innerText.length*0.5 + 15 + 's' 
+
+
       setTimeout(() => {
+		  document.querySelector(".cardTimer").classList.remove("immediate")
         cards.initTimer();
+
       }, 500);
 
       mem.maxRightSymbols = rightSymbols;
@@ -622,6 +663,9 @@ mem.check = (answer) => {
       // document.querySelector("#memosInput").classList.remove("loose");
     }
   }
+
+
+  mem.answerPrevLength = answer.join().length
 };
 
 mem.query = null;
