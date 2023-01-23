@@ -560,12 +560,14 @@ mem.check = (answer) => {
     check.next(1);
   }
   if (answer == "/same") {
+    mem.typoCount = 0 /*Обнулеие счётчика опечаток (per card) */
     mem.answer(0.5);
   }
   if (answer == "/wrong") {
     check.next(0);
   }
   if (answer == "/skip") {
+	mem.typoCount = 0 /*Обнулеие счётчика опечаток (per card) */
     mem.answered++;
     check.next(0.5);
   }
