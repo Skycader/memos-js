@@ -182,6 +182,7 @@ check.focus = () => {
   check.skipped += 1; //turn on skipping
   if (check.skipped > 3) {
     mem.answered++;
+	mem.typoCount = 0 /* Обнуление счётчика опечаток */	
     check.next(0.5);
     check.skipped = 0;
   }

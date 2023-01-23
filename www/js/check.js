@@ -182,6 +182,8 @@ check.focus = () => {
   check.skipped += 1; //turn on skipping
   if (check.skipped > 3) {
     mem.answered++;
+	//mem.typoCount = 0 /* Обнуление счётчика опечаток */
+	mem.setTypoCount(0)
     check.next(0.5);
     check.skipped = 0;
   }
@@ -562,6 +564,9 @@ cardSample = `
 		$question
 		</div>
 	</div>
+
+ <div class="cardTimer"></div>
+  <div class="cardTimer"></div>
 
   <div class="infopanel" style="height: 50px;margin-bottom: 40px;border-top: 1px solid #373737;padding-top: 40px;">
 <div class="diricon">

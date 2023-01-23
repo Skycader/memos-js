@@ -439,8 +439,15 @@ mem.setRDATE = async (id, hours) => {
 
 mem.answered = 0;
 mem.blockAnswer = 0;
+
+mem.setTypoCount = (count) => {
+	mem.typoCount = count
+	document.querySelectorAll(".cardTimer")[2].style.width = ((6-count)/6)*100+"%"
+}
+
 mem.answer = (answerIsCorrect) => {
-  mem.typoCount = 0 /*Обнулеие счётчика опечаток (per card) */
+  //mem.typoCount = 0 /*Обнулеие счётчика опечаток (per card) */
+  mem.setTypoCount(0)
   mem.AnswerPrevLength = 0
   let datenow = Date.now()
   if (!mem.blockAnswer) {
@@ -488,8 +495,11 @@ mem.answer = (answerIsCorrect) => {
       }
       mem.showAnswer = 0;
     } else {
-      mem.update("RDATE", datenow, "ID", mem.res.obj.ID);
-      mem.update("LREPEAT", datenow, "ID", mem.res.obj.ID);
+	  let nullificate = confirm("Nullificate card?")
+	  if (nullificate) {
+		mem.update("RDATE", datenow, "ID", mem.res.obj.ID);
+		mem.update("LREPEAT", datenow, "ID", mem.res.obj.ID);
+	  }
       if (!(mem.showAnswer % 2))
         notifier.show(
           `⌛ - ${mem.convertHMS(
@@ -560,7 +570,8 @@ mem.check = (answer) => {
     check.next(1);
   }
   if (answer == "/same") {
-    mem.typoCount = 0 /*Обнулеие счётчика опечаток (per card) */
+    //mem.typoCount = 0 /*Обнулеие счётчика опечаток (per card) */
+	mem.setTypoCount(0)
     mem.answer(0.5);
   }
   if (answer == "/wrong") {
@@ -584,7 +595,7 @@ mem.check = (answer) => {
 
 		 if ((mem.writingDirection === 1)&&(mem.mistake)) {
 	  console.log(mem.answerPrevLength, answer.join().length)
-	  mem.typoCount++
+	  mem.setTypoCount(mem.typoCount+1)
 	  
 	  check.wrong()
 		  }
