@@ -178,9 +178,11 @@ document.getElementById("memosInput").addEventListener(
   false
 );
 check.skipped = 0;
+check.lastSkip = Date.now()
 check.focus = () => {
   check.skipped += 1; //turn on skipping
-  if (check.skipped > 3) {
+  if ((check.skipped > 3) && (Date.now() - 2000 > check.lastSkip)) {
+	check.lastSkip = Date.now()
     mem.answered++;
 	//mem.typoCount = 0 /* Обнуление счётчика опечаток */
 	mem.setTypoCount(0)
@@ -190,6 +192,7 @@ check.focus = () => {
   document.getElementById("memosInput").focus();
 };
 check.exit = () => {
+  mem.setTypoCount(0)
   mem.terminalCommand("ls"); //update browser on exit
 
   document.querySelector("#memosInput")?.classList.remove("redColor");

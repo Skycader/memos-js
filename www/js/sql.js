@@ -624,6 +624,7 @@ mem.check = (answer) => {
         block = 1;
 
         mem.mistake = 1;
+		break 
       } else {
 		mem.mistake=0
         if (!block) rightSymbols++;
