@@ -576,14 +576,16 @@ mem.check = (answer) => {
   }
   if (answer == "/wrong") {
     check.next(0);
+	mem.setTypoCount(0)
   }
   if (answer == "/skip") {
-	mem.typoCount = 0 /*Обнулеие счётчика опечаток (per card) */
+	mem.setTypoCount(0)
     mem.answered++;
     check.next(0.5);
   }
   if (answer == "/postpone") {
     mem.answered++;
+	mem.setTypoCount(0)
     mem.answer(100);
     check.next(-1);
   }
