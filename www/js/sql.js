@@ -306,7 +306,7 @@ mem.answered = 0; //move forward in a list of files to answer
 mem.define = (increment, comment) => {
   if (increment) {
     mem.answered++;
-    console.log("Comment: ", comment, increment);
+   // console.log("Comment: ", comment, increment);
   }
   let DATA;
   let SPEC;
@@ -326,14 +326,14 @@ mem.define = (increment, comment) => {
 
     let question = DATA[index[0]];
     mem.res.question = question;
-    console.log("Question: " + question);
+    //console.log("Question: " + question);
     let dirData = JSON.parse(mem.res.dir);
-    console.log("dirData", dirData);
+    //console.log("dirData", dirData);
     //console.log(requestedFieldName)
     let reqFieldName = dirData[1][index[1]];
-    console.log("REQ: ", dirData[1][index[1]]);
+   // console.log("REQ: ", dirData[1][index[1]]);
     mem.res.reqFieldName = reqFieldName;
-    console.log(reqFieldName);
+    //console.log(reqFieldName);
     let rightAnswer;
 
     rightAnswer = DATA[index[1]];
@@ -350,19 +350,19 @@ mem.define = (increment, comment) => {
 
     //check for kids in the queue
 
-    console.log(
+   /* console.log(
       "Should you run for ",
       mem.list[mem.answered],
       mem.answered,
       mem.list[mem.answered].INTERVAL < 7200000
-    );
+    ); */
     if (mem.list[mem.answered].INTERVAL < 7200000) {
-      console.log(
+     /* console.log(
         "Case running for ",
         mem.list[mem.answered],
         mem.answered,
         mem.list[mem.answered].INTERVAL < 7200000
-      );
+      ); */
 
 	//Should the child be skipped?
 //	console.log()
@@ -372,7 +372,7 @@ mem.define = (increment, comment) => {
 		if (mem.list[mem.answered].INTERVAL/1000/60/60 * 2 <= settings.minHours) {
 			mem.minimalIntervalValueRAM = mem.list[mem.answered].INTERVAL/1000/60/60 * 2 
 		}
-		if (mem.minimalIntervalValueRAM < settings.minHours) {
+		if ((mem.minimalIntervalValueRAM < settings.minHours) && (mem.list[mem.answered].RDATE * 1 <= Date.now() )) {
 			console.log('Скип отмёнен, дети нужны')
 			return;
 		}
@@ -402,8 +402,8 @@ mem.define = (increment, comment) => {
           item?.INTERVAL < 7200000 &&
           mem.list[mem.answered].INTERVAL < 7200000
         ) {
-          console.log("CHILD DETECTED", i);
-          console.log(mem.answered);
+         // console.log("CHILD DETECTED", i);
+         // console.log(mem.answered);
           mem.define(
             1,
             `Query has a child that didn't become adult ${JSON.stringify(
@@ -485,6 +485,7 @@ mem.answer = (answerIsCorrect) => {
       repeatIn = repeatIn / 1000 / 60 / 60;
       // console.log("New RDATE: " + new Date(diff));
       // console.log(`Repeat in ${repeatIn} hours`);
+	  console.log(`calling mem.update("RDATE", ${diff}, "ID", ${mem.res.obj.ID}`)
       mem.update("RDATE", diff, "ID", mem.res.obj.ID);
       mem.list[mem.answered].INTERVAL = diff - Date.now();
       if (answerIsCorrect != 100) {
@@ -591,12 +592,12 @@ mem.check = (answer) => {
   }
   let rightSymbols = 0;
 
-	console.log("right symbols: ", rightSymbols)
-	console.log(answer.join().length, mem.maxRightSymbols)
+	//console.log("right symbols: ", rightSymbols)
+//	console.log(answer.join().length, mem.maxRightSymbols)
 	  if (mem.answerPrevLength > answer.join().length) {
 
 		 if ((mem.writingDirection === 1)&&(mem.mistake)) {
-	  console.log(mem.answerPrevLength, answer.join().length)
+	  //console.log(mem.answerPrevLength, answer.join().length)
 	  mem.setTypoCount(mem.typoCount+1)
 	  
 	  check.wrong()
@@ -880,7 +881,7 @@ mem.circleData = (update) => {
       "#info4"
     ).innerHTML = `${mem.deadItems} · ${zeroPad(mem.maxIntegrityValue,3)} · ${mem.averageIntegrityValue}`;
 
-    switch (Math.floor(mem.maximalIntegrityValue / 25)) {
+    switch (Math.floor(mem.maxIntegrityValue / 25)) {
       case 0:
 		leftBulb = 'green'
         circle.leftBulb.green();
@@ -1769,7 +1770,7 @@ mem.freeSpace = async () => {
 
 mem.terminalChoice = "";
 mem.terminalCommand = (choice) => {
-	console.log(choice)
+//	console.log(choice)
   if (mem.searchData !== "") choice = "find "+mem.searchData
   ITEM_G_COUNT = 0;
   G_COUNT = 0;

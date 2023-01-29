@@ -294,6 +294,15 @@
                <div style="position: absolute; margin-top: 110px; width: 100%; height: calc(100vh - 100px); overflow: auto">
                 
                   <div style="padding: 20px;">
+
+				  <h1>Settings</h1>
+				  
+				  <form>
+					  <label style="font-size: 20px">Child until</label>
+					  <input id='minHours' style="width: 50px; height: 30px; font-size: 30px" type="number" min=1 step=1 oninput="settings.setMinHours(this.value)"></input>
+					  <label> hours </label>
+				  </form>
+
                   <h1 style="font-family: memoff;" onclick="document.querySelector('#guide').classList.toggle('hidden')">
                      Memos quick start (tap to toggle)</h1> 
                      <h3  style="font-family: memoff;" class="memos-guide ">
@@ -455,6 +464,7 @@
    </div>
 </body>
 <script src="js/shorthands.js"></script>
+<script src="js/settings.js"></script>
 <script src="js/notifier.js"></script>
 <script src="js/viewport.js"></script>
 <script src="css/jquery.min.js"></script> <!--required for owl.carousel-->

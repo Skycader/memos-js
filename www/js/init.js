@@ -34,6 +34,9 @@ function openMemos(){
     document.querySelector(".menu").classList.remove('donotdisplay');
     document.querySelector(".curtain").scrollBy(0,$("#red").height()+100) 
 
+	if (localStorage.getItem('minHours') === null) {
+		localStorage.setItem('minHours','24')
+	}
     
     
 }

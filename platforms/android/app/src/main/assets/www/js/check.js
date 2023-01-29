@@ -221,6 +221,7 @@ check.exit = () => {
 cards = {};
 cards.timerInterval = 0;
 cards.init = () => {
+  check.lastSkip = Date.now()
   document.querySelector("#papers").classList.remove("off")
   cards.animation = 1;
   mem.collect();

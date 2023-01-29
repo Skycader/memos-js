@@ -221,6 +221,7 @@ check.exit = () => {
 cards = {};
 cards.timerInterval = 0;
 cards.init = () => {
+  check.lastSkip = Date.now()
   document.querySelector("#papers").classList.remove("off")
   cards.animation = 1;
   mem.collect();
@@ -229,7 +230,7 @@ cards.init = () => {
   //mem.check time!
   //cards.set("Title")
   check.justStarted = 1;
-  console.log("Cards init");
+  //console.log("Cards init");
   //mem.check(undefined,cards.set)
   mem.nothing = 0;
   // mem.check()
@@ -302,7 +303,7 @@ cards.call = () => {
 };
 
 cards.insert = (amount) => {
-  console.log("insert called")
+  //console.log("insert called")
   if (!amount) {
     amount = 1;
   }
@@ -431,7 +432,7 @@ cards.initTimer = () => {
 	      document.querySelector(".cardTimer").style.transitionDuration = document.querySelector(".innerdata").innerText.length*0.5 + 15 + 's' 
 
     document.querySelector(".cardTimer").classList.add("timerStarted");
-	  console.log(document.querySelector(".innerdata").innerText.length + 's')
+//	  console.log(document.querySelector(".innerdata").innerText.length + 's')
   }
   // console.log(document.querySelector(".cardTimer"));
 };
@@ -454,8 +455,8 @@ cards.checkTimer = () => {
 };
 
 check.subNext = () => {
-  console.log("SUBNEXT INFO");
-  console.log(mem.res);
+ // console.log("SUBNEXT INFO");
+ // console.log(mem.res);
   // cards.set(2);
   mem.ask(2);
   //cards.unfreeze();
@@ -497,7 +498,7 @@ cards.set = (pos) => {
       pos = 4;
     }
     let renderedCard = null;
-    console.log(mem);
+  //  console.log(mem);
     if (!mem.nothing) {
      
 	  mem.res.obj.INTEGRITY = (100*mem.res.obj.INTEGRITY).toFixed(0)
@@ -799,11 +800,11 @@ check.check2 = (ans) => {
     document.querySelector("#memosInput").style.height =
       $("#memosInput2").get(0).scrollHeight + "px";
     document.querySelector(".memokeyboard").scrollBy(0, 34);
-    console.log(
+    /*console.log(
       document.querySelector("#memosInput").style.height,
       " ",
       document.querySelector("#memosInput2").style.height
-    );
+    ); */
   }
   prevHeight =
     document.querySelector("#memosInput2").style.height.slice(0, -2) * 1;
