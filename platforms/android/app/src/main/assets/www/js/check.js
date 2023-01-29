@@ -192,7 +192,6 @@ check.focus = () => {
   document.getElementById("memosInput").focus();
 };
 check.exit = () => {
-  mem.setTypoCount(0)
   mem.terminalCommand("ls"); //update browser on exit
 
   document.querySelector("#memosInput")?.classList.remove("redColor");
@@ -242,6 +241,8 @@ cards.init = () => {
   }
 
   // cards.set(4);
+  mem.setTypoCount(0)
+
 };
 
 cards.p1 = () => {

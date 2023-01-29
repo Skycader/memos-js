@@ -149,11 +149,11 @@ mem.collect = () => {
 	*/
 
   addPriority(100)
-  addChildrenIfNeeded(96)
+  addChildrenIfNeeded(settings.minHours*3)
   addPriority(75)
-  addChildrenIfNeeded(48)
+  addChildrenIfNeeded(settings.minHours*2)
   addPriority(50)
-  addChildrenIfNeeded(24)
+  addChildrenIfNeeded(settings.minHours)
   addAdults()
 
   function addChildrenIfNeeded(hours) {
@@ -369,10 +369,10 @@ mem.define = (increment, comment) => {
 	if (mem.list[mem.answered].RDATE * 1 > Date.now()) { // если где-то там в будущем то скипать {
 		console.log("Карточка ещё не готова тк повтор в будущем! Будет скип?")
 
-		if (mem.list[mem.answered].INTERVAL/1000/60/60 * 2 <= 24) {
-			mem.minimalIntervalValue = mem.list[mem.answered].INTERVAL/1000/60/60 * 2 
+		if (mem.list[mem.answered].INTERVAL/1000/60/60 * 2 <= settings.minHours) {
+			mem.minimalIntervalValueRAM = mem.list[mem.answered].INTERVAL/1000/60/60 * 2 
 		}
-		if (mem.minimalIntervalValue < 24) {
+		if (mem.minimalIntervalValueRAM < settings.minHours) {
 			console.log('Скип отмёнен, дети нужны')
 			return;
 		}
@@ -861,6 +861,7 @@ let rightBulb = null
 
 mem.circleData = (update) => {
 //	console.log(mem.list.length)
+  document.querySelector("#minHours").value = settings.minHours
   let res = `${mem.todayAnsweredResult} | ${mem.countResult} | ${mem.countDailyResult}`;
   if (
     mem.todayAnsweredResult != undefined &&
@@ -879,7 +880,7 @@ mem.circleData = (update) => {
       "#info4"
     ).innerHTML = `${mem.deadItems} · ${zeroPad(mem.maxIntegrityValue,3)} · ${mem.averageIntegrityValue}`;
 
-    switch (Math.floor(mem.averageIntegrityValue / 25)) {
+    switch (Math.floor(mem.maximalIntegrityValue / 25)) {
       case 0:
 		leftBulb = 'green'
         circle.leftBulb.green();
@@ -903,7 +904,7 @@ mem.circleData = (update) => {
     }
 
 
-    switch (Math.floor(mem.minimalIntervalValue / 24)) {
+    switch (Math.floor(mem.minimalIntervalValue / settings.minHours)) {
       case 0:
 		rightBulb = 'green'
         circle.rightBulb.green();
@@ -1102,7 +1103,7 @@ mem.count = async function () {
   );*/
  
 let kids = await sql2(`SELECT CASE
-		WHEN (SELECT (1*RDATE-1*LREPEAT) AS INTERVAL FROM OBJECTS WHERE INTERVAL>7200000 ORDER BY INTERVAL LIMIT 1) > ${24*60*60*1000} 
+		WHEN (SELECT (1*RDATE-1*LREPEAT) AS INTERVAL FROM OBJECTS WHERE INTERVAL>7200000 ORDER BY INTERVAL LIMIT 1) > ${settings.minHours*60*60*1000} 
 		THEN 1 
 		ELSE 0
 		END AS NEEDKIDS, 
