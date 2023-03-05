@@ -1,0 +1,70 @@
+ 
+#mycircle {
+transition-duration: 1s;
+}
+.bar-anim {
+  transition: all 200ms linear;
+ -webkit-transition: all 200ms linear;
+ -moz-transition: all 200ms linear;
+}
+.bar-anim2 {
+  transition: all 400ms linear !important;
+ -webkit-transition: all 400ms linear !important;
+ -moz-transition: all 400ms linear !important;
+}
+
+
+.bar-anim3 {
+  transition: all 300ms linear !important;
+ -webkit-transition: all 300ms linear !important;
+ -moz-transition: all 300ms linear !important;
+}
+
+.opacive {
+opacity: 0.5;
+}
+
+#stick {
+position: absolute;
+}
+
+.shadowSimplex {
+box-shadow: 0 0 10px rgba(0,0,0,0.5);
+
+}
+
+.2transition {
+   transition-duration: box-shadow 1s;
+}
+.transition {
+   
+ transition: box-shadow 0.3s ease-in-out;
+}
+.transition:hover {
+
+}
+
+.hideStats2 {
+opacity: 0;
+}
+
+.hideSimplex {
+opacity: 0;
+}
+
+#stat1, #stat2, #stat3, #thedots {
+transition-duration: 0.5s !important;
+}
+
+.aboveAll {
+z-index: 999; 
+}
+
+.trs {
+transition-duration: 0.5s
+}
+
+.shine {
+opacity: 1 !important
+}
+ 

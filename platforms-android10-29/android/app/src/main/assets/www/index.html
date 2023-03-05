@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<!--
+   Licensed to the Apache Software Foundation (ASF) under one
+   or more contributor license agreements.  See the NOTICE file
+   distributed with this work for additional information
+   regarding copyright ownership.  The ASF licenses this file
+   to you under the Apache License, Version 2.0 (the
+   "License"); you may not use this file except in compliance
+   with the License.  You may obtain a copy of the License at
+   
+   http://www.apache.org/licenses/LICENSE-2.0
+   
+   Unless required by applicable law or agreed to in writing,
+   software distributed under the License is distributed on an
+   "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+    KIND, either express or implied.  See the License for the
+   specific language governing permissions and limitations
+   under the License.
+   -->
+<html>
+
+<head>
+   <meta charset="utf-8">
+   <meta name="format-detection" content="telephone=no">
+   <meta name="msapplication-tap-highlight" content="no">
+   <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no, shrink-to-fit=no">
+   <link rel="icon" type="image/x-icon" href="icon.png">
+   <meta name="color-scheme" content="light dark">
+   <link rel="stylesheet" href="css/page2.css">
+   <link rel="stylesheet" href="css/home.css">
+   <link rel="stylesheet" href="css/index.css">
+   <link rel="stylesheet" href="css/style2.css">
+   <link rel="stylesheet" href="css/circle.css">
+   <link rel="stylesheet" href="css/check.css">
+   <link rel="stylesheet" href="css/style3.css">
+   <link rel="stylesheet" href="css/style4.css">
+   <link rel="stylesheet" href="css/owl.carousel.min.css">
+   <link rel="stylesheet" href="css/owl.theme.default.min.css">
+   <link rel="stylesheet" href="css/notifier.css">
+   <link rel="stylesheet" href="css/settings.css">
+   <title>Memos</title>
+</head>
+
+<body>
+	<!--<div style='position: fixed; left: 0; right: 0; top: 0; bottom: 0; background: black; z-index: 99999'></div>-->
+   <!--opacity 0 stands for curtain thing...-->
+
+   <div class="notifier notifier-up">
+      <div class="notifier-content">
+      </div>
+   </div>
+
+   <div class='menu' style="opacity-0">
+      <div id='papers' onclick='check.focus()' class='donotdisplay'>
+      </div>
+      <div id='keyboard' onclick='check.focus()' oninput='check()' class='hidekeyboard'
+         style="display: none; position: absolute; width: 100%; margin-top: 50vh; height: 50vh; top: 0px; z-index: 999; opacity: 0; ">
+      </div>
+      <div id='keyboard2' class='donotdisplay'
+         style='display: flex; overflow: hidden; position: absolute; border: 0px solid red; width: 100vw; height: 100vh; align-items: flex-end; justify-content: center; flex-direction: column'>
+
+         <div class="memokeyboard" onclick='check.focus()' style="scroll-behavior: smooth; width: 100%; height: 100%; overflow-y: scroll">
+            <div style="width: 100%; height: calc(100% - 52px)"></div>
+
+            <!-- <div style="display: flex; align-items: center; width: 100%;">
+               <textarea style="overflow: hidden" oninput="auto_grow2(this)" id='memosInput' oninput='check.check(this.value)' class='memosInput opacity0'>
+               </textarea>
+            </div> -->
+            <div contenteditable id='memosInput' oninput='check.check(this.value)' class='memosInput opacity0 aboveAll'></div>
+            <div style="display: flex; align-items: flex-start; width: 100%;">
+            <div class='progressBar' style="width: 0%; height: 2px; background: lime"></div>
+         </div>
+             
+      </div>  
+      <div style='opacity: 0; margin-bottom: 100px; width: 100%; position: absolute' class="memokeyboard" onclick='check.focus()' style="scroll-behavior: smooth; width: 100%; height: 100%; overflow-y: scroll">
+         <div style="width: 100%; height: calc(100% - 50px)"></div>
+         <div contenteditable id='memosInput2' oninput='check.check(this.value)' style="max-width: 400px; padding: 10px; border-radius: 15px 15px 0px 0px; border: 0px solid red;font-family: Round;font-size: 25px;color: white; z-index: 99; box-shadow: 0 0 10px rgb(0 0 0 / 50%); background: #171717; outline: none;resize: none;height: 34px;height: 49px; text-align: center;  width: 100%; opacity: 1;position: relative;">
+         </div>
+          
+   </div> 
+   <div style='opacity: 0; margin-bottom: 100px; width: 100%; position: absolute' class="memokeyboard" onclick='check.focus()' style="scroll-behavior: smooth; width: 100%; height: 100%; overflow-y: scroll">
+      <div style="width: 100%; height: calc(100% - 50px)"></div>
+      <div contenteditable id='memosInput3' oninput='check.check(this.value)' style="max-width: 400px; padding: 10px; border-radius: 15px 15px 0px 0px; border: 0px solid red;font-family: Round;font-size: 25px;color: white; z-index: 99; box-shadow: 0 0 10px rgb(0 0 0 / 50%); background: #171717; outline: none;resize: none;height: 34px;height: 49px; text-align: center;  width: 100%; opacity: 1;position: relative;">
+      </div>
+       
+</div> 
+      </div>
+      <div id='menu' class='aboveAll'
+         style='z-index: 9999; position: absolute; height: 0px; transition-duration: 0.5s; width: 100%;  padding-top: 10px;  display: flex; align-items: center; flex-direction: row; justify-content: center; height: 100px; '>
+         <nav class="slidemenu" style='transform: scale(0.8);'>
+            <!-- Item 1 -->
+            <input type="radio" name="slideItem" id="slide-item-1" class="slide-toggle" checked />
+            <label onclick="goTo(0)" id='slide-item-1' for="slide-item-1">
+               <p class="icon1">
+                  <svg fill='white' width="30px" height="30px" style='margin-top: 7.5px' id="Flat"
+                     xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+                     <path
+                        d="M224,115.53906v92.46a15.99994,15.99994,0,0,1-16,16h-.00195l-48.00489-.00732a7.99988,7.99988,0,0,1-7.999-8v-64h-48v64a7.99987,7.99987,0,0,1-7.999,8L48.002,223.999A15.99994,15.99994,0,0,1,32,207.999V115.53857a16.03108,16.03108,0,0,1,5.2373-11.83886l79.99317-72.73389a15.93657,15.93657,0,0,1,21.52637-.00146l80.00683,72.73584A16.03567,16.03567,0,0,1,224,115.53906Z" />
+                  </svg>
+               </p>
+               <span>Home</span>
+            </label>
+            <!-- Item 2 -->
+            <input type="radio" name="slideItem" id="slide-item-2" class="slide-toggle" />
+            <label onclick="goTo(1)" id='slide-item-2' for="slide-item-2">
+               <p id='test' class="icon">✎</p>
+               <span>Edit</span>
+            </label>
+            <!-- Item 3 -->
+            <input type="radio" name="slideItem" id="slide-item-3" class="slide-toggle" />
+            <label onclick="goTo(2)" id='slide-item-3' for="slide-item-3">
+               <p class="icon">★</p>
+               <span>Todo</span>
+            </label>
+            <!-- Item 4 -->
+            <input type="radio" name="slideItem" id="slide-item-4" class="slide-toggle" />
+            <label onclick="goTo(4)" id='slide-item-4' for="slide-item-4">
+               <p class="icon">⚙</p>
+               <span>Settings</span>
+            </label>
+            <div class="clear"></div>
+            <!-- Bar -->
+            <div class="slider">
+               <div class="bar"></div>
+            </div>
+         </nav>
+      </div>
+      <div class="owl-carousel">
+         <div id='home'>
+            <div style='width:100%; height:  0px; background-color: red'></div>
+            <div class="app" style="position: absolute; width: 100%; min-height: 200px;  ">
+               <div id='thatcircle' class="root"
+                  style="position: absolute; transition-duration: 0.53s; border: 0px solid green;  width: 100%; height: 100vh; min-height: 200px; display: flex; flex-direction: column; align-items: flex-end; flex-grow:1; justify-content: center">
+                  <svg style='width: 80%; height: 100%;border: 0px solid red;' viewBox="0 0 36 36"
+                     class="circular-chart">
+                     <g style=" transform: scale(0.8); transform-origin: center;">
+                        <path transition-duration="2s" id='2mycircle' class="  circle2"
+                           style="stroke-dasharray: 100 100" d="M18 2.0845
+                           a 15.9155 15.9155 0 0 1 0 31.831
+                           a 15.9155 15.9155 0 0 1 0 -31.831" />
+                        <path transition-duration="2s" id='mycircle' class="circle-anim circle hidden"
+                           style="stroke-dasharray:  0 100; filter: drop-shadow( 0px 0px 1.2px rgb(255, 255, 255))" d="M18 2.0845
+                           a 15.9155 15.9155 0 0 1 0 31.831
+                           a 15.9155 15.9155 0 0 1 0 -31.831" />
+                           <g id="info">
+                           <text id='info1' x="50%" y="25%" text-anchor="middle" class='opacive' font-family="Round"
+                              fill="white" font-size="2.2px" dy=".3em">00:00:00</text>
+                           <text id='info2' x="50%" y="34%" text-anchor="middle" class='opacive' font-family="Round"
+                              fill="white" font-size="2.2px" stroke-width="1px" dy=".3em">000 | 000 | 000</text>
+                           <text id='info3' x="50%" y="50%" text-anchor="middle" font-family="Round" fill="white"
+                              font-size="5px" stroke-width="1px" dy=".3em">0</text>
+                           <text id='info4' x="50%" y="66%" text-anchor="middle" class='opacive' font-family="Round"
+                              fill="white" font-size="2.2px" stroke-width="1px" dy=".3em">000 · 000 · 000</text>
+                           <text id='info5' x="50%" y="75%" text-anchor="middle" class='opacive' font-family="Round"
+                              fill="white" font-size="2.2px" stroke-width="1px" dy=".3em">000.000.000</text>
+
+                           <rect id="left-bulb" x="16%" y="45%" rx="1" ry="1" width="5.5" height="2.5"
+                              style="fill:rgb(30, 255, 0); filter: drop-shadow( 0px 0px 2px rgb(2, 255, 14));" />
+                           <rect id="right-bulb" x="67%" y="45%" rx="1" ry="1" width="5.5" height="2.5"
+                              style="fill:rgb(30, 255, 0); filter: drop-shadow( 0px 0px 2px rgb(2, 255, 14));" />
+                           </g>
+
+                     </g>
+                  </svg>
+
+               </div>
+         </div>
+            <!-- 158px if does not fit  (115px if iPhone vertical)-->
+            <!-- обратно -->
+            <div id='simplex' class='quickMenu container' onclick='check.start()'
+               style='position: absolute; scroll-behavior: smooth;  height: 100vh; width: 100vw; overflow: scroll;'>
+               <!-- <div style='width: 100%; height: 100%; background: red'></div> -->
+               <div id='simplexPadding' style='width: 100vw' class='verticalSimplex scrollSnapAlignStart'>
+                  <div style='height: 35vh; border: 0px solid red'></div>
+               </div>
+               <div id='stats' onclick='check.start()' class='scrollSnapAlignStart'
+                  style='position: relative;  border: 0px solid red; width: 100%; min-height: 	100px;  display: flex; flex-direction: column; align-items: flex-start; justify-content: flex-end; transition-duration: 0.5s '>
+                  <div id='stick' onclick='upIt()' touchstart='allowStats()' class='quickMenu transition'
+                     style='z-index: 9999; width: 100vw; position: absolute; height: 110px; background: #242424; padding-top: 10px; border-radius: 15px 15px 0px 0px'>
+                     <div
+                        style='display: flex; flex-direction: row; align-items: center; justify-content: center; width: 100%'>
+                        <div style='width: 50px; height: 5px; border-radius: 15px 15px;
+                              background: white'></div>
+                     </div>
+                     <div id='innerbody' class='quickMenu' style='width: 100vw; background: #242424'>
+                        <div onclick='showStats()' id='stat1'
+                           style='z-index: 1; width: 100%; display: flex; flex-direction: row; align-items: flex-end;  justify-content: center; overflow: hidden; transform: scale(0.9); margin: 0 auto; height: 100px; border-radius: 25px; max-width: 400px; background-color: #1d1d1d'>
+                           <!--<div
+                              style='width: 20px; border-radius: 25px 25px 0px 0px; height: 40px; background: blue; display: flex; flex-direction: row; align-items: center; justify-content: center'>
+                              12</div>
+                           <div
+                              style='width: 20px; border-radius: 25px 25px 0px 0px; height: 40px; background: blue; display: flex; flex-direction: row; align-items: center; justify-content: center'>
+							  12</div>-->
+                        </div>
+
+                        <div onclick='showStats()' id='stat2' class='hideSimplex'
+                           style='z-index: 1; width: 100%; display: flex; flex-direction: row; align-items: flex-end;  justify-content: center; overflow: hidden; transform: scale(0.9); margin: 0 auto; height: 100px; border-radius: 25px; max-width: 400px; background-color: #1d1d1d'>
+                           <!--<div
+                              style='width: 20px; border-radius: 25px 25px 0px 0px; height: 40px; background: blue; display: flex; flex-direction: row; align-items: center; justify-content: center'>
+                              12</div>
+                           <div
+                              style='width: 20px; border-radius: 25px 25px 0px 0px; height: 40px; background: blue; display: flex; flex-direction: row; align-items: center; justify-content: center'>
+							  12</div>-->
+                        </div>
+                        <div onclick='showStats()' id='stat3' class='hideSimplex'
+                           style='z-index: 1; width: 100%; display: flex; flex-direction: row; align-items: flex-end;  justify-content: center; overflow: hidden; transform: scale(0.9); margin: 0 auto; height: 100px; border-radius: 25px; max-width: 400px; background-color: #1d1d1d'>
+                           <!--<div
+                              style='width: 20px; border-radius: 25px 25px 0px 0px; height: 40px; background: blue; display: flex; flex-direction: row; align-items: center; justify-content: center'>
+                              12</div>
+                           <div
+                              style='width: 20px; border-radius: 25px 25px 0px 0px; height: 40px; background: blue; display: flex; flex-direction: row; align-items: center; justify-content: center'>
+							  12</div>-->
+                        </div>
+                     </div>
+                     <div style='height: 5px'></div>
+                     <div id='thedots'
+                        style='z-index: 1; width: 100%; display: flex; flex-direction: row; align-items: center;  justify-content: center;  transform: scale(0.9); margin: 0 auto; height: 5px; border-radius: 25px; max-width: 400px'>
+                        <svg style='width: 6px; height: 6px;  ;' viewBox="0 0 100 100">
+                           <circle fill='white' cx="50" cy="50" r="50" />
+                        </svg>
+                        <div style='width: 6px; height: 6px; background: transparent; border-radius: 100%'></div>
+                        <svg style='width: 6px; opacity: 0.1; height: 6px;  ;' viewBox="0 0 100 100">
+                           <circle fill='white' cx="50" cy="50" r="50" />
+                        </svg>
+                        <div style='width: 6px; height: 6px; background: transparent; border-radius: 100%'></div>
+                        <svg style='width: 6px; opacity: 0.1; height: 6px;  ;' viewBox="0 0 100 100">
+                           <circle fill='white' cx="50" cy="50" r="50" />
+                        </svg>
+                        <div style='width: 6px; height: 6px; background: transparent; border-radius: 100%'></div>
+                        <svg style='width: 6px; opacity: 0.1; height: 6px;  ;' viewBox="0 0 100 100">
+                           <circle fill='white' cx="50" cy="50" r="50" />
+                        </svg>
+                        <div style='width: 6px; height: 6px; background: transparent; border-radius: 100%'></div>
+                        <svg style='width: 6px; opacity: 0.1; height: 6px;  ;' viewBox="0 0 100 100">
+                           <circle fill='white' cx="50" cy="50" r="50" />
+                        </svg>
+                     </div>
+                     <div style='height: 8px'></div>
+                  </div>
+               </div>
+            </div>
+            <div id='simplex' style="display: none" class='curtain opacity0' onclick='check.toggle()'
+               style='position: absolute; scroll-behavior: smooth;  height: 100vh; width: 100vw; overflow: scroll; z-index: 0'>
+               <div id='red' style='width: 100%; height: 100%; background: red'></div>
+               <div id='simplexPadding' style='width: 100vw; height: 100vh;' class='verticalSimplex curtainPadding'>
+                
+               </div>
+            </div>
+         </div>
+
+         <div class="page2-root">
+            <div class="page2-subroot">
+               <div class="page2-node1">
+                  <div class="page2-node2">
+                     <div class="page2-node3">
+                        <div class="memosbase-info">
+                           <div class="memobase-info-1"></div>
+                           <div class="memobase-info-2"></div>
+                           <div class="memobase-info-3"></div>
+                           <div class="memobase-info-4"></div>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+            </div>
+            <div  class="page2-node4 scrollBarNone">
+               <div class="page2-node5">
+               </div>
+
+               <div style="scroll-snap-align: start2" class="page2-node6 memotable">
+                  <!--<div style="border: 2px solid red; scroll-snap-align: start; height: calc(100vh - 448px);">  </div> -->
+                  <!-- <div style="border: 0px solid blue; scroll-snap-align: start; height: calc(100px);">  </div> -->
+                  <div class="memotable-upside" style="transition-duration: 0.3s; border: 0px solid orange; scroll-snap-align2: start; height: 20px; x:calc(100vh - 448px);">  </div>
+                  <div class="page2-node6" style="box-shadow: 0 0 10px rgb(0 0 0 / 50%); padding: 10px; width: 100%; background: #232323">
+                  <div style="height: 5px"></div>
+                  <div class="stick"></div>
+                  
+                     <div style="width: 100%" class="objects">
+
+                     </div>
+                   <div style="border: 0px solid blue; height: calc(25px);">  </div> 
+                
+               </div> 
+               </div>
+               </div>
+            </div>
+            <div class='page3' style='     display: content'>
+                
+            </div>
+   
+            <div class='page4' style=' color: white;    display: content'>
+              
+              
+               <div style="position: absolute; margin-top: 110px; width: 100%; height: calc(100vh - 100px); overflow: auto">
+                
+                  <div style="padding: 20px;">
+
+				  <h1>Settings</h1>
+				  
+				  <form>
+					  <label style="font-size: 20px">Child until</label>
+					  <input id='minHours' style="width: 50px; height: 30px; font-size: 30px" type="number" min=1 step=1 oninput="settings.setMinHours(this.value)"></input>
+					  <label> hours </label>
+				  </form>
+
+                  <h1 style="font-family: memoff;" onclick="document.querySelector('#guide').classList.toggle('hidden')">
+                     Memos quick start (tap to toggle)</h1> 
+                     <h3  style="font-family: memoff;" class="memos-guide ">
+                        <h3 id='guide' style="color: white; font-family: memoff;" class="hidden">
+                           <br>About Memos <br><br>
+                           Memos is an app meant to help you memorise
+                           practically any information by
+                           <br>
+                           1) Writing memo cards.
+                           <br>
+                           2) Regularly repeating them.
+                           <br>
+                           Sounds simple and it is simple. 
+                           <br>
+                           However there's some more things to know.
+                           <br>
+                           First, as a user you store your memo cards in catalogs.
+                           <br>
+                           They are just like folders in your filesystem. 
+                           <br>
+                           Create your first catalog by opening  controls panel 
+                           <br>
+                           ⚙️ Show controls 
+                           <br>
+                           Then, tap 
+                           <br>
+                           📁 Add catalog
+                           <br>
+                           Choose an icon, a simple emoji would do.
+                           <br>
+                           Choose a name, like French.
+                           <br>
+                           Last, but not least, the fields, or the sides of your memo card.
+                           <br>
+                           For French example, they could be Original, Translation, Transcription.
+                           <br>
+                           Now you see that memo cards in Memos can have more than two sides.
+                           <br>
+                           After that in your file browser, go to your new French dir and add some cards!
+                           <br>
+                           Or at least one.
+                           <br>
+                           Tap
+                           <br>
+                           📝 Add card
+                           <br>
+                           Fill in the required fields (at last 2).
+						   <br>
+						   You can also make a side questionable only, which means you won't be able to write this part.
+						   <br>
+						   It is useful for long questions but small answers, for example: What year some event happened?
+						   <br>
+						   To make a side question only ,tap on its name and you will see 🔒lock icon.
+                           <br>
+                           Then just quit by tapping ← (arrow back).
+                           <br>
+                           You're ready to go!
+                           <br>
+                           <br>
+                           Memos repeat
+                           <br>
+                           <br>
+                           Tap the circle to enter the repeating mode.
+                           <br>
+                           When see a card with a text (for example, Un renard)
+                           <br>
+                           type the translation you filled in before and that's it!
+                           <br>
+                           Memos will double the waited time, so you repeat the card more rarely when you know it.
+                           <br>
+                           However, if you don't remeber, memos will nullify the full interval so you begin fresh headed.
+
+                           <br>
+                           <br>
+                           Memos card
+                           <br>
+                           <br>
+                           Properties
+                           <br>
+                           ⌛ Next repeat in <br>
+                           ⏰ When in need of repeat, waiting time start counting <br>
+                           🔋 Integrity, if waiting time is more than expected, it will go up to 100% and more, do not allow this <br>
+                           💪 Time it stood still, for example 2 days without repeat
+                           🚗 Current interval expected for the card to hold
+                           <br>
+                           <br>
+                           Repeat queue
+                           <br>
+                           <br>
+                           When cards need repeat, they go to repeat queue.
+                           It consist of two parts.
+                           <br>
+                           Children - cards whose interval is lower than N, by default 1 hour.
+                           <br> It's made so that you repeat one child until it becomes adult, and not all the kids you have.
+                           <br> Lets you focus on it.
+                           <br><br>
+                           Adult cards. Just repeat them.
+                           <br><br>Queue priority by default is
+                           <br>First cards by maximal integrity (biggest first).
+                           <br> It means memos will give you cards in highest need of repeat first.
+                           <br><br>
+                           Memos Circle
+                           <br>
+                           <br>
+                           Circle has 5 fields.
+                           <br>
+                           1) Time before next card needs repeat.
+                           <br>
+                           2) Cards repeated today | Cards needs repeat | Cards will be needed to repeated today
+                           <br>
+                           3) % of all cards that not in need of repeated
+                           <br>
+                           4) Cards that ran out of its waiting time and probably dead |
+                            % of integirty of the first card in queue, better be < 100% | 
+                            Average % of integirty among cards in repeat queue
+                           <br>
+                           5) Hours you may earn if complete all cards in queue
+                           <br>
+                           Also two lights bulbs.
+                           <br> Left one displays how many cards in queue in need of repeat.
+                           <br> Green -> Red (Red if you better start repeating at last).
+                           <br> Right displays the median interval of all cards. 
+                           <br> If Red, it means all the cards are strong and you now should add more.
+                           <br>
+                           <br>
+                           Other stuff.
+                           <br>
+                           You can manipulate your cards and catalogs, move and edit them easily.
+                           <br> Change the order of displayment and search for a card.
+                           <br> Also, do not forget to regularly do your backups!
+                           <br> Some of features are still in development, so please be patient, tell your friends
+                           <br> or donate a little bit to help Open Source<br>
+                           Memos by Skycader, Vodri.
+                           <br><br>Memos uses WebSQL to store data.
+                           <br> Memos Version: 0.7.5
+                        </h3>
+                     </h3>
+
+                  <h1 style="font-family: memoff;" onclick="(()=>{document.querySelector('.terminal').classList.toggle('off')})()">
+                     Terminal (tap to toggle)</h1>
+                  </div>
+                
+                  <div class="terminal off" >
+                 <textarea id="terminal" style="background: #161616; color: white; width: 100%; height: calc(100vh - 280px); font-size: 25px; font-family: memoff"
+                 ></textarea>
+                 <textarea onchange="terminal()" id="terminalCommands" style="background: #161616; color: white; width: 100%; overflow: hidden; height: calc(150px); font-size: 25px; font-family: memoff"
+                 ></textarea>
+                 <!-- <button style="width: 100%; height: 50px" onclick=" mem.terminalCommand(terminal.lastLine)">Send</button> -->
+                   
+               </div>
+            </div>
+               
+            </div>
+         </div>
+
+  
+
+      </div>
+   </div>
+</body>
+<script src="js/shorthands.js"></script>
+<script src="js/settings.js"></script>
+<script src="js/notifier.js"></script>
+<script src="js/viewport.js"></script>
+<script src="css/jquery.min.js"></script> <!--required for owl.carousel-->
+<script src="css/owl.carousel.min.js"></script>
+<script src="js/ripples.js"></script>
+<script src="js/keyboard.js"></script>
+<script src="cordova.js"></script>
+<script src="js/init.js"></script>
+<script src="js/script2.js"></script>
+<script src="js/page2.js"></script>
+<script src="js/check.js"></script>
+<script src="js/script4.js"></script>
+<script src="js/script5.js"></script>
+<script src="js/script6.js"></script>
+<script src="js/sql.js"></script>
+<script src="js/file.js"></script>
+<script src="js/terminal.js"></script>
+<script src="js/home.js"></script>
+<script src="js/backup.js"></script>
+
+</html>

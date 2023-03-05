@@ -1,0 +1,8 @@
+ 
+.remove-right {
+transform: translateX(100vw)
+}
+.remove-left {
+ transform: translateX(-100vw)
+}
+ 

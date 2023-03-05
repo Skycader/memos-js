@@ -13,6 +13,7 @@ db.transaction(function (tx) {
   tx.executeSql("CREATE TABLE IF NOT EXISTS DIRS (ID unique, PID, DATA)");
   tx.executeSql("CREATE TABLE IF NOT EXISTS MEMOROUTES (ID unique, DATA)");
   tx.executeSql("CREATE TABLE IF NOT EXISTS HISTORY (ID unique, DATA)");
+  tx.ececuteSql("CREATE INDEX IF NOT EXISTS OBJECTS_DATA ON OBJECTS (DATA)");
   // tx.executeSql("ALTER TABLE DIRS RENAME COLUMN DIRDATA TO DATA;")
   // tx.executeSql("ALTER TABLE OBJECTS RENAME TO ITEMS ")
 });
@@ -610,8 +611,9 @@ mem.check = (answer) => {
 	  mem.writingDirection = 1
   }
 
-
+	//CHECKHERE
   let block = 0;
+	console.log(answer)
   for (var i = 0; i < answer.length; i++) {
     for (var j = 0; j < answer[i].length; j++) {
       // console.log(
@@ -621,9 +623,9 @@ mem.check = (answer) => {
       //     answer[i][j].toLowerCase() == mem.res.rightAnswer[i][j].toLowerCase()
       //   }`
       // );
-      if (
+      if ((
         answer[i][j].toLowerCase() != mem.res.rightAnswer[i][j].toLowerCase()
-      ) {
+      ) || (answer[i].length > mem.res.rightAnswer[i].length) ) {
         block = 1;
 
         mem.mistake = 1;
@@ -2616,6 +2618,65 @@ var openFile = function (event) {
     console.log(e);
   }
 };
+
+function initImage() {
+  var files = document.getElementById('import-image').files;
+	console.log(files)
+  if (files.length > 0) {
+    openImage(files[0]);
+  }
+};
+
+function openImage(file) {
+  console.log(file)
+   var reader = new FileReader();
+   reader.readAsDataURL(file);
+   reader.onload = function () {
+     console.log(reader.result);
+   };
+   reader.onerror = function (error) {
+     console.log('Error: ', error);
+   };
+}
+
+function openImage2(file) {
+	console.log(file)
+	console.log("working")
+	try {
+   var reader = new FileReader();
+   reader.onload = function () {
+     console.log(reader.result);
+   };
+   reader.onerror = function (error) {
+     console.log('Error: ', error);
+   };
+	   reader.readAsDataURL(file);
+
+	} catch(e) {
+		console.log(e)
+	}
+}
+
+var openImage2 = function (event) {
+  try {
+    var input = event.target;
+
+    var reader = new FileReader();
+    reader.onload = function () {
+      var text = reader.result;
+      //importBackup(text);
+      // var node = document.getElementById('output');
+      // node.innerText = text;
+      // alert(text);
+      // console.log(reader.result.substring(0, 200));
+      // alert(reader.result.substring(0, 200));
+    };
+    reader.readAsText(input.files[0]);
+  } catch (e) {
+    console.log(e);
+  }
+};
+
 browser.toggle = () => {
   browser.showControlPanel = !browser.showControlPanel;
   browser.render();
@@ -2716,11 +2777,21 @@ browser.render = (showFile, id, data) => {
             ".objects"
           ).innerHTML += `<div class="memobject md-ripples" onclick="document.querySelector('#import').click()"><div class="memdata import">🎁 Import data</div></div>`;
 
-        if (path[path.length - 1] == "/")
+if (path[path.length - 1] == "/")
+          document.querySelector(
+            ".objects"
+          ).innerHTML += `<button onclick="initImage()" id='import-image-button'>image</button>`;
+
+        if (path[path.length - 1] == "/") { 
           document.querySelector(
             ".objects"
           ).innerHTML += `<input id="import" type="file" style='display: none' accept='text/plain' onchange='openFile(event)'/>`;
+  document.querySelector(
+            ".objects"
+          ).innerHTML += `<input id="import-image" type="file"/>`;
+		}
       }
+
       if (path[path.length - 1] !== "/")
         document.querySelector(
           ".objects"

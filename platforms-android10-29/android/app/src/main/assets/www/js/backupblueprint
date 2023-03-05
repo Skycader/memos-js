@@ -1,0 +1,114 @@
+function exportData() {
+  //save2, save3 functions
+
+  //   a = prompt()
+  a = mem.exportedData;
+  html = a;
+  var way;
+  //html = html.repeat(30)
+  //a = dataURI = 'data:text/html,' + encodeURIComponent(html);
+  try {
+    var dl = new Download2();
+    //cordova.file.externalApplicationStorageDirectory
+    //cordova.file.externalRootDirectory
+
+    if (a == "root") {
+      way = cordova.file.externalRootDirectory;
+    } else {
+      way = cordova.file.externalApplicationStorageDirectory;
+    }
+    dl.Initialize2({
+      fileSystem: way,
+      folder: "memos",
+      unzip: false,
+      remove: false,
+      timeout: 0,
+      success: DownloaderSuccess,
+      error: DownloaderError,
+    });
+
+    dl.Get(a);
+  } catch (e) {
+    alert(e);
+  }
+}
+
+function DownloaderError(err) {
+  alert("download error: " + err);
+}
+
+function DownloaderSuccess() {
+  alert("yay!");
+}
+
+const obj2 = { hello: "world" };
+const myblob = new Blob([JSON.stringify(obj2, null, 2)], {
+  type: "application/json",
+});
+
+function save32() {
+  try {
+    saveFile2(cordova.file.externalDataDirectory + "memos", myblob, "test");
+  } catch (e) {
+    alert(e);
+  }
+}
+
+function save3() {
+  try {
+    saveFile2(cordova.file.externalRootDirectory + "memos", myblob, "test");
+  } catch (e) {
+    alert(e);
+  }
+}
+
+function saveFile2(dirEntry, fileData, fileName) {
+  try {
+    dirEntry.getFile(
+      fileName,
+      { create: true, exclusive: false },
+      function (fileEntry) {
+        writeFile(fileEntry, fileData);
+      },
+      function () {
+        that.Settings.error(7); /*ERROR 7: File create error*/
+      }
+    );
+  } catch (e) {
+    alert(e);
+  }
+}
+
+function read() {
+  try {
+    window.resolveLocalFileSystemURL(
+      cordova.file.externalApplicationStorageDirectory + "memos/backup.txt",
+      gotFile,
+      fail
+    );
+  } catch (e) {
+    document.querySelector("#terminalCommands").value = e;
+  }
+}
+
+function fail(e) {
+  console.log("FileSystem Error");
+  document.querySelector("#terminalCommands").value = "Filesystem error";
+  console.dir(e);
+}
+
+function gotFile(fileEntry) {
+  fileEntry.file(function (file) {
+    var reader = new FileReader();
+
+    reader.onloadend = function (e) {
+      console.log("Text is: " + this.result);
+      alert(this.result);
+      document.querySelector("#terminalCommands").value = this.result;
+    };
+
+    reader.readAsText(file);
+  });
+}
+// check.toggle()
+// setTimeout(check.exit,4000)

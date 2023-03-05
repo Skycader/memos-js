@@ -1,0 +1,395 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+html, body {
+	width: 100vw;
+    height: 100vh;
+	min-width: 280px;
+	    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;		
+	 position:relative;
+  overflow-x: hidden;
+  padding: 0px;
+  background-color:  #242424; /*memos theme color */
+   
+  
+ 
+ 
+}
+
+h1 {
+	font-family: memoff
+}
+ 
+.simpleblack {
+  background-color:black;
+}
+ #editor {  
+  -webkit-user-select: all;  /* Chrome 49+ */
+  -moz-user-select: all;     /* Firefox 43+ */
+  -ms-user-select: all;      /* No support yet */
+  user-select: all;          /* Likely future */   
+}
+
+/* For Mozilla Firefox */
+* {
+   box-sizing: border-box;
+  } 
+body {
+    margin: 0;
+	min-height: 100vh;
+	padding: 0;
+	
+}
+
+.hidden-left {
+	transform: translate(-100%);
+	 
+}
+
+.hidden-right {
+	transform: translate(100%);
+	 
+}
+
+.input{
+  border:0px solid #ccc;
+  font-family: Round;
+  padding-top: 12px;
+ 
+  border-radius: 10px;
+   outline: none;
+
+}
+
+textarea {
+	padding: 10px !important;
+}
+@media screen and (min-width: 320px) {
+	span {
+ font-size: 15.2px;
+ }
+}
+@media screen and (min-width: 321px) {
+	span {
+ font-size: 16px;
+ }
+}
+@media screen and (min-height: 480px) {
+.iPhone {
+	height: calc(35vh - 160px);
+}
+.iPhoneCircle {
+	height: calc(58vh -  0px);
+}
+}
+
+@media screen and (min-height: 452px) {
+ 
+.iPhoneCircle {
+	height: calc(56vh -  0px);
+}
+}
+
+
+@media screen and (min-height: 460px) {
+ 
+.iPhoneCircle {
+	height: calc(58vh -  0px);
+}
+}
+
+@media screen and (min-height: 470px) {
+ 
+.iPhoneCircle {
+	height: calc(59vh -  0px);
+}
+}
+
+@media screen and (min-height: 478px) {
+ 
+.iPhoneCircle {
+	height: calc(59vh -  0px);
+}
+}
+@media screen and (min-height: 508px) {
+ 
+.iPhoneCircle {
+	height: calc(61vh -  0px);
+}
+}
+
+@media screen and (min-height: 518px) {
+ 
+.iPhoneCircle {
+	height: calc(62vh -  0px);
+}
+}
+
+@media screen and (min-height: 550px) {
+ 
+.iPhoneCircle {
+	height: calc(64vh -  0px);
+}
+}
+
+@media screen and (min-height: 560px) {
+.iPhone {
+	height: calc(35vh - 150px);
+}
+.iPhoneCircle {
+	height: calc(65vh -  0px);
+}
+}
+
+*{
+  margin: 0;
+  padding: 0;
+}
+
+.clear{
+  clear: both;
+}
+
+
+.slide-toggle{
+  display: none;
+}
+
+.slidemenu{
+  font-family: arial, sans-serif;
+  max-width: 400px;
+  padding-left:  10px;
+  padding-right:  10px;
+  width: 100%;
+ 
+  overflow: hidden;
+}
+
+.slidemenu label{
+  width: 25%;
+  text-align: center;
+  display: block;
+  float: left;
+  color: #fff;
+  opacity: 0.2;
+
+}
+
+.slidemenu label:hover{
+ 
+  color: #fff;
+}
+
+.slidemenu label span{
+  display: block;
+  padding: 10px;    
+}
+
+.slidemenu label .icon{
+  font-size: 35px;
+  border: solid 2px #fff;
+  text-align: center;
+  height: 50px;
+  width: 50px;
+  padding-top: 1px;
+  display: block;
+  margin: 0 auto;
+  line-height: 50px;
+  border-radius: 50%;
+}
+
+.icon1{
+  font-size: 35px;
+  border: solid 2px #fff;
+  text-align: center;
+  height: 50px;
+  width: 50px;
+   
+  display: block;
+  margin: 0 auto;
+  line-height: 50px;
+  border-radius: 50%;
+}
+
+/*Bar Style*/
+
+.slider{
+  width: 100%;
+  height: 5px;
+  display: block;
+  background: #242424;
+  margin-top: 0px;
+  padding-bottom: 4px;
+  border-bottom: 2px solid silver;
+}
+
+.slider .bar{
+  width: 25%;
+  height: 4px;
+  background: #fff;
+  border-radius: 5px 5px 0px 0px;
+   
+}
+
+/*Animations*/
+/*
+.slidemenu label, .slider .bar {
+   transition: all 500ms ease-in-out;
+  -webkit-transition: all 500ms ease-in-out;
+  -moz-transition: all 500ms ease-in-out;
+}
+*/
+
+/*Toggle*/
+
+.slidemenu .slide-toggle:checked + label{
+  opacity: 1;
+}
+
+
+
+/*
+.slidemenu #slide-item-1:checked ~ .slider .bar{ margin-left: 0; }
+.slidemenu #slide-item-2:checked ~ .slider .bar{ margin-left: 25%; }
+.slidemenu #slide-item-3:checked ~ .slider .bar{ margin-left: 50%; }
+.slidemenu #slide-item-4:checked ~ .slider .bar{ margin-left: 75%; }
+*/
+ 
+
+.circular-chart {
+  display: block;
+  margin: 10px auto;
+  max-width: 80%;
+}
+
+.circle {
+  stroke: #4CC790;
+  fill: none;
+  stroke-width: 2.8;
+  stroke-linecap: round;
+   
+}
+
+
+.left {
+	right: 100%;
+}
+
+.circle {
+  stroke: #fff;
+  fill: none;
+  stroke-width: 2.8;
+  stroke-linecap: round;
+  z-index: 900;
+  
+  
+}
+
+.circle2 {
+  stroke: #444444;
+  fill: none;
+  stroke-width: 2.8;
+  stroke-linecap: round;
+  
+  
+}
+.hidden {
+	display: none;
+}
+.circle-anim {
+	animation: progress 1s ease-out forwards;
+}
+
+
+@keyframes progress {
+  0% {
+    stroke-dasharray: 25 100;
+  }
+}
+
+@font-face {
+				font-family: Round; /* Имя шрифта */
+				src: url(Nunito-Regular.ttf);
+		   }
+       @font-face {
+				font-family: RoundMedium; /* Имя шрифта */
+				src: url(nunito.regular.ttf);
+		   }
+@font-face {
+				font-family: Baloo; /* Имя шрифта */
+				src: url(Baloo2-Regular.ttf);
+		   }
+@font-face {
+				font-family: Quicksand; /* Имя шрифта */
+				src: url(Quicksand-Medium.ttf);
+         
+		   }
+
+	@font-face {
+				font-family: memoff; /* Имя шрифта */
+			/*	src: url(memoff.woff); */
+					src: url(Nunito-Medium.ttf);
+         
+		   }	 
+
+	@font-face {
+				font-family: memoff-was; /* Имя шрифта */
+			/*	src: url(memoff.woff); */
+					src: url(memoff.woff);
+         
+		   }	
+
+@media screen and (min-width: 354px) {
+ #scrollable::-webkit-scrollbar {
+width: 0px;
+  background: transparent;
+}
+#scrollable::-webkit-scrollbar-track {
+
+
+border: solid 0px red;
+border-radius: 10px;
+
+}
+ 
+#scrollable::-webkit-scrollbar-thumb {
+background-color: #8a8a8a; 
+box-shadow: inset 0 0 20px 16px #444444;
+border: solid 0px red;
+border-radius: 25px;
+
+
+}
+#scrollable::-webkit-scrollbar-thumb:hover {
+box-shadow: inset 0 0  0px 16px #696969 ;
+border: solid 0px transparent;
+}
+
+ 
+}
+
+
+
+
+
+

@@ -1,0 +1,230 @@
+.page2-root {
+    border: 0px solid blue; 
+    display: flex;
+    flex-direction: column;
+    transform: translateY(110px);
+    justify-content: space-between;
+    border-radius: 15px 15px 0px 0px;
+    width: 100%;
+    height: 100vh;
+    overflow: hidden;
+    display: content;
+}
+
+.page2-subroot {
+    z-index: -1;
+    position: absolute;
+    width: 100%;  
+}
+
+.stick {
+    width: 50px;
+    height: 5px;
+    border-radius: 15px 15px;
+    background: white
+}
+
+.page2-node1 {
+    margin: 0 auto;
+    width: calc(100% - 40px);
+    height: calc(100vh - 110px)
+}
+
+.page2-node2 {
+    width: 100%;
+    height: 100%;  
+}
+
+.noSnap {
+    scroll-snap-align: none !important;
+}
+
+.page2-node3 {
+    width: 100%; 
+    height: calc( 100vh - 352px);  
+    min-height:  150px; 
+    border-radius: 10px; 
+    /* background: grey;   */
+    font-family: memoff;
+    color: white;
+    font-size: 25px;
+    margin-top: 1px;
+}
+
+.memosbase-info:before {
+    content: '';
+    width: 90%;
+    height: calc( 100% - 421px);
+	min-height: 188px; /* that grey class */
+    margin-top: 10px;
+    border-radius: 25px;
+    margin: 0 auto;
+    position: absolute;
+    top: 12px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    padding: 10px;
+    box-shadow: inset 0 0 2000px rgb(255 255 255 / 50%);
+    filter: blur(0px);
+}
+
+.memosbase-info {
+    width: 100%;
+    text-align: center;
+    margin-top: 40px;
+}
+
+.align {
+    scroll-snap-align: start;
+    transition-duration: 0.2s;
+}
+
+.page2-node4 { 
+    position: absolute;
+    /* scroll-behavior: smooth; */
+    scroll-snap-type: y mandatory;
+    border-radius: 15px 15px; 
+    border: 0px solid red; 
+    overflow: scroll; 
+    width: 100%;  
+    height: calc(100vh - 110px);
+   
+}
+
+.nonScroll {
+    overflow: hidden;
+
+}
+
+.page2-node5 {
+    width: 100%;
+     height: calc( 100% - 352px);
+     min-height:  150px; 
+     border-radius: 10px; 
+     background: transparent;  
+}
+
+.page2-node6 {
+    padding: 0px;
+    display: flex; 
+    flex-direction: column;
+    align-items: center; 
+    /*box-shadow: 0 0 10px rgb(0 0 0 / 50%); */
+    border-radius: 15px 15px; 
+    /*background: #232323; */
+    width: 100%; 
+    -webkit-overflow-scrolling: touch; 
+     
+}
+
+.memobject2 {
+    margin-top: 10px;
+    padding: 10px;
+    background: #1d1d1d;
+    width: calc(100% - 10px);
+    height: 80px;
+    border-radius: 25px;
+    display: flex;
+    align-items: center;
+    font-size: 15px;
+}
+
+.memobject {
+    margin-top: 10px;
+    padding: 10px;
+    width: calc(100% - 10px);
+    border-bottom: 2px solid #151515;
+    display: flex;
+    align-items: center;
+    font-size: 15px;
+}
+
+.end {
+    border-bottom: 2px dashed white !important;
+    
+}
+
+.memid {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 10px;
+    margin-left: 20px;
+    border-radius: 5px;
+    padding: 10px;
+    height: 100%;
+    font-size: 33px;
+    font-family: memoff;
+    color: white
+   }
+  
+   .memdata {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    width: calc(100% - 60px);
+    overflow-x: hidden;
+    overflow-y: hidden;
+    margin-left: 13px;
+    border-radius: 5px;
+    padding: 10px 60px 10px 10px;
+    height: 100%;
+    font-size: 25px;
+    font-family: memoff;
+    color: white
+   }
+   
+   .memdata-obj {
+    display: flex;
+    justify-content: flex-start;
+    width: 100%;
+    overflow-x: hidden;
+    overflow-y: hidden;
+    border-radius: 5px;
+    height: 100%;
+    font-size: 25px;
+    font-family: memoff;
+    color: white
+   }
+
+.memos-object-input {
+    display: flex;
+    padding: 20px !important;
+    height: 71px;
+    resize: none;
+    justify-content: flex-start;
+    word-break: break-word;
+    word-wrap: break-word;
+    background: #1f1f1f;
+    outline: none;
+    border: 0px;
+    border-bottom: 2px solid #151515;
+    width: 100%;
+    overflow-x: hidden;
+    overflow-y: hidden;
+    font-size: 25px;
+    font-family: memoff;
+    color: white
+}
+
+.memotable-upside-down {
+    height: 100vh !important;
+}
+
+select {
+    color: white;
+    font-size: 25px;
+    background: #1d1d1d
+}
+
+#label {
+    color: white;
+    font-size: 25px;
+}
+
+#import::-webkit-file-upload-button {
+   color: white;
+   background: #1d1d1d;
+   font-size: 25px;
+  }

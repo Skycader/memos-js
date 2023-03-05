@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<!--
+    Licensed to the Apache Software Foundation (ASF) under one
+    or more contributor license agreements.  See the NOTICE file
+    distributed with this work for additional information
+    regarding copyright ownership.  The ASF licenses this file
+    to you under the Apache License, Version 2.0 (the
+    "License"); you may not use this file except in compliance
+    with the License.  You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing,
+    software distributed under the License is distributed on an
+    "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+     KIND, either express or implied.  See the License for the
+    specific language governing permissions and limitations
+    under the License.
+-->
+
+<html class='omniflow memoscolor'>
+    <head>
+        <meta charset="utf-8">
+        <!--
+        Customize this policy to fit your own app's needs. For more guidance, see:
+            https://github.com/apache/cordova-plugin-whitelist/blob/master/README.md#content-security-policy
+        Some notes:
+            * gap: is required only on iOS (when using UIWebView) and is needed for JS->native communication
+            * https://ssl.gstatic.com is required only on Android and is needed for TalkBack to function properly
+            * Disables use of inline scripts in order to mitigate risk of XSS vulnerabilities. To change this:
+                * Enable inline JS: add 'unsafe-inline' to default-src
+        -->
+         
+        <meta name="format-detection" content="telephone=no">
+        <meta name="msapplication-tap-highlight" content="no">
+        <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no, shrink-to-fit=no">
+        <meta name="color-scheme" content="light dark">
+		<link rel="stylesheet" href="css/page2.css"> 
+        <link rel="stylesheet" href="css/index.css"> 
+		<link rel="stylesheet" href="css/style2.css"> 
+		<link rel="stylesheet" href="css/circle.css"> 
+		<link rel="stylesheet" href="css/style1.css"> 
+		<link rel="stylesheet" href="css/style3.css"> 
+		<link rel="stylesheet" href="css/style4.css"> 
+		<link rel="stylesheet" href="css/stick.css">
+		<link rel="stylesheet" href="css/owl.carousel.min.css">
+<link rel="stylesheet" href="css/owl.theme.default.min.css">
+
+<script src="css/jquery.min.js"></script>
+<script src="css/owl.carousel.min.js"></script>
+<script src="js/ripples.js"></script>
+<script src="js/script1.js"></script>
+        <title>Memos</title>
+    </head>
+	
+	
+	
+	
+    <body>
+	
+ <!--opacity 0 stands for curtain thing...-->
+	<div  class='menu ' style='opacity0'>
+ 
+	
+		 
+	
+<div id='papers' class='donotdisplay'>
+
+ 
+</div>
+
+<div id='keyboard' onclick='document.getElementById("textarea").focus();' oninput='check()' class='hidekeyboard' style="position: absolute; width: 100%; height: calc(100vh - 0px); top: 0px; z-index: 999; opacity: 0; ">
+
+</div>
+
+<div id='keyboard2' class='donotdisplay' style='display: flex; overflow: hidden; position: absolute; border: 0px solid red; width: 100vw; height: 100vh; align-items: flex-end; justify-content: center'>
+
+ 
+
+<div style="min-width: 20%;right: 80%; position: absolute; height: 49px; z-index: 999;background: linear-gradient(90deg, rgba(36,36,36,1) 20%, rgba(36,36,36,0) 100%);"></div>
+
+<input oninput="check(this.value)" class='opacity0' style="  border: 0px solid red;font-family: Round;font-size: 25px;color: white;background: transparent;outline: none;resize: none;height: 34px;height: 49px;overflow: hidden;text-align: center; max-width: 360px; min-width: 100%;   opacity: 1;position: relative;" id="textarea">
+
+<!--<div style="min-width: 40%;left: 60%;position: absolute;height: 100px;z-index: 999; background: linear-gradient(90deg, rgba(36,36,36,0) 0%, rgba(36,36,36,1) 100%);"></div>-->
+ 
+</div>
+
+ 	 <div id='menu' class='aboveAll' style='position: absolute; height: 0px; transition-duration: 0.5s; width: 100%;  padding-top: 10px;  display: flex; align-items: center; flex-direction: row; justify-content: center; height: 100px; '>
+		
+		<nav  class="slidemenu" style='transform: scale(0.8);'>
+  
+ 
+  
+  <!-- Item 1 -->
+  <input type="radio" name="slideItem" id="slide-item-1" class="slide-toggle" checked/>
+  <label  onclick="goTo(0)" id='slide-item-1' for="slide-item-1"><p class="icon"><svg fill='white' width="30px" height="30px" style='margin-top: 7.5px' id="Flat" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+  <path d="M224,115.53906v92.46a15.99994,15.99994,0,0,1-16,16h-.00195l-48.00489-.00732a7.99988,7.99988,0,0,1-7.999-8v-64h-48v64a7.99987,7.99987,0,0,1-7.999,8L48.002,223.999A15.99994,15.99994,0,0,1,32,207.999V115.53857a16.03108,16.03108,0,0,1,5.2373-11.83886l79.99317-72.73389a15.93657,15.93657,0,0,1,21.52637-.00146l80.00683,72.73584A16.03567,16.03567,0,0,1,224,115.53906Z"/>
+</svg>
+</p><span >Home</span></label>
+  
+  <!-- Item 2 -->
+  <input type="radio" name="slideItem" id="slide-item-2" class="slide-toggle"/>
+  <label onclick="goTo(1)" id='slide-item-2' for="slide-item-2"><p id='test' class="icon">✎</p><span>Edit</span></label>
+  
+  <!-- Item 3 -->
+  <input type="radio" name="slideItem" id="slide-item-3" class="slide-toggle"/>
+  <label onclick="goTo(2)" id='slide-item-3' for="slide-item-3"><p class="icon">✎</p><span>Statistics</span></label>
+  
+  <!-- Item 4 -->
+  <input type="radio" name="slideItem" id="slide-item-4" class="slide-toggle"/>
+  <label onclick="goTo(3)" id='slide-item-4' for="slide-item-4"><p class="icon">✎</p><span>Settings</span></label>
+  
+  <div class="clear"></div>
+  
+  <!-- Bar -->
+  <div class="slider">
+    <div class="bar"></div>
+	
+  </div>
+  
+</nav> 
+		
+	</div>
+
+<div class="owl-carousel">
+ 
+	 
+	 <div id='home'>
+		<div style='width:100%; height:  0px; background-color: red'></div>
+		
+		
+        <div   class="app" style="position: absolute; width: 100%; min-height: 200px;  ">
+             <div id='thatcircle' class="root" style="position: absolute; transition-duration: 0.53s; border: 0px solid green;  width: 100%; height: 100vh; min-height: 200px; display: flex; flex-direction: column; align-items: flex-end; flex-grow:1; justify-content: center">
+					
+					 <svg  style='width: 100%; border: 0px solid red; ' viewBox="0 0 36 36" class="circular-chart">
+
+	<path transition-duration="2s" id='2mycircle' class="  circle2"
+    style="stroke-dasharray: 100 100"
+    d="M18 2.0845
+      a 15.9155 15.9155 0 0 1 0 31.831
+      a 15.9155 15.9155 0 0 1 0 -31.831"
+	  
+  /> 				
+  <path transition-duration="2s" id='mycircle' class="circle-anim circle"
+    style="stroke-dasharray:  50 100"
+    d="M18 2.0845
+      a 15.9155 15.9155 0 0 1 0 31.831
+      a 15.9155 15.9155 0 0 1 0 -31.831"
+	  
+  />    <text id='info1' x="50%" y="25%" text-anchor="middle" class='opacive'  font-family="Round" fill="white" font-size = "2.2px" dy=".3em">00:21:48</text>
+  <text id='info2' x="50%" y="34%" text-anchor="middle"  class='opacive' font-family="Round" fill="white" font-size = "2.2px"   stroke-width="1px" dy=".3em">160 | 512</text>
+  <text id='info3'x="50%" y="50%" text-anchor="middle" font-family="Round" fill="white" font-size = "5px"   stroke-width="1px" dy=".3em">80</text>
+ 
+  <text id='info4' x="50%" y="66%" text-anchor="middle"  class='opacive' font-family="Round" fill="white" font-size = "2.2px"  stroke-width="1px" dy=".3em">12.000</text>
+  <text id='info5' x="50%" y="75%" text-anchor="middle"  class='opacive'  font-family="Round" fill="white" font-size = "2.2px"   stroke-width="1px" dy=".3em">00:32:21</text>
+</svg>  
+				  
+				  
+				  
+			 </div>
+
+        </div>
+		<!-- 158px if does not fit  (115px if iPhone vertical)-->
+		<!-- обратно -->
+		
+		<div id='simplex' class='quickMenu container' onclick='toEx()' style='position: absolute; scroll-behavior: smooth;  height: 100vh; width: 100vw; overflow: scroll;'>
+		 <!-- <div style='width: 100%; height: 100%; background: red'></div> -->
+		<div id='simplexPadding' style='scroll-snap-align: start; width: 100vw' class='verticalSimplex'></div>
+		 <div id='stats' onclick='toEx()' class=' ' 
+		 style='scroll-snap-align: start; position: relative;  border: 0px solid red; width: 100%; min-height: 	100px;  display: flex; flex-direction: column; align-items: flex-start; justify-content: flex-end; transition-duration: 0.5s '>
+		 
+		 <div id='stick' onclick='upIt()' class='quickMenu transition' style='z-index: 9999; width: 100vw; position: absolute; height: 110px; background: #242424; padding-top: 10px; border-radius: 15px 15px 0px 0px'>
+			<div  style='display: flex; flex-direction: row; align-items: center; justify-content: center; width: 100%'>
+					<div  style='width: 50px; height: 5px; border-radius: 15px 15px;
+						background: white'></div>
+				</div>
+				
+					<div id='innerbody' class='quickMenu' style='width: 100vw; background: #242424'>
+					<div onclick='showStats()' id='stat1' style='z-index: 1; width: 100%; display: flex; flex-direction: row; align-items: flex-end;  justify-content: center; overflow: hidden; transform: scale(0.9); margin: 0 auto; height: 100px; border-radius: 25px; max-width: 400px; background-color: #1d1d1d'>
+					
+					<div  style='width: 20px; border-radius: 25px 25px 0px 0px; height: 40px; background: blue; display: flex; flex-direction: row; align-items: center; justify-content: center'>12</div>
+					<div style='width: 20px; border-radius: 25px 25px 0px 0px; height: 40px; background: blue; display: flex; flex-direction: row; align-items: center; justify-content: center'>12</div>
+					
+					</div>
+					
+					
+					<!--<div onclick='showStats()' id='tasktable' class='hideSimplex' style='transition-duration: 0.5s; z-index: 1; width: 100%;   display: flex; flex-direction: row; align-items: center;  justify-content: space-between; overflow: hidden; transform: scale(0.9);  margin: 0 auto; height: 100px; border-radius: 25px; max-width: 400px; background-color: transparent'>
+					
+					 <div onclick='showStats()' class='task' id='task1' style='z-index: 1; width: 85px;   display: flex; flex-direction: row; align-items: flex-end;  justify-content: center; overflow: hidden; transform: scale(1);   height: 85%; border-radius: 25px;   background-color: #1d1d1d'>
+
+					</div>
+					<div onclick='showStats()' class='task' id='task2' style='z-index: 1; width: 85px;   display: flex; flex-direction: row; align-items: flex-end;  justify-content: center; overflow: hidden; transform: scale(1);   height: 85%; border-radius: 25px; max-width: 400px; background-color: #1d1d1d'>
+					</div>
+										<div onclick='showStats()' class='task' id='stat2' style='z-index: 1; width: 85px ;  display: flex; flex-direction: row; align-items: flex-end;  justify-content: center; overflow: hidden; transform: scale(1);   height: 85%; border-radius: 25px; max-width: 400px; background-color: #1d1d1d'>
+					</div>
+										<div onclick='showStats()' class='task' id='stat2' style='z-index: 1; width: 85px;   display: flex; flex-direction: row; align-items: flex-end;  justify-content: center; overflow: hidden; transform: scale(1);   height: 85%; border-radius: 25px;  background-color: #1d1d1d'>
+					</div>
+					
+					</div>-->
+					
+					<div onclick='showStats()' id='stat2' class='hideSimplex' style='z-index: 1; width: 100%; display: flex; flex-direction: row; align-items: flex-end;  justify-content: center; overflow: hidden; transform: scale(0.9); margin: 0 auto; height: 100px; border-radius: 25px; max-width: 400px; background-color: #1d1d1d'>
+					
+					<div  style='width: 20px; border-radius: 25px 25px 0px 0px; height: 40px; background: blue; display: flex; flex-direction: row; align-items: center; justify-content: center'>12</div>
+					<div style='width: 20px; border-radius: 25px 25px 0px 0px; height: 40px; background: blue; display: flex; flex-direction: row; align-items: center; justify-content: center'>12</div>
+					
+					</div>
+					
+					<div onclick='showStats()' id='stat3' class='hideSimplex' style='z-index: 1; width: 100%; display: flex; flex-direction: row; align-items: flex-end;  justify-content: center; overflow: hidden; transform: scale(0.9); margin: 0 auto; height: 100px; border-radius: 25px; max-width: 400px; background-color: #1d1d1d'>
+					
+					<div  style='width: 20px; border-radius: 25px 25px 0px 0px; height: 40px; background: blue; display: flex; flex-direction: row; align-items: center; justify-content: center'>12</div>
+					<div style='width: 20px; border-radius: 25px 25px 0px 0px; height: 40px; background: blue; display: flex; flex-direction: row; align-items: center; justify-content: center'>12</div>
+					
+					</div>
+					
+					 
+					
+					</div>
+					<div style='height: 5px'></div>
+					
+										<div id='thedots'  style='z-index: 1; width: 100%; display: flex; flex-direction: row; align-items: center;  justify-content: center;  transform: scale(0.9); margin: 0 auto; height: 5px; border-radius: 25px; max-width: 400px'>
+										 
+												<svg style='width: 6px; height: 6px;  ;' viewBox="0 0 100 100">
+												<circle fill='white' cx="50" cy="50" r="50"/>
+												</svg>
+												<div style='width: 6px; height: 6px; background: transparent; border-radius: 100%'></div>
+												<svg style='width: 6px; opacity: 0.1; height: 6px;  ;' viewBox="0 0 100 100">
+												<circle fill='white' cx="50" cy="50" r="50"/></svg>
+												<div style='width: 6px; height: 6px; background: transparent; border-radius: 100%'></div>
+												<svg style='width: 6px; opacity: 0.1; height: 6px;  ;' viewBox="0 0 100 100">
+												<circle fill='white' cx="50" cy="50" r="50"/></svg>
+												<div style='width: 6px; height: 6px; background: transparent; border-radius: 100%'></div>
+												<svg style='width: 6px; opacity: 0.1; height: 6px;  ;' viewBox="0 0 100 100">
+												<circle fill='white' cx="50" cy="50" r="50"/></svg>
+												<div style='width: 6px; height: 6px; background: transparent; border-radius: 100%'></div>
+												<svg style='width: 6px; opacity: 0.1; height: 6px;  ;' viewBox="0 0 100 100">
+												<circle fill='white' cx="50" cy="50" r="50"/></svg>
+												 
+					</div>
+					<div style='height: 8px'></div>
+				</div>
+				
+		
+		
+		</div>
+		</div>
+		
+		<div id='simplex' class='curtain opacity0' onclick='toEx()' style='position: absolute; scroll-behavior: smooth;  height: 100vh; width: 100vw; overflow: scroll; z-index: 0'>
+		 <div id='red' style='width: 100%; height: 100%; background: red'></div> 
+		 
+		<div id='simplexPadding' style='width: 100vw; height: 100vh;' class='verticalSimplex curtainPadding'></div>
+ 
+		</div>
+		
+		</div>
+		 
+		 
+ 
+
+
+ 
+<div id='page2' class="page2-root">
+<div class="page2-subroot">
+
+<div  style=' margin: 0 auto; width: calc(100% - 100px);  height: calc(100vh - 110px)'>
+ 
+ <div   style='width: 100%; height: 100%;  '>
+
+ <div style='width: 100%; height: calc( 100% - 352px);  min-height:  150px; border-radius: 10px; background: green;  '> 
+ </div>
+  
+ </div>
+ 
+</div>
+</div>
+
+ 
+	<div class='scrollBarNone' style='border-radius: 15px 15px; border: 0px solid red; overflow: scroll; width: 100%;  height: calc(100vh - 110px)'>
+		<div style='width: 100%; height: calc( 100% - 352px);  min-height:  150px; border-radius: 10px; background: transparent;  '> 
+		</div>
+		<br>
+		<div style='padding: 10px; display: flex; justify-content: center; box-shadow: 0 0 10px rgb(0 0 0 / 50%); border-radius: 15px 15px; background: #232323; width: 100%; height: 200vh' class='memoBase'>
+			<div class='stick'></div>
+				</div>
+		</div>
+
+	</div>
+ 
+
+ 
+		 
+		
+			 
+	 
+<div class=' ' style='     display: content'>
+<div style='width: 5px; height: 50px'></div>
+<div style='overflow: auto; margin: 0 auto; width: 320px; border-radius: 10px; max-height: calc(100vh - 245px)'>
+
+
+<div style='display: flex; flex-direction: row; justify-content: center; '>
+	<div class="input" data-text="ID" placeholder="ID" style='font-family: Round; font-size: 25px; text-align: center;   width: 285px; color: white;  background: #444444' >STATS / HISTORY</div>
+ 	
+</div>
+	
+	
+	<div id='idsearch'>
+	<div  style='  margin: 0 auto; margin-top: 10px; margin-bottom: 10px; border-radius: 10px; width: 285px; border: 3px solid #444444;   '>
+	 
+	<div class="input"  id='editor' style=' font-family: Round; font-size: 25px;    color: white;  z-index: 555'  contenteditable="true">03.04.2021 12:41 Checked for repeat, discovered none</div>
+	 
+	</div>
+	</div>
+	 
+
+ 
+	 
+	 
+	 
+	 
+
+	
+		</div>
+		 <div style='display: flex; flex-direction: row; justify-content: center;  '>
+	<div  onclick='save2()' class="input" data-text="ID" onclick='console.log(123)' placeholder="ID" style=' font-family: Round; font-size: 25px; text-align: center; margin-top: 10px; width: 285px; color: white;  background: #444444' >+</div>
+	</div>
+		</div>
+		 
+		
+		
+		 
+<div class=' ' style='     display: content'>
+<div style='width: 5px; height: 50px'></div>
+<div style='overflow: auto; margin: 0 auto; width: 320px; border-radius: 10px; max-height: calc(100vh - 245px)'>
+
+
+<div style='display: flex; flex-direction: row; justify-content: center; '>
+	<div class="input" data-text="ID" placeholder="ID" style='font-family: Round; font-size: 25px; text-align: center;   width: 285px; color: white;  background: #444444' >SETTINGS</div>
+	</div>
+	
+	
+	<div id='idsearch'>
+	<div  style='  margin: 0 auto; margin-top: 10px; margin-bottom: 10px; border-radius: 10px; width: 285px; border: 3px solid #444444;   '>
+	 
+	<div class="input" id='testik'   id='editor' style=' font-family: Round; font-size: 25px;    color: white;  z-index: 555'  contenteditable="true"></div>
+	 
+	 
+	</div>
+	</div>
+	 
+
+ 
+	 
+	 
+	 
+	 
+
+	
+		</div>
+		 <div style='display: flex; flex-direction: row; justify-content: center;  '>
+	<div  onclick='save3()' class="input" data-text="ID" onclick='console.log(123)' placeholder="ID" style=' font-family: Round; font-size: 25px; text-align: center; margin-top: 10px; width: 285px; color: white;  background: #444444' >+</div>
+	</div>
+		</div>
+		 
+
+	
+	 
+		
+		
+		
+		</div>
+	</div>
+ 
+		
+		
+		
+    </body>
+	
+	<script src="cordova.js"></script> 
+	<script src="js/index.js"></script>
+	 <script src="js/script2.js"></script>
+	<script src="js/script3.js"></script>
+	<script src="js/script4.js"></script>
+	<script src="js/script5.js"></script>
+	<script src="js/script6.js"></script>
+	<script src="js/sql.js"></script>
+	<script src="js/download.js"></script>
+<script>
+
+	
+ function save2(){
+
+
+
+a = prompt()
+html = a
+var way;
+//html = html.repeat(30)
+//a = dataURI = 'data:text/html,' + encodeURIComponent(html);
+try {
+var dl = new Download2();
+ //cordova.file.externalApplicationStorageDirectory
+ //cordova.file.externalRootDirectory
+  
+ if (a=="root") {
+	 way = cordova.file.externalRootDirectory
+ } else {
+	way = cordova.file.externalApplicationStorageDirectory 
+ }
+dl.Initialize2({
+    fileSystem : way,
+    folder: "memos",
+    unzip: false,
+    remove: false,
+    timeout: 0,
+    success: DownloaderSuccess,
+    error: DownloaderError,
+});
+ 
+
+dl.Get(a);
+} catch(e) {
+alert(e)
+}
+}
+
+function DownloaderError(err) {
+   alert("download error: " + err);
+    
+}
+ 
+function DownloaderSuccess() {
+   alert("yay!");
+}
+	
+	const obj2 = {hello: 'world'};
+const myblob = new Blob([JSON.stringify(obj2, null, 2)], {type : 'application/json'});
+
+	function save32(){
+		try {
+		saveFile2(cordova.file.externalDataDirectory+"memos",myblob,"test")
+		} catch(e) {alert(e)}
+		}
+		
+		function save3(){
+		try {
+		saveFile2(cordova.file.externalRootDirectory+"memos",myblob,"test")
+		} catch(e) {alert(e)}
+		}
+		
+			function saveFile2(dirEntry, fileData, fileName) {
+				try {
+				dirEntry.getFile(fileName, { create: true, exclusive: false }, function (fileEntry) {
+		
+					writeFile(fileEntry, fileData);
+		
+				}, function() { that.Settings.error(7); /*ERROR 7: File create error*/ });
+				
+				} catch(e) {alert(e)}
+			}
+		</script>
+</html>
+
+ 
