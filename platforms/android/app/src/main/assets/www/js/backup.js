@@ -35,18 +35,18 @@ function exportData() {
     });
     dl.Get(a);
   } catch (e) {
-    //alert(e)
+    //console.log(e)
   }
 }
 
 function DownloaderError(err) {
-  // alert("download error: " + err);
+  // console.log("download error: " + err);
   notifier.show(`📨 Export error ${err}`,true)
   
 }
 
 function DownloaderSuccess() {
-  // alert("yay!");
+  // console.log("yay!");
   notifier.show("📨 Export complete")
 }
 
@@ -77,7 +77,7 @@ function gotFile(fileEntry) {
 
     reader.onloadend = function (e) {
       // console.log("Text is: " + this.result);
-      // alert(this.result);
+      // console.log(this.result);
       document.querySelector("#terminalCommands").value = this.result; //<-- this is import
     };
 

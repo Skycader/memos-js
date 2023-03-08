@@ -111,7 +111,7 @@ keyboard.exit = () => {
 window.addEventListener(
   "resize",
   function (event) {
-    // alert(window.innerHeight + " " + defaultWindowHeight)
+    // console.log(window.innerHeight + " " + defaultWindowHeight)
     if (!check.toggled && !fullscreenToggling) {
       window.location.reload(true);
     }
@@ -332,12 +332,12 @@ check.wrong = () => {
 };
 fullscreenToggling = 1;
 function toggleFullscreen() {
-  //alert(fullscreenToggling)
+  //console.log(fullscreenToggling)
   let elem = document.querySelector("html");
 
   if (!document.fullscreenElement) {
     elem.requestFullscreen().catch((err) => {
-      alert(
+      console.log(
         `Error attempting to enable full-screen mode: ${err.message} (${err.name})`
       );
     });

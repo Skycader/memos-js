@@ -119,7 +119,7 @@ function simplex2(){
 //dragElement(document.getElementById("stick"));
 //document.querySelector("#stick").addEventListener("touchmove",elementDrag,false)
 function lol(){
-	alert()
+	console.log()
 	}
 	document.touchstart = lol;
 	
@@ -169,7 +169,7 @@ function dragMouseDown(e) {
   
     function closeDragElement() {
  
-	//alert()
+	//console.log()
    //closeStats()
     /* stop moving when mouse button is released:*/
     document.onmouseup = null;

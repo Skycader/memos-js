@@ -3,7 +3,7 @@ var db = 0;
 try {
   db = openDatabase("MEMODB", "1.0", "OBJECTS DATABASE", null);
 } catch (e) {
-  alert("Websql is not supported!");
+  console.log("Websql is not supported!");
 }
 db.transaction(function (tx) {
   //rDATA - repeatition DATA; lrepeat - last repeat unix time; dur - duration;
@@ -13,11 +13,12 @@ db.transaction(function (tx) {
   tx.executeSql("CREATE TABLE IF NOT EXISTS DIRS (ID unique, PID, DATA)");
   tx.executeSql("CREATE TABLE IF NOT EXISTS MEMOROUTES (ID unique, DATA)");
   tx.executeSql("CREATE TABLE IF NOT EXISTS HISTORY (ID unique, DATA)");
-  tx.ececuteSql("CREATE INDEX IF NOT EXISTS OBJECTS_DATA ON OBJECTS (DATA)");
+  tx.executeSql("CREATE INDEX IF NOT EXISTS OBJECTS_DATA ON OBJECTS (DATA)");
   // tx.executeSql("ALTER TABLE DIRS RENAME COLUMN DIRDATA TO DATA;")
   // tx.executeSql("ALTER TABLE OBJECTS RENAME TO ITEMS ")
 });
 
+/*
 const openConnection = () => {
   db.transaction(function (tx) {
     //rDATA - repeatition DATA; lrepeat - last repeat unix time; dur - duration;
@@ -31,6 +32,7 @@ const openConnection = () => {
     // tx.executeSql("ALTER TABLE OBJECTS RENAME TO ITEMS ")
   });
 };
+* what's that for? 08.03.2023 /
 
 //The executeSql method is the following: executeSql(sqlStatement, arguments, callback, errorCallback)
 
@@ -71,7 +73,7 @@ sql = (query, callback, error, arg1, arg2, arg3) => {
       },
       function (tx, results) {
         console.log(results, query, "ERROR");
-		alert(JSON.stringify(results), JSON.stringify(query), JSON.stringify(tx))
+		console.log(JSON.stringify(results), JSON.stringify(query), JSON.stringify(tx))
         error(arg1, arg2, arg3);
       }
     );
@@ -117,7 +119,7 @@ mem.find = async (data) => {
   return await sql2(`select LOWER(data), * from objects where data like "%${data}%"`);
 };
 mem.collect = () => {
-
+try {
 	/*
 	switch (rightBulb) {
 		case 'green':
@@ -156,10 +158,12 @@ mem.collect = () => {
   addPriority(50)
   addChildrenIfNeeded(settings.minHours)
   addAdults()
+  
 
   function addChildrenIfNeeded(hours) {
 	sql(`SELECT CASE
 		WHEN (SELECT (1*RDATE-1*LREPEAT) AS INTERVAL FROM OBJECTS WHERE INTERVAL>7200000 ORDER BY INTERVAL LIMIT 1) > ${hours*60*60*1000} 
+		OR (SELECT COUNT(ID) AS IDX FROM OBJECTS)
 		THEN 1 
 		ELSE 0
 		END AS NEEDKIDS, 
@@ -223,7 +227,7 @@ mem.collect = () => {
     mem.collectCallback
   );
 	}
-
+} catch(e) {console.log(e)}
 };
 mem.fixLinker = () => {
   sql("select id,spec from objects", (res) => {
@@ -1106,7 +1110,8 @@ mem.count = async function () {
   );*/
  
 let kids = await sql2(`SELECT CASE
-		WHEN (SELECT (1*RDATE-1*LREPEAT) AS INTERVAL FROM OBJECTS WHERE INTERVAL>7200000 ORDER BY INTERVAL LIMIT 1) > ${settings.minHours*60*60*1000} 
+		WHEN (SELECT (1*RDATE-1*LREPEAT) AS INTERVAL FROM OBJECTS WHERE INTERVAL>7200000 ORDER BY INTERVAL LIMIT 1) > ${settings.minHours*60*60*1000}
+		OR (SELECT COUNT(ID) AS IDX FROM OBJECTS)
 		THEN 1 
 		ELSE 0
 		END AS NEEDKIDS, 
@@ -1262,13 +1267,13 @@ mem.setItem = function (PID, DATA, SPEC) {
     //   SPEC
     // );
   } else {
-    alert("CANNOT GENERATE UNIQUE ID");
+    console.log("CANNOT GENERATE UNIQUE ID");
   }
   //sql(`SELECT ID FROM OBJECTS WHERE ID = '${ID}'`);
 };
 
 mem.setItemError = (e) => {
-  alert("Error: ", e);
+  console.log("Error: ", e);
 };
 
 let G_PID = 0;
@@ -1292,7 +1297,7 @@ mem.setDir = (PID, DATA) => {
       DATA
     );
   } else {
-    alert("CANNOT GENERATE UNIQUE ID");
+    console.log("CANNOT GENERATE UNIQUE ID");
   }
 };
 
@@ -1375,7 +1380,7 @@ mem.addItem = (ID, ARRAY, QFIELDS) => {
       throw new Error("Too small");
     }
   } catch (e) {
-    alert("Error: ", e);
+    console.log("Error: ", e);
     notifier.show(`⚠️ Error during adding ${e}`, true);
     // console.log(e);
   }
@@ -1779,7 +1784,7 @@ mem.terminalCommand = (choice) => {
   if (pathNames.length == 0) {
     pathNames[0] = "/";
   }
-  // alert(choice)
+  // console.log(choice)
   command = choice.split(" ")[0].toLowerCase();
 
   switch (command) {
@@ -1883,7 +1888,7 @@ mem.terminalCommand = (choice) => {
         mem.addDir(path[path.length - 1], JSON.parse(DATA));
         // mem.browser(path[path.length - 1]);
       } catch (e) {
-        alert("Error during mkdir");
+        console.log("Error during mkdir");
         console.log(e);
       }
       break;
@@ -1901,7 +1906,7 @@ mem.terminalCommand = (choice) => {
         DATA = DATA.replaceAll("'", "''");
         mem.addItem(path[path.length - 1], JSON.parse(DATA));
       } catch (e) {
-        alert("Error during touch");
+        console.log("Error during touch");
         console.warn(e);
       }
       mem.collect();
@@ -1928,7 +1933,7 @@ mem.terminalCommand = (choice) => {
           mem.editDir(DIRID, DATA);
         }
       } catch (e) {
-        alert("Erro while editing");
+        console.log("Erro while editing");
       }
       break;
 
@@ -2423,7 +2428,7 @@ const readFields = (data) => {
 browser.postpone = async (id) => {
   let hours = 1 * prompt("Enter hours");
   if (isNaN(hours)) {
-    alert("Iput is not a number");
+    console.log("Iput is not a number");
     return;
   }
   await mem.setRDATE(id, hours * 1000 * 60 * 60);
@@ -2609,9 +2614,9 @@ var openFile = function (event) {
       importBackup(text);
       // var node = document.getElementById('output');
       // node.innerText = text;
-      // alert(text);
+      // console.log(text);
       // console.log(reader.result.substring(0, 200));
-      // alert(reader.result.substring(0, 200));
+      // console.log(reader.result.substring(0, 200));
     };
     reader.readAsText(input.files[0]);
   } catch (e) {
@@ -2667,9 +2672,9 @@ var openImage2 = function (event) {
       //importBackup(text);
       // var node = document.getElementById('output');
       // node.innerText = text;
-      // alert(text);
+      // console.log(text);
       // console.log(reader.result.substring(0, 200));
-      // alert(reader.result.substring(0, 200));
+      // console.log(reader.result.substring(0, 200));
     };
     reader.readAsText(input.files[0]);
   } catch (e) {

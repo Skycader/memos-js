@@ -12,7 +12,7 @@ class Settings {
 		if ((value*1).toFixed(0)>0) {
 			localStorage.setItem('minHours',value)
 		} else {
-			//alert("Error")
+			//console.log("Error")
 		}
 	} catch (e) {
 		console.log(e)

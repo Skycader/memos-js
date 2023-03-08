@@ -7,7 +7,7 @@ notify = (res, callback) => {
   }
   if (method == "update") {
     try {
-      //alert()
+      //console.log()
       console.log("update called");
       callback(res);
       // mem.res=res;
@@ -109,7 +109,7 @@ notify = (res, callback) => {
         check.clear();
 
         function inner() {
-          //alert()
+          //console.log()
           //check.next(mem.code)
         }
       } else {
@@ -145,7 +145,7 @@ notify = (res, callback) => {
       if (!mem.res) {
         mem.res = {};
       }
-      alert();
+      console.log();
       mem.res.obj = res;
 
       if (mem.res) {

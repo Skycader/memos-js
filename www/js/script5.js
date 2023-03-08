@@ -104,7 +104,7 @@ function goTo(x){
  
 //simplex2()
 //vibrate(x*100)
-//alert(window.innerWidth + " | " + window.innerHeight)
+//console.log(window.innerWidth + " | " + window.innerHeight)
 var a = Math.abs(Math.ceil(p())-x);
  
 if ((a==3)||(a==75)) {

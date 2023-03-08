@@ -29,16 +29,16 @@ function exportData() {
 
     dl.Get(a);
   } catch (e) {
-    alert(e);
+    console.log(e);
   }
 }
 
 function DownloaderError(err) {
-  alert("download error: " + err);
+  console.log("download error: " + err);
 }
 
 function DownloaderSuccess() {
-  alert("yay!");
+  console.log("yay!");
 }
 
 const obj2 = { hello: "world" };
@@ -50,7 +50,7 @@ function save32() {
   try {
     saveFile2(cordova.file.externalDataDirectory + "memos", myblob, "test");
   } catch (e) {
-    alert(e);
+    console.log(e);
   }
 }
 
@@ -58,7 +58,7 @@ function save3() {
   try {
     saveFile2(cordova.file.externalRootDirectory + "memos", myblob, "test");
   } catch (e) {
-    alert(e);
+    console.log(e);
   }
 }
 
@@ -75,7 +75,7 @@ function saveFile2(dirEntry, fileData, fileName) {
       }
     );
   } catch (e) {
-    alert(e);
+    console.log(e);
   }
 }
 
@@ -103,7 +103,7 @@ function gotFile(fileEntry) {
 
     reader.onloadend = function (e) {
       console.log("Text is: " + this.result);
-      alert(this.result);
+      console.log(this.result);
       document.querySelector("#terminalCommands").value = this.result;
     };
 

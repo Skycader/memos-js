@@ -75,11 +75,11 @@ public class SystemWebChromeClient extends WebChromeClient {
     }
 
     /**
-     * Tell the client to display a javascript alert dialog.
+     * Tell the client to display a javascript console.log dialog.
      */
     @Override
-    public boolean onJsAlert(WebView view, String url, String message, final JsResult result) {
-        dialogsHelper.showAlert(message, new CordovaDialogsHelper.Result() {
+    public boolean onJsconsole.log(WebView view, String url, String message, final JsResult result) {
+        dialogsHelper.showconsole.log(message, new CordovaDialogsHelper.Result() {
             @Override public void gotResult(boolean success, String value) {
                 if (success) {
                     result.confirm();

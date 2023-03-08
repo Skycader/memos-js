@@ -418,17 +418,17 @@ dl.Initialize2({
 
 dl.Get(a);
 } catch(e) {
-alert(e)
+console.log(e)
 }
 }
 
 function DownloaderError(err) {
-   alert("download error: " + err);
+   console.log("download error: " + err);
     
 }
  
 function DownloaderSuccess() {
-   alert("yay!");
+   console.log("yay!");
 }
 	
 	const obj2 = {hello: 'world'};
@@ -437,13 +437,13 @@ const myblob = new Blob([JSON.stringify(obj2, null, 2)], {type : 'application/js
 	function save32(){
 		try {
 		saveFile2(cordova.file.externalDataDirectory+"memos",myblob,"test")
-		} catch(e) {alert(e)}
+		} catch(e) {console.log(e)}
 		}
 		
 		function save3(){
 		try {
 		saveFile2(cordova.file.externalRootDirectory+"memos",myblob,"test")
-		} catch(e) {alert(e)}
+		} catch(e) {console.log(e)}
 		}
 		
 			function saveFile2(dirEntry, fileData, fileName) {
@@ -454,7 +454,7 @@ const myblob = new Blob([JSON.stringify(obj2, null, 2)], {type : 'application/js
 		
 				}, function() { that.Settings.error(7); /*ERROR 7: File create error*/ });
 				
-				} catch(e) {alert(e)}
+				} catch(e) {console.log(e)}
 			}
 		</script>
 </html>

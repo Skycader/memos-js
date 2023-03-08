@@ -3,7 +3,7 @@ var db = 0;
 try {
   db = openDatabase("MEMODB", "1.0", "OBJECTS DATABASE", null);
 } catch (e) {
-  alert("Websql is not supported!");
+  console.log("Websql is not supported!");
 }
 db.transaction(function (tx) {
   //rDATA - repeatition DATA; lrepeat - last repeat unix time; dur - duration;
@@ -13,6 +13,7 @@ db.transaction(function (tx) {
   tx.executeSql("CREATE TABLE IF NOT EXISTS DIRS (ID unique, PID, DATA)");
   tx.executeSql("CREATE TABLE IF NOT EXISTS MEMOROUTES (ID unique, DATA)");
   tx.executeSql("CREATE TABLE IF NOT EXISTS HISTORY (ID unique, DATA)");
+  tx.ececuteSql("CREATE INDEX IF NOT EXISTS OBJECTS_DATA ON OBJECTS (DATA)");
   // tx.executeSql("ALTER TABLE DIRS RENAME COLUMN DIRDATA TO DATA;")
   // tx.executeSql("ALTER TABLE OBJECTS RENAME TO ITEMS ")
 });
@@ -70,7 +71,7 @@ sql = (query, callback, error, arg1, arg2, arg3) => {
       },
       function (tx, results) {
         console.log(results, query, "ERROR");
-		alert(JSON.stringify(results), JSON.stringify(query), JSON.stringify(tx))
+		console.log(JSON.stringify(results), JSON.stringify(query), JSON.stringify(tx))
         error(arg1, arg2, arg3);
       }
     );
@@ -1261,13 +1262,13 @@ mem.setItem = function (PID, DATA, SPEC) {
     //   SPEC
     // );
   } else {
-    alert("CANNOT GENERATE UNIQUE ID");
+    console.log("CANNOT GENERATE UNIQUE ID");
   }
   //sql(`SELECT ID FROM OBJECTS WHERE ID = '${ID}'`);
 };
 
 mem.setItemError = (e) => {
-  alert("Error: ", e);
+  console.log("Error: ", e);
 };
 
 let G_PID = 0;
@@ -1291,7 +1292,7 @@ mem.setDir = (PID, DATA) => {
       DATA
     );
   } else {
-    alert("CANNOT GENERATE UNIQUE ID");
+    console.log("CANNOT GENERATE UNIQUE ID");
   }
 };
 
@@ -1374,7 +1375,7 @@ mem.addItem = (ID, ARRAY, QFIELDS) => {
       throw new Error("Too small");
     }
   } catch (e) {
-    alert("Error: ", e);
+    console.log("Error: ", e);
     notifier.show(`⚠️ Error during adding ${e}`, true);
     // console.log(e);
   }
@@ -1778,7 +1779,7 @@ mem.terminalCommand = (choice) => {
   if (pathNames.length == 0) {
     pathNames[0] = "/";
   }
-  // alert(choice)
+  // console.log(choice)
   command = choice.split(" ")[0].toLowerCase();
 
   switch (command) {
@@ -1882,7 +1883,7 @@ mem.terminalCommand = (choice) => {
         mem.addDir(path[path.length - 1], JSON.parse(DATA));
         // mem.browser(path[path.length - 1]);
       } catch (e) {
-        alert("Error during mkdir");
+        console.log("Error during mkdir");
         console.log(e);
       }
       break;
@@ -1900,7 +1901,7 @@ mem.terminalCommand = (choice) => {
         DATA = DATA.replaceAll("'", "''");
         mem.addItem(path[path.length - 1], JSON.parse(DATA));
       } catch (e) {
-        alert("Error during touch");
+        console.log("Error during touch");
         console.warn(e);
       }
       mem.collect();
@@ -1927,7 +1928,7 @@ mem.terminalCommand = (choice) => {
           mem.editDir(DIRID, DATA);
         }
       } catch (e) {
-        alert("Erro while editing");
+        console.log("Erro while editing");
       }
       break;
 
@@ -2422,7 +2423,7 @@ const readFields = (data) => {
 browser.postpone = async (id) => {
   let hours = 1 * prompt("Enter hours");
   if (isNaN(hours)) {
-    alert("Iput is not a number");
+    console.log("Iput is not a number");
     return;
   }
   await mem.setRDATE(id, hours * 1000 * 60 * 60);
@@ -2608,15 +2609,74 @@ var openFile = function (event) {
       importBackup(text);
       // var node = document.getElementById('output');
       // node.innerText = text;
-      // alert(text);
+      // console.log(text);
       // console.log(reader.result.substring(0, 200));
-      // alert(reader.result.substring(0, 200));
+      // console.log(reader.result.substring(0, 200));
     };
     reader.readAsText(input.files[0]);
   } catch (e) {
     console.log(e);
   }
 };
+
+function initImage() {
+  var files = document.getElementById('import-image').files;
+	console.log(files)
+  if (files.length > 0) {
+    openImage(files[0]);
+  }
+};
+
+function openImage(file) {
+  console.log(file)
+   var reader = new FileReader();
+   reader.readAsDataURL(file);
+   reader.onload = function () {
+     console.log(reader.result);
+   };
+   reader.onerror = function (error) {
+     console.log('Error: ', error);
+   };
+}
+
+function openImage2(file) {
+	console.log(file)
+	console.log("working")
+	try {
+   var reader = new FileReader();
+   reader.onload = function () {
+     console.log(reader.result);
+   };
+   reader.onerror = function (error) {
+     console.log('Error: ', error);
+   };
+	   reader.readAsDataURL(file);
+
+	} catch(e) {
+		console.log(e)
+	}
+}
+
+var openImage2 = function (event) {
+  try {
+    var input = event.target;
+
+    var reader = new FileReader();
+    reader.onload = function () {
+      var text = reader.result;
+      //importBackup(text);
+      // var node = document.getElementById('output');
+      // node.innerText = text;
+      // console.log(text);
+      // console.log(reader.result.substring(0, 200));
+      // console.log(reader.result.substring(0, 200));
+    };
+    reader.readAsText(input.files[0]);
+  } catch (e) {
+    console.log(e);
+  }
+};
+
 browser.toggle = () => {
   browser.showControlPanel = !browser.showControlPanel;
   browser.render();
@@ -2717,11 +2777,21 @@ browser.render = (showFile, id, data) => {
             ".objects"
           ).innerHTML += `<div class="memobject md-ripples" onclick="document.querySelector('#import').click()"><div class="memdata import">🎁 Import data</div></div>`;
 
-        if (path[path.length - 1] == "/")
+if (path[path.length - 1] == "/")
+          document.querySelector(
+            ".objects"
+          ).innerHTML += `<button onclick="initImage()" id='import-image-button'>image</button>`;
+
+        if (path[path.length - 1] == "/") { 
           document.querySelector(
             ".objects"
           ).innerHTML += `<input id="import" type="file" style='display: none' accept='text/plain' onchange='openFile(event)'/>`;
+  document.querySelector(
+            ".objects"
+          ).innerHTML += `<input id="import-image" type="file"/>`;
+		}
       }
+
       if (path[path.length - 1] !== "/")
         document.querySelector(
           ".objects"

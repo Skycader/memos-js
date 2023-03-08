@@ -57,7 +57,7 @@ function r() {
   
  if (document.querySelector(".page2-node4").scrollTop > scrollHeight()) {
     // document.querySelector("#slide-item-4 span").innerHTML = "touch end"
-   //  alert("Touchend")
+   //  console.log("Touchend")
 //  document.querySelector(".page2-node4").classList.add("nonScroll")
 if (touchEnd) {
  document.querySelector(".page2-node4").classList.add("nonScroll")

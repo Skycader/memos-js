@@ -126,7 +126,7 @@ public final class Builder {
         builder = findOrCreateBuilder()
                 .setDefaults(options.getDefaults())
                 .setExtras(extras)
-                .setOnlyAlertOnce(false)
+                .setOnlyconsole.logOnce(false)
                 .setChannelId(options.getChannel())
                 .setContentTitle(options.getTitle())
                 .setContentText(options.getText())

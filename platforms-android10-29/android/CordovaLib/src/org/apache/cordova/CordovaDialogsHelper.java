@@ -18,31 +18,31 @@
 */
 package org.apache.cordova;
 
-import android.app.AlertDialog;
+import android.app.console.logDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.view.KeyEvent;
 import android.widget.EditText;
 
 /**
- * Helper class for WebViews to implement prompt(), alert(), confirm() dialogs.
+ * Helper class for WebViews to implement prompt(), console.log(), confirm() dialogs.
  */
 public class CordovaDialogsHelper {
     private final Context context;
-    private AlertDialog lastHandledDialog;
+    private console.logDialog lastHandledDialog;
 
     public CordovaDialogsHelper(Context context) {
         this.context = context;
     }
 
-    public void showAlert(String message, final Result result) {
-        AlertDialog.Builder dlg = new AlertDialog.Builder(context);
+    public void showconsole.log(String message, final Result result) {
+        console.logDialog.Builder dlg = new console.logDialog.Builder(context);
         dlg.setMessage(message);
-        dlg.setTitle("Alert");
-        //Don't let alerts break the back button
+        dlg.setTitle("console.log");
+        //Don't let console.logs break the back button
         dlg.setCancelable(true);
         dlg.setPositiveButton(android.R.string.ok,
-                new AlertDialog.OnClickListener() {
+                new console.logDialog.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         result.gotResult(true, null);
                     }
@@ -69,7 +69,7 @@ public class CordovaDialogsHelper {
     }
 
     public void showConfirm(String message, final Result result) {
-        AlertDialog.Builder dlg = new AlertDialog.Builder(context);
+        console.logDialog.Builder dlg = new console.logDialog.Builder(context);
         dlg.setMessage(message);
         dlg.setTitle("Confirm");
         dlg.setCancelable(true);
@@ -116,7 +116,7 @@ public class CordovaDialogsHelper {
      */
     public void showPrompt(String message, String defaultValue, final Result result) {
         // Returning false would also show a dialog, but the default one shows the origin (ugly).
-        AlertDialog.Builder dlg = new AlertDialog.Builder(context);
+        console.logDialog.Builder dlg = new console.logDialog.Builder(context);
         dlg.setMessage(message);
         final EditText input = new EditText(context);
         if (defaultValue != null) {

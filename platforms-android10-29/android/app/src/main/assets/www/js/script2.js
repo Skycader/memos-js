@@ -128,8 +128,8 @@ var ready = false;
  //setTimeout(initApp,5000)
 
 window.onerror = function(msg, url, linenumber) {
-   //Error alert
-    //alert('Error message: '+msg+'\nURL: '+url+'\nLine Number: '+linenumber);
+   //Error console.log
+    //console.log('Error message: '+msg+'\nURL: '+url+'\nLine Number: '+linenumber);
     return true;
 } 
 
@@ -137,7 +137,7 @@ function runApp(){
   try {
    initApp();
    } catch(e) {
-   alert(e)}
+   console.log(e)}
    }
 function initApp() {
  

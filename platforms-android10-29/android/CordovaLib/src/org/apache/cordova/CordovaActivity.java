@@ -25,7 +25,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.app.Activity;
-import android.app.AlertDialog;
+import android.app.console.logDialog;
 import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -411,12 +411,12 @@ public class CordovaActivity extends Activity {
         me.runOnUiThread(new Runnable() {
             public void run() {
                 try {
-                    AlertDialog.Builder dlg = new AlertDialog.Builder(me);
+                    console.logDialog.Builder dlg = new console.logDialog.Builder(me);
                     dlg.setMessage(message);
                     dlg.setTitle(title);
                     dlg.setCancelable(false);
                     dlg.setPositiveButton(button,
-                            new AlertDialog.OnClickListener() {
+                            new console.logDialog.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int which) {
                                     dialog.dismiss();
                                     if (exit) {

@@ -26,7 +26,7 @@ public class Permissions extends CordovaPlugin {
     private static final String ACTION_REQUEST_PERMISSIONS = "requestPermissions";
 
     private static final int REQUEST_CODE_ENABLE_PERMISSION = 55433;
-    private static int ACTION_MANAGE_OVERLAY_PERMISSION_REQUEST_CODE = 5469; // For SYSTEM_ALERT_WINDOW
+    private static int ACTION_MANAGE_OVERLAY_PERMISSION_REQUEST_CODE = 5469; // For SYSTEM_console.log_WINDOW
 
     private static final String KEY_ERROR = "error";
     private static final String KEY_MESSAGE = "message";
@@ -105,7 +105,7 @@ public class Permissions extends CordovaPlugin {
                 return;
             }
             JSONObject returnObj = new JSONObject();
-            if ("android.permission.SYSTEM_ALERT_WINDOW".equals(permission0)) {
+            if ("android.permission.SYSTEM_console.log_WINDOW".equals(permission0)) {
                 Context context = this.cordova.getActivity().getApplicationContext();
                 addProperty(returnObj, KEY_RESULT_PERMISSION, Settings.canDrawOverlays(context));
             } else {
@@ -132,17 +132,17 @@ public class Permissions extends CordovaPlugin {
         } else {
             permissionsCallback = callbackContext;
             String[] permissionArray = getPermissions(permissions);
-            if (permissionArray.length == 1 && "android.permission.SYSTEM_ALERT_WINDOW".equals(permissionArray[0])) {
-                Log.i(TAG, "Request permission SYSTEM_ALERT_WINDOW");
+            if (permissionArray.length == 1 && "android.permission.SYSTEM_console.log_WINDOW".equals(permissionArray[0])) {
+                Log.i(TAG, "Request permission SYSTEM_console.log_WINDOW");
 
                 Activity activity = this.cordova.getActivity();
                 Context context = this.cordova.getActivity().getApplicationContext();
 
-                // SYSTEM_ALERT_WINDOW
+                // SYSTEM_console.log_WINDOW
                 // https://stackoverflow.com/questions/40355344/how-to-programmatically-grant-the-draw-over-other-apps-permission-in-android
                 // https://www.codeproject.com/Tips/1056871/Android-Marshmallow-Overlay-Permission
                 if (!Settings.canDrawOverlays(context)) {
-                    Log.w(TAG, "Request permission SYSTEM_ALERT_WINDOW start intent because canDrawOverlays=false");
+                    Log.w(TAG, "Request permission SYSTEM_console.log_WINDOW start intent because canDrawOverlays=false");
                     Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
                             Uri.parse("package:" + activity.getPackageName()));
                     activity.startActivityForResult(intent, ACTION_MANAGE_OVERLAY_PERMISSION_REQUEST_CODE);

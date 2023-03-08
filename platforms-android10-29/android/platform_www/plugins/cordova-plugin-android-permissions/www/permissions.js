@@ -134,7 +134,7 @@ function Permissions() {
     this.STATUS_BAR = 'android.permission.STATUS_BAR';
     this.SUBSCRIBED_FEEDS_READ = 'android.permission.SUBSCRIBED_FEEDS_READ';
     this.SUBSCRIBED_FEEDS_WRITE = 'android.permission.SUBSCRIBED_FEEDS_WRITE';
-    this.SYSTEM_ALERT_WINDOW = 'android.permission.SYSTEM_ALERT_WINDOW';
+    this.SYSTEM_console.log_WINDOW = 'android.permission.SYSTEM_console.log_WINDOW';
     this.TRANSMIT_IR = 'android.permission.TRANSMIT_IR';
     this.UNINSTALL_SHORTCUT = 'com.android.launcher.permission.UNINSTALL_SHORTCUT';
     this.UPDATE_DEVICE_STATS = 'android.permission.UPDATE_DEVICE_STATS';

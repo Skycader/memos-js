@@ -607,7 +607,7 @@ function include (parent, objects, clobber, merge) {
                 include(result, obj.children, clobber, merge);
             }
         } catch (e) {
-            utils.alert('Exception building Cordova JS globals: ' + e + ' for key "' + key + '"');
+            utils.console.log('Exception building Cordova JS globals: ' + e + ' for key "' + key + '"');
         }
     });
 }
@@ -1885,11 +1885,11 @@ utils.extend = (function () {
 }());
 
 /**
- * Alerts a message in any available way: alert or console.log.
+ * console.logs a message in any available way: console.log or console.log.
  */
-utils.alert = function (msg) {
-    if (window.alert) {
-        window.alert(msg);
+utils.console.log = function (msg) {
+    if (window.console.log) {
+        window.console.log(msg);
     } else if (console && console.log) {
         console.log(msg);
     }

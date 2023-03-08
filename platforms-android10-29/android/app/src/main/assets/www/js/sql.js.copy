@@ -97,7 +97,7 @@ notify = (res,callback) => { //notify is called any time sql is called
 	}
 	if (method=="update") {
       try {
-		  //alert()
+		  //console.log()
 		  console.log("update called")
          callback(res)
 		 // mem.res=res;
@@ -213,7 +213,7 @@ notify = (res,callback) => { //notify is called any time sql is called
             check.clear();
              
 			function inner() {
-				//alert()
+				//console.log()
 				//check.next(mem.code)
 			}
             
