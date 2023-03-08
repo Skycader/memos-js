@@ -607,9 +607,12 @@ mem.check = (answer) => {
 	  
 	  check.wrong()
 		  }
+		  /*
 	  if (mem.typoCount > 6) {
+		  alert()
 		mem.answer(0)
 	  }
+	  */
 	  mem.writingDirection = -1
   } else {
 	  mem.writingDirection = 1

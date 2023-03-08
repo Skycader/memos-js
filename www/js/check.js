@@ -185,7 +185,6 @@ check.focus = () => {
 	check.lastSkip = Date.now()
     mem.answered++;
 	//mem.typoCount = 0 /* Обнуление счётчика опечаток */
-	mem.setTypoCount(0)
     check.next(0.5);
     check.skipped = 0;
   }
@@ -221,6 +220,8 @@ check.exit = () => {
 cards = {};
 cards.timerInterval = 0;
 cards.init = () => {
+	try {
+
   check.lastSkip = Date.now()
   document.querySelector("#papers").classList.remove("off")
   cards.animation = 1;
@@ -243,7 +244,7 @@ cards.init = () => {
 
   // cards.set(4);
   mem.setTypoCount(0)
-
+	} catch(e) {console.log(e)}
 };
 
 cards.p1 = () => {

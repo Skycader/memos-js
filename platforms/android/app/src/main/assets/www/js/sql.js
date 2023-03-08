@@ -13,11 +13,12 @@ db.transaction(function (tx) {
   tx.executeSql("CREATE TABLE IF NOT EXISTS DIRS (ID unique, PID, DATA)");
   tx.executeSql("CREATE TABLE IF NOT EXISTS MEMOROUTES (ID unique, DATA)");
   tx.executeSql("CREATE TABLE IF NOT EXISTS HISTORY (ID unique, DATA)");
-  tx.ececuteSql("CREATE INDEX IF NOT EXISTS OBJECTS_DATA ON OBJECTS (DATA)");
+  tx.executeSql("CREATE INDEX IF NOT EXISTS OBJECTS_DATA ON OBJECTS (DATA)");
   // tx.executeSql("ALTER TABLE DIRS RENAME COLUMN DIRDATA TO DATA;")
   // tx.executeSql("ALTER TABLE OBJECTS RENAME TO ITEMS ")
 });
 
+/*
 const openConnection = () => {
   db.transaction(function (tx) {
     //rDATA - repeatition DATA; lrepeat - last repeat unix time; dur - duration;
@@ -31,6 +32,7 @@ const openConnection = () => {
     // tx.executeSql("ALTER TABLE OBJECTS RENAME TO ITEMS ")
   });
 };
+* what's that for? 08.03.2023 /
 
 //The executeSql method is the following: executeSql(sqlStatement, arguments, callback, errorCallback)
 
@@ -117,7 +119,7 @@ mem.find = async (data) => {
   return await sql2(`select LOWER(data), * from objects where data like "%${data}%"`);
 };
 mem.collect = () => {
-
+try {
 	/*
 	switch (rightBulb) {
 		case 'green':
@@ -156,10 +158,12 @@ mem.collect = () => {
   addPriority(50)
   addChildrenIfNeeded(settings.minHours)
   addAdults()
+  
 
   function addChildrenIfNeeded(hours) {
 	sql(`SELECT CASE
 		WHEN (SELECT (1*RDATE-1*LREPEAT) AS INTERVAL FROM OBJECTS WHERE INTERVAL>7200000 ORDER BY INTERVAL LIMIT 1) > ${hours*60*60*1000} 
+		OR (SELECT COUNT(ID) AS IDX FROM OBJECTS)
 		THEN 1 
 		ELSE 0
 		END AS NEEDKIDS, 
@@ -223,7 +227,7 @@ mem.collect = () => {
     mem.collectCallback
   );
 	}
-
+} catch(e) {console.log(e)}
 };
 mem.fixLinker = () => {
   sql("select id,spec from objects", (res) => {
@@ -603,9 +607,12 @@ mem.check = (answer) => {
 	  
 	  check.wrong()
 		  }
+		  /*
 	  if (mem.typoCount > 6) {
+		  alert()
 		mem.answer(0)
 	  }
+	  */
 	  mem.writingDirection = -1
   } else {
 	  mem.writingDirection = 1
@@ -1106,7 +1113,8 @@ mem.count = async function () {
   );*/
  
 let kids = await sql2(`SELECT CASE
-		WHEN (SELECT (1*RDATE-1*LREPEAT) AS INTERVAL FROM OBJECTS WHERE INTERVAL>7200000 ORDER BY INTERVAL LIMIT 1) > ${settings.minHours*60*60*1000} 
+		WHEN (SELECT (1*RDATE-1*LREPEAT) AS INTERVAL FROM OBJECTS WHERE INTERVAL>7200000 ORDER BY INTERVAL LIMIT 1) > ${settings.minHours*60*60*1000}
+		OR (SELECT COUNT(ID) AS IDX FROM OBJECTS)
 		THEN 1 
 		ELSE 0
 		END AS NEEDKIDS, 

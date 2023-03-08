@@ -295,6 +295,8 @@ dependencies {
 
     // SUB-PROJECT DEPENDENCIES START
     implementation(project(path: ":CordovaLib"))
+    implementation "androidx.webkit:webkit:1.4.0"
+    implementation "org.nanohttpd:nanohttpd:+"
     // SUB-PROJECT DEPENDENCIES END
 }
 
