@@ -17,7 +17,7 @@
        under the License.
  */
 
-package com.vodri.memos11;
+package com.vodri.memos;
 
 import android.os.Bundle;
 import org.apache.cordova.*;

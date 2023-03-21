@@ -103,37 +103,37 @@
   },
   "installed_plugins": {
     "cordova-plugin-android-permissions": {
-      "PACKAGE_NAME": "com.vodri.memos11"
+      "PACKAGE_NAME": "com.vodri.memos"
     },
     "cordova-plugin-badge": {
-      "PACKAGE_NAME": "com.vodri.memos11"
+      "PACKAGE_NAME": "com.vodri.memos"
     },
     "cordova-plugin-device": {
-      "PACKAGE_NAME": "com.vodri.memos11"
+      "PACKAGE_NAME": "com.vodri.memos"
     },
     "cordova-plugin-file": {
-      "PACKAGE_NAME": "com.vodri.memos11"
+      "PACKAGE_NAME": "com.vodri.memos"
     },
     "cordova-plugin-local-notification": {
-      "PACKAGE_NAME": "com.vodri.memos11"
+      "PACKAGE_NAME": "com.vodri.memos"
     },
     "cordova-plugin-navigationbar-color": {
-      "PACKAGE_NAME": "com.vodri.memos11"
+      "PACKAGE_NAME": "com.vodri.memos"
     },
     "cordova-plugin-splashscreen": {
-      "PACKAGE_NAME": "com.vodri.memos11"
+      "PACKAGE_NAME": "com.vodri.memos"
     },
     "cordova-plugin-statusbar": {
-      "PACKAGE_NAME": "com.vodri.memos11"
+      "PACKAGE_NAME": "com.vodri.memos"
     },
     "cordova-plugin-vibration": {
-      "PACKAGE_NAME": "com.vodri.memos11"
+      "PACKAGE_NAME": "com.vodri.memos"
     },
     "cordova-plugin-webserver": {
-      "PACKAGE_NAME": "com.vodri.memos11"
+      "PACKAGE_NAME": "com.vodri.memos"
     },
     "cordova-plugin-whitelist": {
-      "PACKAGE_NAME": "com.vodri.memos11"
+      "PACKAGE_NAME": "com.vodri.memos"
     }
   },
   "dependent_plugins": {},
