@@ -43,6 +43,7 @@
   "dependencies": {
     "cordova": "^9.0.0",
     "cordova-plugin-local-notifications": "^1.0.0",
-    "cordova-plugin-signed-bundle": "^1.0.1"
+    "cordova-plugin-signed-bundle": "^1.0.1",
+    "passport-jwt": "^4.0.1"
   }
 }
