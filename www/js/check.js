@@ -443,7 +443,7 @@ cards.initTimer = () => {
 cards.checkTimer = () => {
   // theTime = new Date()
   let width = $(".cardTimer").width();
-  if (width != undefined) {
+  if (document.querySelectorAll(".win").length === 0) {
     if (width == 0) {
       cards.allowNull = 0;
       mem.answer(0);
