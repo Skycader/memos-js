@@ -50,13 +50,13 @@ function onDeviceReady() {
    // openMemos()
 
    
-	NavigationBar.backgroundColorByHexString("#242424", false);
+	// NavigationBar.backgroundColorByHexString("#242424", false);
    
-	if (cordova.platformId == 'android') {
-            StatusBar.backgroundColorByHexString("#242424");
-            StatusBar.overlaysWebView(false)
+// 	if (cordova.platformId == 'android') {
+//             StatusBar.backgroundColorByHexString("#242424");
+//             StatusBar.overlaysWebView(false)
   
-}
+// }
    console.log('Running cordova-' + cordova.platformId + '@' + cordova.version);
      
 }
