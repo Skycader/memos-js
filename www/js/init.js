@@ -50,14 +50,23 @@ function onDeviceReady() {
    // openMemos()
 
    
-	// NavigationBar.backgroundColorByHexString("#242424", false);
+	NavigationBar.backgroundColorByHexString("#242424", false);
    
-// 	if (cordova.platformId == 'android') {
-//             StatusBar.backgroundColorByHexString("#242424");
-//             StatusBar.overlaysWebView(false)
+    
+   
+	if (cordova.platformId == 'android') {
+
+      
+        setTimeout(()=>{
+            StatusBar.backgroundColorByHexString("#242424");
+            StatusBar.overlaysWebView(false)
+            alert("SWITCH")
+        },2000)
+        
+   
   
-// }
-   console.log('Running cordova-' + cordova.platformId + '@' + cordova.version);
+}
+    // alert('Running cordova-' + cordova.platformId + '@' + cordova.version);
      
 }
 
