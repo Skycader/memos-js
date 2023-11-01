@@ -49,23 +49,21 @@ function onDeviceReady() {
     setTimeout(curtain,1000)
    // openMemos()
 
-   try {
+   
 	NavigationBar.backgroundColorByHexString("#242424", false);
-   } catch(e) {
-    alert(e)
-   }
-    
+   
     
  
 	if (cordova.platformId == 'android') {
 
-        try {  
-            
-        StatusBar.backgroundColorByHexString("#242424");
-        StatusBar.overlaysWebView(false)
-    } catch(e) {
-            alert(e)
-        }
+      
+        setTimeout(()=>{
+            StatusBar.backgroundColorByHexString("#242424");
+            StatusBar.overlaysWebView(false)
+            alert("SWITCH")
+        },2000)
+        
+   
   
 }
     console.log('Running cordova-' + cordova.platformId + '@' + cordova.version);
