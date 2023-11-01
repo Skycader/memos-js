@@ -48,13 +48,25 @@ function onDeviceReady() {
     document.querySelector(".curtain").scrollBy(0,$("#red").height()+100) 
     setTimeout(curtain,1000)
    // openMemos()
+
+   try {
 	NavigationBar.backgroundColorByHexString("#242424", false);
+   } catch(e) {
+    alert(e)
+   }
     
     
  
 	if (cordova.platformId == 'android') {
-    StatusBar.backgroundColorByHexString("#242424");
-	StatusBar.overlaysWebView(false)
+
+        try {  
+            
+        StatusBar.backgroundColorByHexString("#242424");
+        StatusBar.overlaysWebView(false)
+    } catch(e) {
+            alert(e)
+        }
+  
 }
     console.log('Running cordova-' + cordova.platformId + '@' + cordova.version);
      
