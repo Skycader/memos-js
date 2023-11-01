@@ -53,7 +53,7 @@ function onDeviceReady() {
 	NavigationBar.backgroundColorByHexString("#242424", false);
    
     
- 
+    alert(cordova.platformId)
 	if (cordova.platformId == 'android') {
 
       
@@ -66,7 +66,7 @@ function onDeviceReady() {
    
   
 }
-    console.log('Running cordova-' + cordova.platformId + '@' + cordova.version);
+    alert('Running cordova-' + cordova.platformId + '@' + cordova.version);
      
 }
 
