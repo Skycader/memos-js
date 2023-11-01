@@ -10,6 +10,10 @@
     </author>
     <content src="index.html" />
     <access origin="*" />
+    <preference name="StatusBarOverlaysWebView" value="false" />
+    <preference name="StatusBarBackgroundColor" value="#242424" />
+    <preference name="NavigationBarBackgroundColor" value="#242424" />
+    <preference name="NavigationBarLight" value="true" />
 	<preference name="SplashScreen" value="true"/>
 	<preference name = "SplashMaintainAspectRatio" value = "true" />
 	<preference name="ShowSplashScreenSpinner" value="false"/>

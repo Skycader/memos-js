@@ -52,21 +52,12 @@ function onDeviceReady() {
    
 	NavigationBar.backgroundColorByHexString("#242424", false);
    
-    
-    alert(cordova.platformId)
 	if (cordova.platformId == 'android') {
-
-      
-        setTimeout(()=>{
             StatusBar.backgroundColorByHexString("#242424");
             StatusBar.overlaysWebView(false)
-            alert("SWITCH")
-        },2000)
-        
-   
   
 }
-    alert('Running cordova-' + cordova.platformId + '@' + cordova.version);
+   console.log('Running cordova-' + cordova.platformId + '@' + cordova.version);
      
 }
 
